@@ -20,7 +20,7 @@
   - Write image optimization and processing utilities
   - _Requirements: 1.3, 1.4, 7.4_
 
-- [ ] 4. Create blog listing page with article display
+- [x] 4. Create blog listing page with article display
   - Implement `app/routes/blog/route.tsx` with loader for article metadata
   - Create `app/routes/blog/article-card.tsx` component for article preview display
   - Build article sorting and pagination functionality
