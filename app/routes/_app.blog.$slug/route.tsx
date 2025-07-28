@@ -26,7 +26,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
   ];
 };
 
-export const loader = async ({ params }: Route.LoaderArgs) => {
+export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const { slug } = params;
 
   if (!slug) {
@@ -34,7 +34,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
   }
 
   // Load article metadata
-  const article = await loadArticleBySlug(slug);
+  const article = await loadArticleBySlug(slug, request);
 
   if (!article) {
     throw new Response('Article not found', { status: 404 });

@@ -9,8 +9,8 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async (): Promise<{ articles: Awaited<ReturnType<typeof loadArticleMetadata>>; }> => {
-  const articles = await loadArticleMetadata();
+export const loader = async ({ request }: Route.LoaderArgs): Promise<{ articles: Awaited<ReturnType<typeof loadArticleMetadata>>; }> => {
+  const articles = await loadArticleMetadata(request);
 
   // Sort articles by publication date (newest first) and filter published articles
   const publishedArticles = articles

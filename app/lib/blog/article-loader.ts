@@ -11,7 +11,7 @@ interface ArticleCache {
 /**
  * Loads article metadata from the generated cache file
  */
-export async function loadArticleMetadata(): Promise<ArticleMetadata[]> {
+export async function loadArticleMetadata(request?: Request): Promise<ArticleMetadata[]> {
   try {
     let cache: ArticleCache;
 
@@ -24,7 +24,15 @@ export async function loadArticleMetadata(): Promise<ArticleMetadata[]> {
       cache = JSON.parse(content);
     } else {
       // In browser environment, fetch from server
-      const response = await fetch("/blog-metadata.json");
+      let url = "/blog-metadata.json";
+
+      // If we have a request object (SSR), construct absolute URL
+      if (request) {
+        const requestUrl = new URL(request.url);
+        url = `${requestUrl.origin}/blog-metadata.json`;
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         console.warn(
@@ -61,8 +69,9 @@ export async function loadArticleMetadata(): Promise<ArticleMetadata[]> {
  */
 export async function loadArticleBySlug(
   slug: string,
+  request?: Request,
 ): Promise<ArticleMetadata | null> {
-  const articles = await loadArticleMetadata();
+  const articles = await loadArticleMetadata(request);
   return articles.find((article) => article.slug === slug) || null;
 }
 
@@ -71,16 +80,17 @@ export async function loadArticleBySlug(
  */
 export async function loadArticlesByTag(
   tag: string,
+  request?: Request,
 ): Promise<ArticleMetadata[]> {
-  const articles = await loadArticleMetadata();
+  const articles = await loadArticleMetadata(request);
   return articles.filter((article) => article.tags.includes(tag));
 }
 
 /**
  * Gets all unique tags from articles
  */
-export async function getAllTags(): Promise<string[]> {
-  const articles = await loadArticleMetadata();
+export async function getAllTags(request?: Request): Promise<string[]> {
+  const articles = await loadArticleMetadata(request);
   const tagSet = new Set<string>();
 
   articles.forEach((article) => {
