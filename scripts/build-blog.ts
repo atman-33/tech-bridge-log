@@ -16,10 +16,22 @@ async function buildBlog() {
     // Generate article cache
     const cache = await generateArticleCache();
 
-    // Write cache to public directory
-    await writeFile('public/blog-metadata.json', JSON.stringify(cache, null, 2));
+    // Write cache to public directory (excluding errors and stats from the JSON file)
+    const cacheForPublic = {
+      articles: cache.articles,
+      generatedAt: cache.generatedAt,
+    };
+
+    await writeFile('public/blog-metadata.json', JSON.stringify(cacheForPublic, null, 2));
 
     console.log(`✅ Generated metadata for ${cache.articles.length} articles`);
+    console.log(`📊 Processing stats: ${cache.stats.processed}/${cache.stats.total} successful, ${cache.stats.failed} failed`);
+
+    if (cache.errors.length > 0) {
+      console.log(`⚠️  ${cache.errors.length} errors encountered:`);
+      cache.errors.forEach(error => console.log(`   - ${error}`));
+    }
+
     console.log(`📝 Cache written to public/blog-metadata.json`);
 
   } catch (error) {

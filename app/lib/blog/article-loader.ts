@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import type { ArticleMetadata } from "./mdx-processor";
+import { validateArticleMetadata } from "./mdx-processor";
 
 interface ArticleCache {
   articles: ArticleMetadata[];
@@ -35,12 +36,17 @@ export async function loadArticleMetadata(): Promise<ArticleMetadata[]> {
       cache = await response.json();
     }
 
-    // Convert date strings back to Date objects
-    return cache.articles.map((article) => ({
-      ...article,
-      publishedAt: new Date(article.publishedAt),
-      updatedAt: new Date(article.updatedAt),
-    }));
+    // Convert date strings back to Date objects and validate metadata
+    return cache.articles.map((article, index) => {
+      const articleWithDates = {
+        ...article,
+        publishedAt: new Date(article.publishedAt),
+        updatedAt: new Date(article.updatedAt),
+      };
+
+      // Validate the article metadata structure
+      return validateArticleMetadata(articleWithDates, `cache article ${index} (${article.slug})`);
+    });
   } catch (error) {
     console.error("Error loading article metadata:", error);
     return [];
