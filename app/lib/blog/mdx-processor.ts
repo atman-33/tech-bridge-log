@@ -1,9 +1,14 @@
 import { existsSync } from "node:fs";
-import { copyFile, mkdir, readdir, readFile } from "node:fs/promises";
-import { dirname, extname, join } from "node:path";
+import { readdir, readFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { compile } from "@mdx-js/mdx";
 import matter from "gray-matter";
 import readingTime from "reading-time";
+import {
+  processArticleImages,
+  resolveThumbnailPath,
+  validateThumbnailPath,
+} from "./image-processor";
 
 export interface ArticleMetadata {
   slug: string;
@@ -34,13 +39,32 @@ interface ArticleFrontmatter {
  * Validation schema for article frontmatter fields
  */
 const FRONTMATTER_VALIDATION = {
-  title: { type: 'string', required: true, minLength: 1, maxLength: 200 },
-  slug: { type: 'string', required: true, pattern: /^[a-z0-9-]+$/, minLength: 1, maxLength: 100 },
-  publishedAt: { type: 'string', required: true, pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/ },
-  updatedAt: { type: 'string', required: true, pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/ },
-  tags: { type: 'array', required: true, minLength: 1, maxLength: 10 },
-  description: { type: 'string', required: true, minLength: 10, maxLength: 500 },
-  thumbnail: { type: 'string', required: true, minLength: 1 }
+  title: { type: "string", required: true, minLength: 1, maxLength: 200 },
+  slug: {
+    type: "string",
+    required: true,
+    pattern: /^[a-z0-9-]+$/,
+    minLength: 1,
+    maxLength: 100,
+  },
+  publishedAt: {
+    type: "string",
+    required: true,
+    pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/,
+  },
+  updatedAt: {
+    type: "string",
+    required: true,
+    pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/,
+  },
+  tags: { type: "array", required: true, minLength: 1, maxLength: 10 },
+  description: {
+    type: "string",
+    required: true,
+    minLength: 10,
+    maxLength: 500,
+  },
+  thumbnail: { type: "string", required: true, minLength: 1 },
 } as const;
 
 const BLOG_CONTENT_DIR = "contents/blog";
@@ -49,7 +73,11 @@ const PUBLIC_ASSETS_DIR = "public/blog-assets";
 /**
  * Enhanced reading time calculation with customizable options
  */
-function calculateReadingTime(content: string): { minutes: number; words: number; text: string; } {
+function calculateReadingTime(content: string): {
+  minutes: number;
+  words: number;
+  text: string;
+} {
   const stats = readingTime(content, {
     wordsPerMinute: 200, // Average reading speed
   });
@@ -64,50 +92,68 @@ function calculateReadingTime(content: string): { minutes: number; words: number
 /**
  * Validates that an ArticleMetadata object has all required properties with correct types
  */
-export function validateArticleMetadata(metadata: unknown, source: string): ArticleMetadata {
-  if (typeof metadata !== 'object' || metadata === null) {
+export function validateArticleMetadata(
+  metadata: unknown,
+  source: string,
+): ArticleMetadata {
+  if (typeof metadata !== "object" || metadata === null) {
     throw new Error(`Invalid article metadata in ${source}. Expected object.`);
   }
 
   const meta = metadata as Record<string, unknown>;
-  const required = ['slug', 'title', 'description', 'publishedAt', 'updatedAt', 'tags', 'thumbnail', 'readingTime'];
+  const required = [
+    "slug",
+    "title",
+    "description",
+    "publishedAt",
+    "updatedAt",
+    "tags",
+    "thumbnail",
+    "readingTime",
+  ];
 
   for (const field of required) {
     if (!(field in meta)) {
-      throw new Error(`Missing required field "${field}" in article metadata from ${source}`);
+      throw new Error(
+        `Missing required field "${field}" in article metadata from ${source}`,
+      );
     }
   }
 
   // Type validations
-  if (typeof meta.slug !== 'string') {
+  if (typeof meta.slug !== "string") {
     throw new Error(`Invalid slug type in ${source}. Expected string.`);
   }
 
-  if (typeof meta.title !== 'string') {
+  if (typeof meta.title !== "string") {
     throw new Error(`Invalid title type in ${source}. Expected string.`);
   }
 
-  if (typeof meta.description !== 'string') {
+  if (typeof meta.description !== "string") {
     throw new Error(`Invalid description type in ${source}. Expected string.`);
   }
 
   if (!(meta.publishedAt instanceof Date)) {
-    throw new Error(`Invalid publishedAt type in ${source}. Expected Date object.`);
+    throw new Error(
+      `Invalid publishedAt type in ${source}. Expected Date object.`,
+    );
   }
 
   if (!(meta.updatedAt instanceof Date)) {
-    throw new Error(`Invalid updatedAt type in ${source}. Expected Date object.`);
+    throw new Error(
+      `Invalid updatedAt type in ${source}. Expected Date object.`,
+    );
   }
 
   if (!Array.isArray(meta.tags)) {
     throw new Error(`Invalid tags type in ${source}. Expected array.`);
   }
 
-  if (typeof meta.thumbnail !== 'string') {
+  if (typeof meta.thumbnail !== "string") {
     throw new Error(`Invalid thumbnail type in ${source}. Expected string.`);
   }
 
-  if (typeof meta.readingTime !== 'number') {
+  if (typeof meta.readingTime !== "number") {
     throw new Error(`Invalid readingTime type in ${source}. Expected number.`);
   }
 
@@ -117,13 +163,17 @@ export function validateArticleMetadata(metadata: unknown, source: string): Arti
 /**
  * Sanitizes and normalizes article metadata
  */
-export function sanitizeArticleMetadata(metadata: ArticleMetadata): ArticleMetadata {
+export function sanitizeArticleMetadata(
+  metadata: ArticleMetadata,
+): ArticleMetadata {
   return {
     ...metadata,
     title: metadata.title.trim(),
     description: metadata.description.trim(),
     slug: metadata.slug.toLowerCase().trim(),
-    tags: metadata.tags.map(tag => tag.toLowerCase().trim()).filter(tag => tag.length > 0),
+    tags: metadata.tags
+      .map((tag) => tag.toLowerCase().trim())
+      .filter((tag) => tag.length > 0),
     thumbnail: metadata.thumbnail.trim(),
   };
 }
@@ -138,7 +188,9 @@ export function isArticlePublished(metadata: ArticleMetadata): boolean {
 /**
  * Gets articles that are ready to be published
  */
-export function getPublishedArticles(articles: ArticleMetadata[]): ArticleMetadata[] {
+export function getPublishedArticles(
+  articles: ArticleMetadata[],
+): ArticleMetadata[] {
   return articles.filter(isArticlePublished);
 }
 
@@ -153,8 +205,13 @@ function validateField(
   const rules = FRONTMATTER_VALIDATION[fieldName];
 
   // Check if field is required and missing
-  if (rules.required && (value === undefined || value === null || value === '')) {
-    throw new Error(`Missing required frontmatter field "${fieldName}" in ${filePath}`);
+  if (
+    rules.required &&
+    (value === undefined || value === null || value === "")
+  ) {
+    throw new Error(
+      `Missing required frontmatter field "${fieldName}" in ${filePath}`,
+    );
   }
 
   // Skip further validation if field is not required and missing
@@ -163,47 +220,63 @@ function validateField(
   }
 
   // Type validation
-  if (rules.type === 'string' && typeof value !== 'string') {
-    throw new Error(`Invalid ${fieldName} type in ${filePath}. Expected string, got ${typeof value}.`);
+  if (rules.type === "string" && typeof value !== "string") {
+    throw new Error(
+      `Invalid ${fieldName} type in ${filePath}. Expected string, got ${typeof value}.`,
+    );
   }
 
-  if (rules.type === 'array' && !Array.isArray(value)) {
-    throw new Error(`Invalid ${fieldName} type in ${filePath}. Expected array, got ${typeof value}.`);
+  if (rules.type === "array" && !Array.isArray(value)) {
+    throw new Error(
+      `Invalid ${fieldName} type in ${filePath}. Expected array, got ${typeof value}.`,
+    );
   }
 
   // String-specific validations
-  if (rules.type === 'string' && typeof value === 'string') {
-    if ('minLength' in rules && value.length < rules.minLength) {
-      throw new Error(`${fieldName} in ${filePath} must be at least ${rules.minLength} characters long.`);
+  if (rules.type === "string" && typeof value === "string") {
+    if ("minLength" in rules && value.length < rules.minLength) {
+      throw new Error(
+        `${fieldName} in ${filePath} must be at least ${rules.minLength} characters long.`,
+      );
     }
 
-    if ('maxLength' in rules && value.length > rules.maxLength) {
-      throw new Error(`${fieldName} in ${filePath} must be no more than ${rules.maxLength} characters long.`);
+    if ("maxLength" in rules && value.length > rules.maxLength) {
+      throw new Error(
+        `${fieldName} in ${filePath} must be no more than ${rules.maxLength} characters long.`,
+      );
     }
 
-    if ('pattern' in rules && !rules.pattern.test(value)) {
+    if ("pattern" in rules && !rules.pattern.test(value)) {
       throw new Error(`${fieldName} in ${filePath} has invalid format.`);
     }
   }
 
   // Array-specific validations
-  if (rules.type === 'array' && Array.isArray(value)) {
-    if ('minLength' in rules && value.length < rules.minLength) {
-      throw new Error(`${fieldName} in ${filePath} must have at least ${rules.minLength} items.`);
+  if (rules.type === "array" && Array.isArray(value)) {
+    if ("minLength" in rules && value.length < rules.minLength) {
+      throw new Error(
+        `${fieldName} in ${filePath} must have at least ${rules.minLength} items.`,
+      );
     }
 
-    if ('maxLength' in rules && value.length > rules.maxLength) {
-      throw new Error(`${fieldName} in ${filePath} must have no more than ${rules.maxLength} items.`);
+    if ("maxLength" in rules && value.length > rules.maxLength) {
+      throw new Error(
+        `${fieldName} in ${filePath} must have no more than ${rules.maxLength} items.`,
+      );
     }
 
     // Validate that all array items are strings for tags
-    if (fieldName === 'tags') {
+    if (fieldName === "tags") {
       for (const tag of value) {
-        if (typeof tag !== 'string') {
-          throw new Error(`All tags in ${filePath} must be strings. Found ${typeof tag}.`);
+        if (typeof tag !== "string") {
+          throw new Error(
+            `All tags in ${filePath} must be strings. Found ${typeof tag}.`,
+          );
         }
         if (tag.length === 0) {
-          throw new Error(`Empty tag found in ${filePath}. All tags must be non-empty strings.`);
+          throw new Error(
+            `Empty tag found in ${filePath}. All tags must be non-empty strings.`,
+          );
         }
       }
     }
@@ -225,7 +298,9 @@ function validateFrontmatter(
   const fm = frontmatter as Record<string, unknown>;
 
   // Validate each field according to its rules
-  for (const fieldName of Object.keys(FRONTMATTER_VALIDATION) as Array<keyof typeof FRONTMATTER_VALIDATION>) {
+  for (const fieldName of Object.keys(FRONTMATTER_VALIDATION) as Array<
+    keyof typeof FRONTMATTER_VALIDATION
+  >) {
     validateField(fieldName, fm[fieldName], filePath);
   }
 
@@ -233,23 +308,31 @@ function validateFrontmatter(
   const publishedAt = new Date(fm.publishedAt as string);
   const updatedAt = new Date(fm.updatedAt as string);
 
-  if (isNaN(publishedAt.getTime())) {
-    throw new Error(`Invalid publishedAt date format in ${filePath}. Expected ISO 8601 format.`);
+  if (Number.isNaN(publishedAt.getTime())) {
+    throw new Error(
+      `Invalid publishedAt date format in ${filePath}. Expected ISO 8601 format.`,
+    );
   }
 
-  if (isNaN(updatedAt.getTime())) {
-    throw new Error(`Invalid updatedAt date format in ${filePath}. Expected ISO 8601 format.`);
+  if (Number.isNaN(updatedAt.getTime())) {
+    throw new Error(
+      `Invalid updatedAt date format in ${filePath}. Expected ISO 8601 format.`,
+    );
   }
 
   if (updatedAt < publishedAt) {
-    throw new Error(`updatedAt cannot be earlier than publishedAt in ${filePath}.`);
+    throw new Error(
+      `updatedAt cannot be earlier than publishedAt in ${filePath}.`,
+    );
   }
 
   // Check for duplicate tags
   const tags = fm.tags as string[];
   const uniqueTags = new Set(tags);
   if (uniqueTags.size !== tags.length) {
-    throw new Error(`Duplicate tags found in ${filePath}. All tags must be unique.`);
+    throw new Error(
+      `Duplicate tags found in ${filePath}. All tags must be unique.`,
+    );
   }
 
   // After validation, we can safely cast to ArticleFrontmatter
@@ -290,54 +373,6 @@ export async function discoverArticles(): Promise<string[]> {
 }
 
 /**
- * Copies images from article directory to public assets directory
- */
-async function copyArticleAssets(
-  articleDir: string,
-  slug: string,
-): Promise<void> {
-  const publicDir = join(PUBLIC_ASSETS_DIR, slug);
-
-  // Ensure public directory exists
-  if (!existsSync(dirname(publicDir))) {
-    await mkdir(dirname(publicDir), { recursive: true });
-  }
-  if (!existsSync(publicDir)) {
-    await mkdir(publicDir, { recursive: true });
-  }
-
-  const entries = await readdir(articleDir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (entry.isFile() && entry.name !== "index.mdx") {
-      const ext = extname(entry.name).toLowerCase();
-      const imageExtensions = [
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".gif",
-        ".svg",
-        ".webp",
-      ];
-
-      if (imageExtensions.includes(ext)) {
-        const sourcePath = join(articleDir, entry.name);
-        const destPath = join(publicDir, entry.name);
-
-        try {
-          await copyFile(sourcePath, destPath);
-        } catch (error) {
-          console.warn(
-            `Failed to copy asset ${sourcePath} to ${destPath}:`,
-            error,
-          );
-        }
-      }
-    }
-  }
-}
-
-/**
  * Processes a single MDX file and extracts metadata
  */
 export async function processArticle(
@@ -356,13 +391,29 @@ export async function processArticle(
   const articleDir = dirname(filePath);
   const slug = validatedFrontmatter.slug;
 
-  // Copy article assets to public directory
-  await copyArticleAssets(articleDir, slug);
+  // Process article images using enhanced image processor
+  const imageResult = await processArticleImages(articleDir, slug);
 
-  // Process thumbnail path
-  let thumbnailPath = validatedFrontmatter.thumbnail;
-  if (thumbnailPath.startsWith("./")) {
-    thumbnailPath = `/blog-assets/${slug}/${thumbnailPath.slice(2)}`;
+  // Log any image processing errors
+  if (imageResult.errors.length > 0) {
+    console.warn(`Image processing warnings for ${slug}:`, imageResult.errors);
+  }
+
+  // Resolve and validate thumbnail path
+  const thumbnailPath = resolveThumbnailPath(
+    validatedFrontmatter.thumbnail,
+    slug,
+  );
+  const thumbnailValidation = validateThumbnailPath(
+    validatedFrontmatter.thumbnail,
+    imageResult.assets,
+    slug,
+  );
+
+  if (!thumbnailValidation.isValid) {
+    console.warn(
+      `Thumbnail validation warning for ${slug}: ${thumbnailValidation.error}`,
+    );
   }
 
   const metadata: ArticleMetadata = {
@@ -372,7 +423,7 @@ export async function processArticle(
     publishedAt: new Date(validatedFrontmatter.publishedAt),
     updatedAt: new Date(validatedFrontmatter.updatedAt),
     tags: validatedFrontmatter.tags,
-    thumbnail: thumbnailPath,
+    thumbnail: thumbnailValidation.resolvedPath,
     readingTime: readingStats.minutes,
   };
 
@@ -457,11 +508,13 @@ export async function generateArticleCache(): Promise<{
     failed: articlePaths.length - articles.length,
   };
 
-  console.log(`Article processing complete: ${stats.processed}/${stats.total} successful, ${stats.failed} failed`);
+  console.log(
+    `Article processing complete: ${stats.processed}/${stats.total} successful, ${stats.failed} failed`,
+  );
 
   if (errors.length > 0) {
     console.warn(`${errors.length} errors encountered during processing:`);
-    errors.forEach(error => console.warn(`  - ${error}`));
+    errors.forEach((error) => console.warn(`  - ${error}`));
   }
 
   return {

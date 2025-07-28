@@ -175,13 +175,13 @@ describe("Frontmatter Validation", () => {
         throw new Error('Missing required frontmatter field "title"');
       }
       if (!/^[a-z0-9-]+$/.test(invalidFrontmatter.slug)) {
-        throw new Error('slug has invalid format');
+        throw new Error("slug has invalid format");
       }
       if (invalidFrontmatter.tags.length === 0) {
-        throw new Error('tags must have at least 1 items');
+        throw new Error("tags must have at least 1 items");
       }
       if (invalidFrontmatter.description.length < 10) {
-        throw new Error('description must be at least 10 characters long');
+        throw new Error("description must be at least 10 characters long");
       }
     }).toThrow();
   });
@@ -192,15 +192,15 @@ describe("Frontmatter Validation", () => {
 
     expect(() => {
       const date = new Date(invalidDate);
-      if (isNaN(date.getTime())) {
-        throw new Error('Invalid date format');
+      if (Number.isNaN(date.getTime())) {
+        throw new Error("Invalid date format");
       }
-    }).toThrow('Invalid date format');
+    }).toThrow("Invalid date format");
 
     expect(() => {
       const date = new Date(validDate);
-      if (isNaN(date.getTime())) {
-        throw new Error('Invalid date format');
+      if (Number.isNaN(date.getTime())) {
+        throw new Error("Invalid date format");
       }
     }).not.toThrow();
   });
@@ -211,8 +211,8 @@ describe("Frontmatter Validation", () => {
 
     expect(() => {
       if (updatedAt < publishedAt) {
-        throw new Error('updatedAt cannot be earlier than publishedAt');
+        throw new Error("updatedAt cannot be earlier than publishedAt");
       }
-    }).toThrow('updatedAt cannot be earlier than publishedAt');
+    }).toThrow("updatedAt cannot be earlier than publishedAt");
   });
 });

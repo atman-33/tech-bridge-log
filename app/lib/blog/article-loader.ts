@@ -45,7 +45,10 @@ export async function loadArticleMetadata(): Promise<ArticleMetadata[]> {
       };
 
       // Validate the article metadata structure
-      return validateArticleMetadata(articleWithDates, `cache article ${index} (${article.slug})`);
+      return validateArticleMetadata(
+        articleWithDates,
+        `cache article ${index} (${article.slug})`,
+      );
     });
   } catch (error) {
     console.error("Error loading article metadata:", error);
