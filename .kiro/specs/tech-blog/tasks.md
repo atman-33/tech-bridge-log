@@ -27,7 +27,7 @@
   - Implement article metadata loading and caching in route loader
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 5. Implement individual article page with MDX rendering
+- [x] 5. Implement individual article page with MDX rendering
   - Create `app/routes/blog.$slug/route.tsx` with dynamic article loading
   - Build `app/routes/blog.$slug/article-content.tsx` for MDX content rendering
   - Implement MDX compilation and React component rendering

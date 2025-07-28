@@ -1,7 +1,6 @@
 import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { compile } from "@mdx-js/mdx";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import {
@@ -432,7 +431,7 @@ export async function processArticle(
 }
 
 /**
- * Loads and compiles MDX content for a specific article
+ * Loads raw MDX content for a specific article (without compilation)
  */
 export async function loadArticleContent(slug: string): Promise<string | null> {
   const articlePath = join(BLOG_CONTENT_DIR, slug, "index.mdx");
@@ -444,18 +443,10 @@ export async function loadArticleContent(slug: string): Promise<string | null> {
   const content = await readFile(articlePath, "utf-8");
   const { content: mdxContent } = matter(content);
 
-  try {
-    const compiled = await compile(mdxContent, {
-      outputFormat: "function-body",
-      development: process.env.NODE_ENV === "development",
-    });
-
-    return String(compiled);
-  } catch (error) {
-    console.error(`Failed to compile MDX for ${slug}:`, error);
-    return null;
-  }
+  return mdxContent;
 }
+
+
 
 /**
  * Processes all articles and generates metadata cache with comprehensive validation

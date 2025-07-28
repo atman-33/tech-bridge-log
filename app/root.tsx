@@ -29,6 +29,10 @@ export const links: Route.LinksFunction = () => [
 		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
 	},
 	{
+		rel: "stylesheet",
+		href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
+	},
+	{
 		rel: 'apple-touch-icon',
 		sizes: '180x180',
 		href: '/favicons/apple-touch-icon.png',
