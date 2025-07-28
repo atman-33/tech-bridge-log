@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Set up core blog infrastructure and MDX processing
+- [x] 1. Set up core blog infrastructure and MDX processing
   - Create directory structure for blog content management
   - Implement MDX file discovery and frontmatter parsing utilities
   - Set up build-time article metadata extraction and caching
