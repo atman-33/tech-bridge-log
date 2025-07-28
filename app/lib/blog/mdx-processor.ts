@@ -50,8 +50,15 @@ function validateFrontmatter(
     "thumbnail",
   ];
 
+  // First assert frontmatter is an object
+  if (typeof frontmatter !== "object" || frontmatter === null) {
+    throw new Error(`Invalid frontmatter in ${filePath}. Expected object.`);
+  }
+
+  const fm = frontmatter as Record<string, unknown>;
+
   for (const field of required) {
-    if (!frontmatter[field]) {
+    if (!fm[field]) {
       throw new Error(
         `Missing required frontmatter field "${field}" in ${filePath}`,
       );
@@ -59,19 +66,28 @@ function validateFrontmatter(
   }
 
   // Validate data types
-  if (typeof frontmatter.title !== "string") {
+  if (typeof fm.title !== "string") {
     throw new Error(`Invalid title type in ${filePath}. Expected string.`);
   }
 
-  if (typeof frontmatter.slug !== "string") {
+  if (typeof fm.slug !== "string") {
     throw new Error(`Invalid slug type in ${filePath}. Expected string.`);
   }
 
-  if (!Array.isArray(frontmatter.tags)) {
+  if (!Array.isArray(fm.tags)) {
     throw new Error(`Invalid tags type in ${filePath}. Expected array.`);
   }
 
-  return frontmatter as ArticleFrontmatter;
+  // After validation, we can safely cast to ArticleFrontmatter
+  return {
+    title: fm.title as string,
+    slug: fm.slug as string,
+    publishedAt: fm.publishedAt as string,
+    updatedAt: fm.updatedAt as string,
+    tags: fm.tags as string[],
+    description: fm.description as string,
+    thumbnail: fm.thumbnail as string,
+  };
 }
 
 /**
