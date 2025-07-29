@@ -76,7 +76,10 @@ const BLOG_CONTENT_DIR = join(PROJECT_ROOT, "contents/blog");
 const PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
 
 // Use import.meta.glob to load MDX files at build time (Vite + SSR compatible)
-const mdxModules = import.meta.glob('/contents/blog/**/index.mdx', { as: 'raw' });
+// This will be undefined in Node.js environment
+const mdxModules = typeof import.meta.glob !== 'undefined'
+  ? import.meta.glob('/contents/blog/**/index.mdx', { as: 'raw' })
+  : {};
 
 /**
  * Enhanced reading time calculation with customizable options
@@ -359,11 +362,34 @@ function validateFrontmatter(
  * Discovers all MDX files in the blog content directory
  */
 export async function discoverArticles(): Promise<string[]> {
-  // Use import.meta.glob to discover articles at build time
-  const moduleKeys = Object.keys(mdxModules);
-  console.log('discoverArticles - found modules:', moduleKeys);
+  // In Vite environment, use import.meta.glob
+  if (Object.keys(mdxModules).length > 0) {
+    const moduleKeys = Object.keys(mdxModules);
+    console.log('discoverArticles - found modules:', moduleKeys);
+    return moduleKeys;
+  }
 
-  return moduleKeys;
+  // In Node.js environment, use file system
+  if (!existsSync(BLOG_CONTENT_DIR)) {
+    console.log('discoverArticles - blog content directory does not exist:', BLOG_CONTENT_DIR);
+    return [];
+  }
+
+  const articles: string[] = [];
+  const entries = await readdir(BLOG_CONTENT_DIR, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const indexPath = join(BLOG_CONTENT_DIR, entry.name, 'index.mdx');
+      if (existsSync(indexPath)) {
+        // Convert to the format expected by import.meta.glob
+        articles.push(`/contents/blog/${entry.name}/index.mdx`);
+      }
+    }
+  }
+
+  console.log('discoverArticles - found articles:', articles);
+  return articles;
 }
 
 /**
@@ -372,13 +398,20 @@ export async function discoverArticles(): Promise<string[]> {
 export async function processArticle(
   filePath: string,
 ): Promise<ArticleMetadata> {
-  // Load content using import.meta.glob
-  const moduleLoader = mdxModules[filePath];
-  if (!moduleLoader) {
-    throw new Error(`Article not found: ${filePath}`);
-  }
+  let content: string;
 
-  const content = await moduleLoader();
+  // Load content using import.meta.glob in Vite environment
+  const moduleLoader = mdxModules[filePath];
+  if (moduleLoader) {
+    content = await moduleLoader();
+  } else {
+    // In Node.js environment, read from file system
+    const absolutePath = join(PROJECT_ROOT, filePath.replace(/^\//, ''));
+    if (!existsSync(absolutePath)) {
+      throw new Error(`Article not found: ${absolutePath}`);
+    }
+    content = await readFile(absolutePath, 'utf-8');
+  }
   const { data: frontmatter, content: mdxContent } = matter(content);
 
   // Validate frontmatter

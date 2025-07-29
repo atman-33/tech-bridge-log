@@ -1,12 +1,10 @@
 import type { Route } from './+types/route';
 import { loadArticleMetadata } from '~/lib/blog/article-loader';
+import { generateBlogListingMetaTags } from '~/lib/seo';
 import { ArticleCard } from './article-card';
 
 export const meta: Route.MetaFunction = () => {
-  return [
-    { title: 'Tech Blog - Latest Articles' },
-    { name: 'description', content: 'Discover the latest technical articles and insights from our blog.' },
-  ];
+  return generateBlogListingMetaTags();
 };
 
 export const loader = async ({ request }: Route.LoaderArgs): Promise<{ articles: Awaited<ReturnType<typeof loadArticleMetadata>>; }> => {

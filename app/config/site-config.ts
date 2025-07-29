@@ -1,11 +1,11 @@
 export const siteConfig = {
-  name: "React Router Boilerplate",
+  name: "Tech Blog",
   description:
-    "A modern React Router + Cloudflare boilerplate with authentication, database, and SSR.",
+    "Technical articles and insights on modern web development, React, TypeScript, and more.",
   appUrl: "https://your-app.pages.dev",
   xUrl: "https://x.com/your-handle",
   githubUrl: "https://github.com/your-username/your-repo",
-  keywords: ["react", "cloudflare", "boilerplate", "typescript", "tailwind"],
+  keywords: ["react", "typescript", "web development", "javascript", "cloudflare", "programming"],
   author: "Your Name",
-  ogpImage: "/ogp-image.png",
+  ogpImage: "/ogp-image.svg",
 };

@@ -34,7 +34,7 @@
   - Add syntax highlighting and rich formatting support for code blocks
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 6. Add SEO and social media meta tag generation
+- [x] 6. Add SEO and social media meta tag generation
   - Implement meta tag generation in article route loader
   - Create OGP tag utilities for social media sharing
   - Build dynamic title and description generation from article frontmatter

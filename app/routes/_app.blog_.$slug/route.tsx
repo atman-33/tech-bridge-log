@@ -1,6 +1,7 @@
 import type { Route } from './+types/route';
 import { loadArticleBySlug, loadArticleMetadata } from '~/lib/blog/article-loader';
 import { loadArticleContent } from '~/lib/blog/mdx-processor';
+import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
 import { ArticleContent } from './article-content';
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -8,22 +9,12 @@ export const meta: Route.MetaFunction = ({ data }) => {
     return [
       { title: 'Article Not Found' },
       { name: 'description', content: 'The requested article could not be found.' },
+      { name: 'robots', content: 'noindex, nofollow' },
     ];
   }
 
   const { article } = data;
-
-  return [
-    { title: `${article.title} - Tech Blog` },
-    { name: 'description', content: article.description },
-    { property: 'og:title', content: article.title },
-    { property: 'og:description', content: article.description },
-    { property: 'og:image', content: article.thumbnail },
-    { property: 'og:type', content: 'article' },
-    { property: 'article:published_time', content: article.publishedAt.toISOString() },
-    { property: 'article:modified_time', content: article.updatedAt.toISOString() },
-    { property: 'article:tag', content: article.tags.join(', ') },
-  ];
+  return generateArticleMetaTags(article);
 };
 
 export const loader = async ({ params, request }: Route.LoaderArgs) => {
@@ -87,17 +78,28 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const { article, mdxContent, previousArticle, nextArticle } = loaderData;
 
+  // Generate structured data for SEO
+  const structuredData = generateArticleStructuredData(article);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <ArticleContent
-          article={article}
-          mdxContent={mdxContent}
-          previousArticle={previousArticle}
-          nextArticle={nextArticle}
-        />
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: structuredData }}
+      />
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <ArticleContent
+            article={article}
+            mdxContent={mdxContent}
+            previousArticle={previousArticle}
+            nextArticle={nextArticle}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
