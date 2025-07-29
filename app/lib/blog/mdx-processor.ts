@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import {
@@ -66,8 +67,16 @@ const FRONTMATTER_VALIDATION = {
   thumbnail: { type: "string", required: true, minLength: 1 },
 } as const;
 
-const BLOG_CONTENT_DIR = "contents/blog";
-const PUBLIC_ASSETS_DIR = "public/blog-assets";
+// Get the current file's directory and resolve project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = join(__dirname, "../../..");
+
+const BLOG_CONTENT_DIR = join(PROJECT_ROOT, "contents/blog");
+const PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
+
+// Use import.meta.glob to load MDX files at build time (Vite + SSR compatible)
+const mdxModules = import.meta.glob('/contents/blog/**/index.mdx', { as: 'raw' });
 
 /**
  * Enhanced reading time calculation with customizable options
@@ -350,25 +359,11 @@ function validateFrontmatter(
  * Discovers all MDX files in the blog content directory
  */
 export async function discoverArticles(): Promise<string[]> {
-  if (!existsSync(BLOG_CONTENT_DIR)) {
-    return [];
-  }
+  // Use import.meta.glob to discover articles at build time
+  const moduleKeys = Object.keys(mdxModules);
+  console.log('discoverArticles - found modules:', moduleKeys);
 
-  const articles: string[] = [];
-  const entries = await readdir(BLOG_CONTENT_DIR, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const articleDir = join(BLOG_CONTENT_DIR, entry.name);
-      const indexPath = join(articleDir, "index.mdx");
-
-      if (existsSync(indexPath)) {
-        articles.push(indexPath);
-      }
-    }
-  }
-
-  return articles;
+  return moduleKeys;
 }
 
 /**
@@ -377,7 +372,13 @@ export async function discoverArticles(): Promise<string[]> {
 export async function processArticle(
   filePath: string,
 ): Promise<ArticleMetadata> {
-  const content = await readFile(filePath, "utf-8");
+  // Load content using import.meta.glob
+  const moduleLoader = mdxModules[filePath];
+  if (!moduleLoader) {
+    throw new Error(`Article not found: ${filePath}`);
+  }
+
+  const content = await moduleLoader();
   const { data: frontmatter, content: mdxContent } = matter(content);
 
   // Validate frontmatter
@@ -386,9 +387,10 @@ export async function processArticle(
   // Calculate reading time with enhanced options
   const readingStats = calculateReadingTime(mdxContent);
 
-  // Get article directory and slug
-  const articleDir = dirname(filePath);
+  // Get article directory and slug from the file path
+  // filePath is like "/contents/blog/getting-started/index.mdx"
   const slug = validatedFrontmatter.slug;
+  const articleDir = join(PROJECT_ROOT, "contents/blog", slug);
 
   // Process article images using enhanced image processor
   const imageResult = await processArticleImages(articleDir, slug);
@@ -434,16 +436,33 @@ export async function processArticle(
  * Loads raw MDX content for a specific article (without compilation)
  */
 export async function loadArticleContent(slug: string): Promise<string | null> {
-  const articlePath = join(BLOG_CONTENT_DIR, slug, "index.mdx");
+  const pattern = `/contents/blog/${slug}/index.mdx`;
 
-  if (!existsSync(articlePath)) {
+  // console.log('loadArticleContent - slug:', slug);
+  // console.log('loadArticleContent - pattern:', pattern);
+  // console.log('loadArticleContent - available modules:', Object.keys(mdxModules));
+
+  const moduleLoader = mdxModules[pattern];
+
+  if (!moduleLoader) {
+    console.log('loadArticleContent - module not found for pattern:', pattern);
     return null;
   }
 
-  const content = await readFile(articlePath, "utf-8");
-  const { content: mdxContent } = matter(content);
+  try {
+    // Load the raw content
+    const rawContent = await moduleLoader();
+    // console.log('loadArticleContent - raw content loaded, length:', rawContent.length);
 
-  return mdxContent;
+    // Parse frontmatter and extract content
+    const { content: mdxContent } = matter(rawContent);
+    // console.log('loadArticleContent - MDX content extracted, length:', mdxContent.length);
+
+    return mdxContent;
+  } catch (error) {
+    console.error('loadArticleContent - error loading module:', error);
+    return null;
+  }
 }
 
 

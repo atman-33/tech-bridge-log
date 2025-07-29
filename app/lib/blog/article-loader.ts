@@ -1,7 +1,15 @@
+import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import type { ArticleMetadata } from "./mdx-processor";
 import { validateArticleMetadata } from "./mdx-processor";
+
+// Get the current file's directory and resolve project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = join(__dirname, "../../..");
+const METADATA_FILE_PATH = join(PROJECT_ROOT, "public/blog-metadata.json");
 
 interface ArticleCache {
   articles: ArticleMetadata[];
@@ -15,13 +23,18 @@ export async function loadArticleMetadata(request?: Request): Promise<ArticleMet
   try {
     let cache: ArticleCache;
 
+    // console.log('loadArticleMetadata - METADATA_FILE_PATH:', METADATA_FILE_PATH);
+    // console.log('loadArticleMetadata - file exists:', existsSync(METADATA_FILE_PATH));
+
     // In test/build environment, read from file system
     if (
       typeof window === "undefined" &&
-      existsSync("public/blog-metadata.json")
+      existsSync(METADATA_FILE_PATH)
     ) {
-      const content = await readFile("public/blog-metadata.json", "utf-8");
+      // console.log('loadArticleMetadata - Reading from file system');
+      const content = await readFile(METADATA_FILE_PATH, "utf-8");
       cache = JSON.parse(content);
+      // console.log('loadArticleMetadata - Loaded cache from file:', cache);
     } else {
       // In browser environment, fetch from server
       let url = "/blog-metadata.json";
@@ -31,7 +44,6 @@ export async function loadArticleMetadata(request?: Request): Promise<ArticleMet
         const requestUrl = new URL(request.url);
         url = `${requestUrl.origin}/blog-metadata.json`;
       }
-
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -72,7 +84,11 @@ export async function loadArticleBySlug(
   request?: Request,
 ): Promise<ArticleMetadata | null> {
   const articles = await loadArticleMetadata(request);
-  return articles.find((article) => article.slug === slug) || null;
+  // console.log('loadArticleBySlug - Looking for slug:', slug);
+  // console.log('loadArticleBySlug - Available articles:', articles.map(a => a.slug));
+  const found = articles.find((article) => article.slug === slug) || null;
+  // console.log('loadArticleBySlug - Found article:', found);
+  return found;
 }
 
 /**
