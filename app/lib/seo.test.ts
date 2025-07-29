@@ -63,7 +63,9 @@ describe('SEO utilities', () => {
         image: 'https://example.com/image.png',
       });
 
-      const ogImageTag = metaTags.find(tag => tag.property === 'og:image');
+      const ogImageTag = metaTags.find((tag): tag is { property: string; content: string; } =>
+        'property' in tag && tag.property === 'og:image'
+      );
       expect(ogImageTag?.content).toBe('https://example.com/image.png');
     });
 
@@ -73,7 +75,9 @@ describe('SEO utilities', () => {
         image: '/test-image.png',
       });
 
-      const ogImageTag = metaTags.find(tag => tag.property === 'og:image');
+      const ogImageTag = metaTags.find((tag): tag is { property: string; content: string; } =>
+        'property' in tag && tag.property === 'og:image'
+      );
       expect(ogImageTag?.content).toBe('https://your-app.pages.dev/test-image.png');
     });
   });
