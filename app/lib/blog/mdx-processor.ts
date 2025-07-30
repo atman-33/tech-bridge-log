@@ -73,13 +73,14 @@ const __dirname = dirname(__filename);
 const PROJECT_ROOT = join(__dirname, "../../..");
 
 const BLOG_CONTENT_DIR = join(PROJECT_ROOT, "contents/blog");
-const PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
+const _PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
 
 // Use import.meta.glob to load MDX files at build time (Vite + SSR compatible)
 // This will be undefined in Node.js environment
-const mdxModules = typeof import.meta.glob !== 'undefined'
-  ? import.meta.glob('/contents/blog/**/index.mdx', { as: 'raw' })
-  : {};
+const mdxModules =
+  typeof import.meta.glob !== "undefined"
+    ? import.meta.glob("/contents/blog/**/index.mdx", { as: "raw" })
+    : {};
 
 /**
  * Enhanced reading time calculation with customizable options
@@ -365,13 +366,16 @@ export async function discoverArticles(): Promise<string[]> {
   // In Vite environment, use import.meta.glob
   if (Object.keys(mdxModules).length > 0) {
     const moduleKeys = Object.keys(mdxModules);
-    console.log('discoverArticles - found modules:', moduleKeys);
+    console.log("discoverArticles - found modules:", moduleKeys);
     return moduleKeys;
   }
 
   // In Node.js environment, use file system
   if (!existsSync(BLOG_CONTENT_DIR)) {
-    console.log('discoverArticles - blog content directory does not exist:', BLOG_CONTENT_DIR);
+    console.log(
+      "discoverArticles - blog content directory does not exist:",
+      BLOG_CONTENT_DIR,
+    );
     return [];
   }
 
@@ -380,7 +384,7 @@ export async function discoverArticles(): Promise<string[]> {
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      const indexPath = join(BLOG_CONTENT_DIR, entry.name, 'index.mdx');
+      const indexPath = join(BLOG_CONTENT_DIR, entry.name, "index.mdx");
       if (existsSync(indexPath)) {
         // Convert to the format expected by import.meta.glob
         articles.push(`/contents/blog/${entry.name}/index.mdx`);
@@ -388,7 +392,7 @@ export async function discoverArticles(): Promise<string[]> {
     }
   }
 
-  console.log('discoverArticles - found articles:', articles);
+  console.log("discoverArticles - found articles:", articles);
   return articles;
 }
 
@@ -406,11 +410,11 @@ export async function processArticle(
     content = await moduleLoader();
   } else {
     // In Node.js environment, read from file system
-    const absolutePath = join(PROJECT_ROOT, filePath.replace(/^\//, ''));
+    const absolutePath = join(PROJECT_ROOT, filePath.replace(/^\//, ""));
     if (!existsSync(absolutePath)) {
       throw new Error(`Article not found: ${absolutePath}`);
     }
-    content = await readFile(absolutePath, 'utf-8');
+    content = await readFile(absolutePath, "utf-8");
   }
   const { data: frontmatter, content: mdxContent } = matter(content);
 
@@ -434,7 +438,7 @@ export async function processArticle(
   }
 
   // Resolve and validate thumbnail path
-  const thumbnailPath = resolveThumbnailPath(
+  const _thumbnailPath = resolveThumbnailPath(
     validatedFrontmatter.thumbnail,
     slug,
   );
@@ -478,7 +482,7 @@ export async function loadArticleContent(slug: string): Promise<string | null> {
   const moduleLoader = mdxModules[pattern];
 
   if (!moduleLoader) {
-    console.log('loadArticleContent - module not found for pattern:', pattern);
+    console.log("loadArticleContent - module not found for pattern:", pattern);
     return null;
   }
 
@@ -493,12 +497,10 @@ export async function loadArticleContent(slug: string): Promise<string | null> {
 
     return mdxContent;
   } catch (error) {
-    console.error('loadArticleContent - error loading module:', error);
+    console.error("loadArticleContent - error loading module:", error);
     return null;
   }
 }
-
-
 
 /**
  * Processes all articles and generates metadata cache with comprehensive validation

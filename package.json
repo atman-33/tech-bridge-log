@@ -1,5 +1,5 @@
 {
-  "name": "react-router-cloudflare-boilerplate",
+  "name": "tech-bridge-log",
   "private": true,
   "type": "module",
   "scripts": {
@@ -28,6 +28,7 @@
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "@react-router/fs-routes": "^7.6.3",

@@ -1,6 +1,6 @@
-import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ArticleMetadata } from "./mdx-processor";
 import { validateArticleMetadata } from "./mdx-processor";
@@ -19,7 +19,9 @@ interface ArticleCache {
 /**
  * Loads article metadata from the generated cache file
  */
-export async function loadArticleMetadata(request?: Request): Promise<ArticleMetadata[]> {
+export async function loadArticleMetadata(
+  request?: Request,
+): Promise<ArticleMetadata[]> {
   try {
     let cache: ArticleCache;
 
@@ -27,10 +29,7 @@ export async function loadArticleMetadata(request?: Request): Promise<ArticleMet
     // console.log('loadArticleMetadata - file exists:', existsSync(METADATA_FILE_PATH));
 
     // In test/build environment, read from file system
-    if (
-      typeof window === "undefined" &&
-      existsSync(METADATA_FILE_PATH)
-    ) {
+    if (typeof window === "undefined" && existsSync(METADATA_FILE_PATH)) {
       // console.log('loadArticleMetadata - Reading from file system');
       const content = await readFile(METADATA_FILE_PATH, "utf-8");
       cache = JSON.parse(content);

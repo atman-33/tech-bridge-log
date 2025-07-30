@@ -18,7 +18,10 @@ export interface SEOConfig {
 /**
  * Generates comprehensive meta tags for SEO and social media sharing
  */
-export function generateMetaTags(config: SEOConfig, request?: Request): MetaDescriptor[] {
+export function generateMetaTags(
+  config: SEOConfig,
+  _request?: Request,
+): MetaDescriptor[] {
   const {
     title,
     description = siteConfig.description,
@@ -38,7 +41,11 @@ export function generateMetaTags(config: SEOConfig, request?: Request): MetaDesc
   // Resolve absolute URLs - use configured app URL as fallback
   const baseUrl = siteConfig.appUrl;
   const absoluteUrl = url ? `${baseUrl}${url}` : baseUrl;
-  const absoluteImage = image ? (image.startsWith('http') ? image : `${baseUrl}${image}`) : `${baseUrl}${siteConfig.ogpImage}`;
+  const absoluteImage = image
+    ? image.startsWith("http")
+      ? image
+      : `${baseUrl}${image}`
+    : `${baseUrl}${siteConfig.ogpImage}`;
 
   const metaTags: MetaDescriptor[] = [
     // Basic meta tags
@@ -69,17 +76,23 @@ export function generateMetaTags(config: SEOConfig, request?: Request): MetaDesc
   // Add article-specific meta tags
   if (type === "article") {
     if (publishedTime) {
-      metaTags.push({ property: "article:published_time", content: publishedTime });
+      metaTags.push({
+        property: "article:published_time",
+        content: publishedTime,
+      });
     }
     if (modifiedTime) {
-      metaTags.push({ property: "article:modified_time", content: modifiedTime });
+      metaTags.push({
+        property: "article:modified_time",
+        content: modifiedTime,
+      });
     }
     if (author) {
       metaTags.push({ property: "article:author", content: author });
     }
     if (tags && tags.length > 0) {
       // Add each tag as a separate meta tag (OGP standard)
-      tags.forEach(tag => {
+      tags.forEach((tag) => {
         metaTags.push({ property: "article:tag", content: tag });
       });
 
@@ -94,78 +107,100 @@ export function generateMetaTags(config: SEOConfig, request?: Request): MetaDesc
 /**
  * Generates meta tags specifically for blog articles
  */
-export function generateArticleMetaTags(article: ArticleMetadata, request?: Request): MetaDescriptor[] {
-  return generateMetaTags({
-    title: article.title,
-    description: article.description,
-    image: article.thumbnail,
-    url: `/blog/${article.slug}`,
-    type: "article",
-    publishedTime: article.publishedAt.toISOString(),
-    modifiedTime: article.updatedAt.toISOString(),
-    tags: article.tags,
-  }, request);
+export function generateArticleMetaTags(
+  article: ArticleMetadata,
+  request?: Request,
+): MetaDescriptor[] {
+  return generateMetaTags(
+    {
+      title: article.title,
+      description: article.description,
+      image: article.thumbnail,
+      url: `/blog/${article.slug}`,
+      type: "article",
+      publishedTime: article.publishedAt.toISOString(),
+      modifiedTime: article.updatedAt.toISOString(),
+      tags: article.tags,
+    },
+    request,
+  );
 }
 
 /**
  * Generates meta tags for the blog listing page
  */
-export function generateBlogListingMetaTags(request?: Request): MetaDescriptor[] {
-  return generateMetaTags({
-    title: "Blog",
-    description: "Technical articles and insights on modern web development, React, TypeScript, and more.",
-    url: "/blog",
-    type: "website",
-  }, request);
+export function generateBlogListingMetaTags(
+  request?: Request,
+): MetaDescriptor[] {
+  return generateMetaTags(
+    {
+      title: "Blog",
+      description:
+        "Technical articles and insights on modern web development, React, TypeScript, and more.",
+      url: "/blog",
+      type: "website",
+    },
+    request,
+  );
 }
 
 /**
  * Generates meta tags for tag-filtered blog pages
  */
-export function generateTagPageMetaTags(tag: string, articleCount: number, request?: Request): MetaDescriptor[] {
-  return generateMetaTags({
-    title: `Articles tagged "${tag}"`,
-    description: `Browse ${articleCount} articles about ${tag}. Technical insights and tutorials on ${tag} and related technologies.`,
-    url: `/blog/tag/${tag}`,
-    type: "website",
-  }, request);
+export function generateTagPageMetaTags(
+  tag: string,
+  articleCount: number,
+  request?: Request,
+): MetaDescriptor[] {
+  return generateMetaTags(
+    {
+      title: `Articles tagged "${tag}"`,
+      description: `Browse ${articleCount} articles about ${tag}. Technical insights and tutorials on ${tag} and related technologies.`,
+      url: `/blog/tag/${tag}`,
+      type: "website",
+    },
+    request,
+  );
 }
 
 /**
  * Generates structured data for articles (JSON-LD)
  */
-export function generateArticleStructuredData(article: ArticleMetadata, request?: Request): string {
+export function generateArticleStructuredData(
+  article: ArticleMetadata,
+  _request?: Request,
+): string {
   const baseUrl = siteConfig.appUrl;
   const absoluteUrl = `${baseUrl}/blog/${article.slug}`;
-  const absoluteImage = article.thumbnail.startsWith('http')
+  const absoluteImage = article.thumbnail.startsWith("http")
     ? article.thumbnail
     : `${baseUrl}${article.thumbnail}`;
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": article.title,
-    "description": article.description,
-    "image": absoluteImage,
-    "url": absoluteUrl,
-    "datePublished": article.publishedAt.toISOString(),
-    "dateModified": article.updatedAt.toISOString(),
-    "author": {
+    headline: article.title,
+    description: article.description,
+    image: absoluteImage,
+    url: absoluteUrl,
+    datePublished: article.publishedAt.toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    author: {
       "@type": "Person",
-      "name": siteConfig.author,
+      name: siteConfig.author,
     },
-    "publisher": {
+    publisher: {
       "@type": "Organization",
-      "name": siteConfig.name,
-      "logo": {
+      name: siteConfig.name,
+      logo: {
         "@type": "ImageObject",
-        "url": `${baseUrl}${siteConfig.ogpImage}`,
+        url: `${baseUrl}${siteConfig.ogpImage}`,
       },
     },
-    "keywords": article.tags.join(", "),
-    "articleSection": "Technology",
-    "wordCount": Math.round(article.readingTime * 200), // Approximate word count
-    "timeRequired": `PT${article.readingTime}M`, // ISO 8601 duration format
+    keywords: article.tags.join(", "),
+    articleSection: "Technology",
+    wordCount: Math.round(article.readingTime * 200), // Approximate word count
+    timeRequired: `PT${article.readingTime}M`, // ISO 8601 duration format
   };
 
   return JSON.stringify(structuredData);

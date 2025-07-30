@@ -6,38 +6,38 @@ import { UserAvatar } from "~/components/user-avatar";
 import { getAuthClient } from "~/lib/auth/auth-client";
 
 export function Header() {
-  const navigate = useNavigate();
-  const rootData = useRouteLoaderData("root") as {
-    user: { name: string; image?: string | null; } | null;
-    baseURL: string;
-  };
+  // const navigate = useNavigate();
+  // const rootData = useRouteLoaderData("root") as {
+  //   user: { name: string; image?: string | null; } | null;
+  //   baseURL: string;
+  // };
 
-  const user = rootData?.user;
-  const { signIn: signInAuth, signOut: signOutAuth } = getAuthClient({
-    baseURL: rootData?.baseURL || ''
-  });
+  // const user = rootData?.user;
+  // const { signIn: signInAuth, signOut: signOutAuth } = getAuthClient({
+  //   baseURL: rootData?.baseURL || ''
+  // });
 
-  const signInGoogle = async () => {
-    await signInAuth.social({
-      provider: "google",
-      callbackURL: '/home'
-    });
-  };
+  // const signInGoogle = async () => {
+  //   await signInAuth.social({
+  //     provider: "google",
+  //     callbackURL: '/home'
+  //   });
+  // };
 
-  const signOut = async () => {
-    await signOutAuth();
-    navigate("/");
-  };
+  // const signOut = async () => {
+  //   await signOutAuth();
+  //   navigate("/");
+  // };
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
-          <Logo to="/home" />
+          <Logo to="/" />
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            {user ? (
+            {/* {user ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <UserAvatar user={user} size="sm" />
@@ -59,7 +59,7 @@ export function Header() {
               >
                 Login with Google
               </Button>
-            )}
+            )} */}
           </div>
         </div>
       </div>
