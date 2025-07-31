@@ -4,11 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import readingTime from "reading-time";
-import {
-  processArticleImages,
-  resolveThumbnailPath,
-  validateThumbnailPath,
-} from "./image-processor";
+import { processArticleImages } from "./image-processor";
 
 export interface ArticleMetadata {
   slug: string;
@@ -70,7 +66,7 @@ const FRONTMATTER_VALIDATION = {
     minLength: 1,
     maxLength: 10,
     pattern:
-      /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}\u{1F9B0}-\u{1F9B3}]+$/u,
+      /^[\p{Emoji}\p{Emoji_Modifier}\p{Emoji_Component}\p{Emoji_Modifier_Base}\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u,
   },
 } as const;
 

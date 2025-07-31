@@ -1,6 +1,51 @@
 {
   "articles": [
     {
+      "slug": "typescript-advanced-patterns",
+      "title": "Advanced TypeScript Patterns for Better Code Quality",
+      "description": "Explore advanced TypeScript patterns and techniques that will help you write more maintainable, type-safe, and robust applications.",
+      "publishedAt": "2024-02-22T16:45:00.000Z",
+      "updatedAt": "2024-02-22T16:45:00.000Z",
+      "tags": [
+        "typescript",
+        "patterns",
+        "code-quality",
+        "advanced"
+      ],
+      "emoji": "🔧",
+      "readingTime": 6
+    },
+    {
+      "slug": "react-router-v7-guide",
+      "title": "React Router v7: A Complete Migration Guide",
+      "description": "Learn how to migrate your React application to React Router v7 with this comprehensive guide covering new features and breaking changes.",
+      "publishedAt": "2024-02-10T14:30:00.000Z",
+      "updatedAt": "2024-02-10T14:30:00.000Z",
+      "tags": [
+        "react",
+        "react-router",
+        "migration",
+        "frontend"
+      ],
+      "emoji": "⚛️",
+      "readingTime": 3
+    },
+    {
+      "slug": "cloudflare-workers-best-practices",
+      "title": "Cloudflare Workers: Best Practices for Edge Computing",
+      "description": "Discover essential best practices for building high-performance applications with Cloudflare Workers, from optimization techniques to deployment strategies.",
+      "publishedAt": "2024-01-28T09:15:00.000Z",
+      "updatedAt": "2024-01-28T09:15:00.000Z",
+      "tags": [
+        "cloudflare",
+        "edge-computing",
+        "serverless",
+        "performance"
+      ],
+      "emoji": "☁️",
+      "readingTime": 4
+    },
+    {
       "slug": "getting-started",
       "title": "Getting Started with Our Tech Blog",
       "description": "Welcome to our technical blog! Learn how to navigate and make the most of our content.",
@@ -15,5 +60,5 @@
       "readingTime": 2
     }
   ],
-  "generatedAt": "2025-07-31T00:14:21.152Z"
+  "generatedAt": "2025-07-31T00:24:47.648Z"
 }
