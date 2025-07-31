@@ -25,7 +25,7 @@ describe("MDX Processor", () => {
       expect(metadata).toHaveProperty("publishedAt");
       expect(metadata).toHaveProperty("updatedAt");
       expect(metadata).toHaveProperty("tags");
-      expect(metadata).toHaveProperty("thumbnail");
+      expect(metadata).toHaveProperty("emoji");
       expect(metadata).toHaveProperty("readingTime");
 
       expect(metadata.publishedAt).toBeInstanceOf(Date);
@@ -78,7 +78,7 @@ describe("Article Metadata Validation", () => {
       publishedAt: new Date("2024-01-15T10:00:00Z"),
       updatedAt: new Date("2024-01-15T10:00:00Z"),
       tags: ["test", "article"],
-      thumbnail: "/test-thumbnail.png",
+      emoji: "🧪",
       readingTime: 5,
     };
 
@@ -110,7 +110,7 @@ describe("Article Metadata Validation", () => {
       publishedAt: new Date("2024-01-15T10:00:00Z"),
       updatedAt: new Date("2024-01-15T10:00:00Z"),
       tags: ["  TEST  ", "  ARTICLE  ", ""],
-      thumbnail: "  /test-thumbnail.png  ",
+      emoji: "  🧪  ",
       readingTime: 5,
     };
 
@@ -121,7 +121,7 @@ describe("Article Metadata Validation", () => {
     expect(result.title).toBe("Test Article");
     expect(result.description).toBe("This is a test article description");
     expect(result.tags).toEqual(["test", "article"]);
-    expect(result.thumbnail).toBe("/test-thumbnail.png");
+    expect(result.emoji).toBe("🧪");
   });
 
   it("should check if article is published", async () => {
@@ -134,7 +134,7 @@ describe("Article Metadata Validation", () => {
       publishedAt: new Date("2024-01-15T10:00:00Z"), // Past date
       updatedAt: new Date("2024-01-15T10:00:00Z"),
       tags: ["published"],
-      thumbnail: "/thumbnail.png",
+      emoji: "📝",
       readingTime: 5,
     };
 
@@ -145,7 +145,7 @@ describe("Article Metadata Validation", () => {
       publishedAt: new Date("2030-01-15T10:00:00Z"), // Future date
       updatedAt: new Date("2030-01-15T10:00:00Z"),
       tags: ["future"],
-      thumbnail: "/thumbnail.png",
+      emoji: "🔮",
       readingTime: 5,
     };
 
@@ -163,7 +163,7 @@ describe("Frontmatter Validation", () => {
       updatedAt: "2024-01-15T10:00:00Z",
       tags: [],
       description: "Short",
-      thumbnail: "",
+      emoji: "",
     };
 
     // We need to access the internal validateFrontmatter function

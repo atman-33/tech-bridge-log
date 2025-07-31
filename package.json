@@ -10,7 +10,7 @@
     "db:migrate": "wrangler d1 migrations apply --local DB",
     "db:migrate-production": "dotenv -- drizzle-kit migrate",
     "deploy": "npm run build && wrangler deploy",
-    "dev": "react-router dev",
+    "dev": "npm run blog:build && react-router dev",
     "postinstall": "npm run cf-typegen",
     "preview": "npm run build && vite preview",
     "typecheck": "npm run cf-typegen && react-router typegen && tsc -b",

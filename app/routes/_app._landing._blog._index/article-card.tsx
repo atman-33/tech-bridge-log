@@ -25,15 +25,16 @@ export function ArticleCard({ article }: ArticleCardProps) {
       <Link to={`/blog/${article.slug}`} className="block">
         <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg group-hover:shadow-lg">
           <div className="flex flex-col md:flex-row">
-            {/* Thumbnail */}
+            {/* Emoji Thumbnail */}
             <div className="md:w-1/3 lg:w-1/4">
-              <div className="aspect-video md:aspect-square overflow-hidden">
-                <img
-                  src={article.thumbnail}
-                  alt={`Thumbnail for ${article.title}`}
-                  className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                  loading="lazy"
-                />
+              <div className="aspect-video md:aspect-square flex items-center justify-center bg-muted/50 rounded-lg">
+                <span
+                  className="text-6xl md:text-7xl transition-transform duration-200 group-hover:scale-110"
+                  role="img"
+                  aria-label={`Emoji for ${article.title}`}
+                >
+                  {article.emoji}
+                </span>
               </div>
             </div>
 

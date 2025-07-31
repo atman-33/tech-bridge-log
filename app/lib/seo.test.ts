@@ -14,7 +14,7 @@ describe("SEO utilities", () => {
     publishedAt: new Date("2024-01-15T10:00:00Z"),
     updatedAt: new Date("2024-01-16T14:30:00Z"),
     tags: ["react", "typescript", "testing"],
-    thumbnail: "/blog-assets/test-article/thumbnail.png",
+    emoji: "🧪",
     readingTime: 5,
   };
 

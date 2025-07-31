@@ -111,11 +111,15 @@ export function generateArticleMetaTags(
   article: ArticleMetadata,
   request?: Request,
 ): MetaDescriptor[] {
+  // For emoji thumbnails, use the default OGP image instead
+  // since social media platforms don't handle emoji images well
+  const ogImage = siteConfig.ogpImage;
+
   return generateMetaTags(
     {
       title: article.title,
       description: article.description,
-      image: article.thumbnail,
+      image: ogImage,
       url: `/blog/${article.slug}`,
       type: "article",
       publishedTime: article.publishedAt.toISOString(),
@@ -172,9 +176,8 @@ export function generateArticleStructuredData(
 ): string {
   const baseUrl = siteConfig.appUrl;
   const absoluteUrl = `${baseUrl}/blog/${article.slug}`;
-  const absoluteImage = article.thumbnail.startsWith("http")
-    ? article.thumbnail
-    : `${baseUrl}${article.thumbnail}`;
+  // Use default OGP image for structured data since emoji isn't suitable for schema.org
+  const absoluteImage = `${baseUrl}${siteConfig.ogpImage}`;
 
   const structuredData = {
     "@context": "https://schema.org",

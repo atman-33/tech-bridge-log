@@ -17,7 +17,7 @@ export interface ArticleMetadata {
   publishedAt: Date;
   updatedAt: Date;
   tags: string[];
-  thumbnail: string;
+  emoji: string;
   readingTime: number;
 }
 
@@ -32,7 +32,7 @@ interface ArticleFrontmatter {
   updatedAt: string;
   tags: string[];
   description: string;
-  thumbnail: string;
+  emoji: string;
 }
 
 /**
@@ -64,7 +64,14 @@ const FRONTMATTER_VALIDATION = {
     minLength: 10,
     maxLength: 500,
   },
-  thumbnail: { type: "string", required: true, minLength: 1 },
+  emoji: {
+    type: "string",
+    required: true,
+    minLength: 1,
+    maxLength: 10,
+    pattern:
+      /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}\u{1F9B0}-\u{1F9B3}]+$/u,
+  },
 } as const;
 
 // Get the current file's directory and resolve project root
@@ -120,7 +127,7 @@ export function validateArticleMetadata(
     "publishedAt",
     "updatedAt",
     "tags",
-    "thumbnail",
+    "emoji",
     "readingTime",
   ];
 
@@ -161,8 +168,8 @@ export function validateArticleMetadata(
     throw new Error(`Invalid tags type in ${source}. Expected array.`);
   }
 
-  if (typeof meta.thumbnail !== "string") {
-    throw new Error(`Invalid thumbnail type in ${source}. Expected string.`);
+  if (typeof meta.emoji !== "string") {
+    throw new Error(`Invalid emoji type in ${source}. Expected string.`);
   }
 
   if (typeof meta.readingTime !== "number") {
@@ -186,7 +193,7 @@ export function sanitizeArticleMetadata(
     tags: metadata.tags
       .map((tag) => tag.toLowerCase().trim())
       .filter((tag) => tag.length > 0),
-    thumbnail: metadata.thumbnail.trim(),
+    emoji: metadata.emoji.trim(),
   };
 }
 
@@ -355,7 +362,7 @@ function validateFrontmatter(
     updatedAt: fm.updatedAt as string,
     tags: fm.tags as string[],
     description: fm.description as string,
-    thumbnail: fm.thumbnail as string,
+    emoji: fm.emoji as string,
   };
 }
 
@@ -429,29 +436,12 @@ export async function processArticle(
   const slug = validatedFrontmatter.slug;
   const articleDir = join(PROJECT_ROOT, "contents/blog", slug);
 
-  // Process article images using enhanced image processor
+  // Process article images (for content images, not thumbnails)
   const imageResult = await processArticleImages(articleDir, slug);
 
   // Log any image processing errors
   if (imageResult.errors.length > 0) {
     console.warn(`Image processing warnings for ${slug}:`, imageResult.errors);
-  }
-
-  // Resolve and validate thumbnail path
-  const _thumbnailPath = resolveThumbnailPath(
-    validatedFrontmatter.thumbnail,
-    slug,
-  );
-  const thumbnailValidation = validateThumbnailPath(
-    validatedFrontmatter.thumbnail,
-    imageResult.assets,
-    slug,
-  );
-
-  if (!thumbnailValidation.isValid) {
-    console.warn(
-      `Thumbnail validation warning for ${slug}: ${thumbnailValidation.error}`,
-    );
   }
 
   const metadata: ArticleMetadata = {
@@ -461,7 +451,7 @@ export async function processArticle(
     publishedAt: new Date(validatedFrontmatter.publishedAt),
     updatedAt: new Date(validatedFrontmatter.updatedAt),
     tags: validatedFrontmatter.tags,
-    thumbnail: thumbnailValidation.resolvedPath,
+    emoji: validatedFrontmatter.emoji,
     readingTime: readingStats.minutes,
   };
 
