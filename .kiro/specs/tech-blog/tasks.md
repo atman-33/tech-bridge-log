@@ -43,16 +43,16 @@
 
 - [ ] 7. Build tag management and filtering system
   - Create tags.json configuration file structure and validation
-  - Implement `app/routes/blog.tag.$tag/route.tsx` for tag-based filtering
-  - Build `app/routes/blog.tag.$tag/tag-header.tsx` component for tag display
+  - Implement `app/routes/_app._landing.tags._index/route.tsx` for tag-based filtering
+  - Build `app/routes/_app._landing.tags._index/tag-header.tsx` component for tag display
   - Create tag badge components and tag-based article filtering logic
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
 - [ ] 8. Implement client-side search functionality
   - Set up FlexSearch library integration and search index generation
-  - Create `app/routes/search/route.tsx` for search results display
-  - Build `app/routes/search/search-results.tsx` component with result highlighting
-  - Implement `app/routes/blog/search-box.tsx` with real-time search suggestions
+  - Create `app/routes/_app.search/route.tsx` for search results display
+  - Build `app/routes/_app.search/search-results.tsx` component with result highlighting
+  - Implement `app/routes/_app/search-box.tsx` with real-time search suggestions
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 9. Add dark/light theme support
@@ -70,7 +70,7 @@
   - _Requirements: 2.3, 8.3, 8.4_
 
 - [ ] 11. Add reading progress and navigation enhancements
-  - Create `app/routes/blog.$slug/reading-progress.tsx` component
+  - Create `app/routes/blog_.$slug/reading-progress.tsx` component
   - Implement scroll-based reading progress calculation
   - Add article navigation between previous/next articles
   - Build table of contents generation from MDX headings
