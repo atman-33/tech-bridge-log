@@ -25,7 +25,7 @@ export function ArticleCard({ article, index = 0, tags = [] }: ArticleCardProps)
     >
       <Link
         to={`/blog/${article.slug}`}
-        className="block p-6 rounded-2xl  backdrop-blur-sm  border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 hover:bg-white/90 dark:hover:bg-slate-800/90 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 hover:-translate-y-1"
+        className="block p-2 md:p-4 rounded-2xl  backdrop-blur-sm  border-slate-200/60 dark:border-slate-700/60 hover:border-slate-300/80 dark:hover:border-slate-600/80 hover:bg-white/90 dark:hover:bg-slate-800/90 transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 hover:-translate-y-1"
       >
         <div className="flex items-start gap-5">
           {/* Emoji */}

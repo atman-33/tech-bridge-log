@@ -38,25 +38,10 @@ export default function BlogPage({ loaderData }: Route.ComponentProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800/50">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto">
-          <header className="mb-16 text-center">
+          <header className="mb-8 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground text-sm font-medium mb-6">
               <span className="w-2 h-2 bg-primary dark:bg-primary-foreground rounded-full animate-pulse"></span>
               Latest Articles
-            </div>
-            <h1 className="text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-slate-100 dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
-              Tech Blog
-            </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6">
-              Discover the latest technical articles, tutorials, and insights from our development team.
-            </p>
-            <div className="flex justify-center">
-              <a
-                href="/tags"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
-              >
-                <span className="text-base">🏷️</span>
-                Browse by Tags
-              </a>
             </div>
           </header>
 

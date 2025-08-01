@@ -41,12 +41,6 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
           </div>
         ) : (
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-slate-100 dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
-              Browse by Tags
-            </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Explore our technical articles organized by topics and technologies.
-            </p>
             <p className="text-sm text-slate-500 dark:text-slate-500">
               {articleCount} total {articleCount === 1 ? 'article' : 'articles'}
             </p>
@@ -84,24 +78,6 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
             {tag.label}
           </Link>
         ))}
-      </div>
-
-      {/* Back to blog link */}
-      <div className="text-center">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Blog
-        </Link>
       </div>
     </header>
   );

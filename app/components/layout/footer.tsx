@@ -77,9 +77,6 @@ export function Footer({ contactEmail }: FooterProps) {
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               © 2025 Tech Bridge Log. All rights reserved.
             </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Built with React Router v7 + Cloudflare
-            </p>
           </div>
         </div>
       </div>
