@@ -41,7 +41,7 @@ export default function BlogPage({ loaderData }: Route.ComponentProps) {
             </p>
           </div>
         ) : (
-          <div className="grid gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {articles.map((article) => (
               <ArticleCard key={article.slug} article={article} />
             ))}

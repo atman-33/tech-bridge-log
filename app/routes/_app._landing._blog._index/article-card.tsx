@@ -1,6 +1,4 @@
 import { Link } from 'react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
 import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
 
 interface ArticleCardProps {
@@ -11,64 +9,37 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     }).format(date);
   };
 
-  const formatReadingTime = (minutes: number) => {
-    return `${minutes} min read`;
-  };
-
   return (
     <article className="group">
-      <Link to={`/blog/${article.slug}`} className="block">
-        <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg group-hover:shadow-lg">
-          <div className="flex flex-col md:flex-row">
-            {/* Emoji Thumbnail */}
-            <div className="md:w-1/3 lg:w-1/4">
-              <div className="aspect-video md:aspect-square flex items-center justify-center bg-muted/50 rounded-lg">
-                <span
-                  className="text-6xl md:text-7xl transition-transform duration-200 group-hover:scale-110"
-                  role="img"
-                  aria-label={`Emoji for ${article.title}`}
-                >
-                  {article.emoji}
-                </span>
-              </div>
-            </div>
+      <Link
+        to={`/blog/${article.slug}`}
+        className="flex items-center gap-4 p-4 rounded-lg border bg-card hover:shadow-md transition-all duration-200 group-hover:border-primary/20"
+      >
+        {/* Emoji */}
+        <div className="flex h-16 w-16 min-w-16 items-center justify-center rounded-full bg-muted">
+          <span
+            className="text-3xl transition-transform duration-200 group-hover:scale-110"
+            role="img"
+            aria-label={`Emoji for ${article.title}`}
+          >
+            {article.emoji}
+          </span>
+        </div>
 
-            {/* Content */}
-            <div className="md:w-2/3 lg:w-3/4">
-              <CardHeader className="pb-4">
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {article.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                <CardTitle className="text-xl md:text-2xl line-clamp-2 group-hover:text-primary transition-colors">
-                  {article.title}
-                </CardTitle>
-
-                <CardDescription className="text-base line-clamp-3 mt-2">
-                  {article.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <time dateTime={article.publishedAt.toISOString()}>
-                    {formatDate(article.publishedAt)}
-                  </time>
-                  <span>{formatReadingTime(article.readingTime)}</span>
-                </div>
-              </CardContent>
-            </div>
+        {/* Content */}
+        <div className="flex flex-col justify-center space-y-1 min-w-0">
+          <h2 className="font-semibold text-base line-clamp-2 group-hover:text-primary transition-colors">
+            {article.title}
+          </h2>
+          <div className="flex items-center text-xs text-muted-foreground">
+            <span>📅 {formatDate(article.publishedAt)}</span>
           </div>
-        </Card>
+        </div>
       </Link>
     </article>
   );
