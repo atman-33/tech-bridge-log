@@ -10,7 +10,7 @@ const AppTopLayout = () => {
         <AppNavLink to="/Tags">Tags</AppNavLink>
       </div>
       <Separator />
-      <div className="py-4">
+      <div className="py-0">
         <Outlet />
       </div>
     </>

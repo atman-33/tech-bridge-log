@@ -461,29 +461,32 @@ export async function processArticle(
 export async function loadArticleContent(slug: string): Promise<string | null> {
   const pattern = `/contents/blog/${slug}/index.mdx`;
 
-  // console.log('loadArticleContent - slug:', slug);
-  // console.log('loadArticleContent - pattern:', pattern);
-  // console.log('loadArticleContent - available modules:', Object.keys(mdxModules));
-
+  // In Vite environment, use import.meta.glob
   const moduleLoader = mdxModules[pattern];
-
-  if (!moduleLoader) {
-    console.log("loadArticleContent - module not found for pattern:", pattern);
-    return null;
+  if (moduleLoader) {
+    try {
+      const rawContent = await moduleLoader();
+      const { content: mdxContent } = matter(rawContent);
+      return mdxContent;
+    } catch (error) {
+      console.error("loadArticleContent - error loading module:", error);
+      return null;
+    }
   }
 
+  // In Node.js environment, read from file system
   try {
-    // Load the raw content
-    const rawContent = await moduleLoader();
-    // console.log('loadArticleContent - raw content loaded, length:', rawContent.length);
+    const absolutePath = join(PROJECT_ROOT, `contents/blog/${slug}/index.mdx`);
+    if (!existsSync(absolutePath)) {
+      console.log("loadArticleContent - file not found:", absolutePath);
+      return null;
+    }
 
-    // Parse frontmatter and extract content
+    const rawContent = await readFile(absolutePath, "utf-8");
     const { content: mdxContent } = matter(rawContent);
-    // console.log('loadArticleContent - MDX content extracted, length:', mdxContent.length);
-
     return mdxContent;
   } catch (error) {
-    console.error("loadArticleContent - error loading module:", error);
+    console.error("loadArticleContent - error reading file:", error);
     return null;
   }
 }

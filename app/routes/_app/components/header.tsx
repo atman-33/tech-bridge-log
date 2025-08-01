@@ -4,6 +4,7 @@ import { ThemeToggle } from "~/components/theme-toggle";
 import { Logo } from "~/components/logo";
 import { UserAvatar } from "~/components/user-avatar";
 import { getAuthClient } from "~/lib/auth/auth-client";
+import { SearchBox } from "~/routes/_app/search-box";
 
 export function Header() {
   // const navigate = useNavigate();
@@ -35,7 +36,14 @@ export function Header() {
         <div className="flex justify-between items-center">
           <Logo to="/" />
 
+          <div className="flex-1 max-w-md mx-8 hidden md:block">
+            <SearchBox />
+          </div>
+
           <div className="flex items-center gap-3">
+            <div className="md:hidden">
+              <SearchBox className="w-64" />
+            </div>
             <ThemeToggle />
             {/* {user ? (
               <div className="flex items-center gap-3">
