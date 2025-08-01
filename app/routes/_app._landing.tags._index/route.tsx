@@ -1,9 +1,9 @@
 import type { Route } from './+types/route';
 import { loadArticleMetadata } from '~/lib/blog/article-loader';
 import { loadTagsConfig, getUsedTags } from '~/lib/blog/tags';
-import { generateBlogListingMetaTags } from '~/lib/seo';
 import { ArticleCard } from '~/routes/_app._landing._blog._index/article-card';
 import { TagHeader } from './tag-header';
+import { TagErrorBoundary } from '~/components/error-boundaries/tag-error-boundary';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -16,39 +16,53 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   const selectedTag = url.searchParams.get('tag');
 
-  // Load all articles and tags
-  const [articles, allTags] = await Promise.all([
-    loadArticleMetadata(request),
-    loadTagsConfig(),
-  ]);
+  try {
+    // Load all articles and tags
+    const [articles, allTags] = await Promise.all([
+      loadArticleMetadata(request),
+      loadTagsConfig(),
+    ]);
 
-  // Filter published articles
-  const publishedArticles = articles
-    .filter(article => article.publishedAt <= new Date())
-    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+    // Filter published articles
+    const publishedArticles = articles
+      .filter(article => article.publishedAt <= new Date())
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
-  // Get tags that are actually used in articles
-  const usedTags = await getUsedTags(publishedArticles);
+    // Get tags that are actually used in articles
+    const usedTags = await getUsedTags(publishedArticles);
 
-  // Filter articles by selected tag if provided
-  const filteredArticles = selectedTag
-    ? publishedArticles.filter(article => article.tags.includes(selectedTag))
-    : publishedArticles;
+    // If a specific tag is requested but doesn't exist, throw 404
+    if (selectedTag && !usedTags.find(tag => tag.id === selectedTag)) {
+      throw new Response(`Tag "${selectedTag}" not found`, { status: 404 });
+    }
 
-  // Find the selected tag info
-  const selectedTagInfo = selectedTag
-    ? usedTags.find(tag => tag.id === selectedTag) || null
-    : null;
+    // Filter articles by selected tag if provided
+    const filteredArticles = selectedTag
+      ? publishedArticles.filter(article => article.tags.includes(selectedTag))
+      : publishedArticles;
 
-  return {
-    articles: filteredArticles,
-    allTags: usedTags,
-    selectedTag: selectedTagInfo,
-  };
+    // Find the selected tag info
+    const selectedTagInfo = selectedTag
+      ? usedTags.find(tag => tag.id === selectedTag) || null
+      : null;
+
+    return {
+      articles: filteredArticles,
+      allTags: usedTags,
+      selectedTag: selectedTagInfo,
+      requestedTagId: selectedTag,
+    };
+  } catch (error) {
+    if (error instanceof Response) {
+      throw error;
+    }
+    console.error('Failed to load tags page:', error);
+    throw new Response('Failed to load tags', { status: 500 });
+  }
 };
 
 export default function TagsPage({ loaderData }: Route.ComponentProps) {
-  const { articles, allTags, selectedTag } = loaderData;
+  const { articles, allTags, selectedTag, requestedTagId } = loaderData;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800/50">
@@ -90,4 +104,13 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
       </div>
     </div>
   );
+}
+
+export function ErrorBoundary({ error }: { error?: Error; }) {
+  // Try to extract tag ID from URL if available
+  const tagId = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('tag')
+    : null;
+
+  return <TagErrorBoundary tagId={tagId || undefined} error={error} />;
 }

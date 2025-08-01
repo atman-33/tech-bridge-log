@@ -4,6 +4,7 @@ import { loadArticleContent } from '~/lib/blog/mdx-processor';
 import { getTagsByIds } from '~/lib/blog/tags';
 import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
 import { ArticleContent } from './article-content';
+import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data?.article) {
@@ -110,20 +111,5 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl font-bold mb-4">Article Not Found</h1>
-        <p className="text-xl text-muted-foreground mb-8">
-          The article you're looking for doesn't exist or has been moved.
-        </p>
-        <a
-          href="/"
-          className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-        >
-          ← Back to Blog
-        </a>
-      </div>
-    </div>
-  );
+  return <ArticleNotFoundBoundary />;
 }

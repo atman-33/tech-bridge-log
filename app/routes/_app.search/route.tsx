@@ -1,6 +1,8 @@
-import { useLoaderData, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 import type { Route } from './+types/route';
 import { SearchResults } from './search-results';
+import { SearchErrorBoundary } from '~/components/error-boundaries/search-error-boundary';
+import { NoScriptSearchFallback } from '~/components/blog/noscript-fallback';
 import type { SearchIndex } from '~/lib/blog/search-index';
 
 export const meta: Route.MetaFunction = ({ location }) => {
@@ -18,25 +20,30 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const query = url.searchParams.get('q') || '';
 
   // Load search index from public directory
-  // In a real app, you might want to cache this or load it differently
   let searchIndex: SearchIndex | null = null;
+  let searchIndexError: string | null = null;
+
   try {
     const response = await fetch(new URL('/search-index.json', request.url));
     if (response.ok) {
       searchIndex = await response.json() as SearchIndex;
+    } else {
+      searchIndexError = `Failed to load search index: ${response.status} ${response.statusText}`;
     }
   } catch (error) {
     console.error('Failed to load search index:', error);
+    searchIndexError = error instanceof Error ? error.message : 'Unknown error loading search index';
   }
 
   return {
     query,
     searchIndex,
+    searchIndexError,
   };
 };
 
 export default function SearchPage({ loaderData }: Route.ComponentProps) {
-  const { query, searchIndex } = loaderData;
+  const { query, searchIndex, searchIndexError } = loaderData;
   const [searchParams] = useSearchParams();
   const currentQuery = searchParams.get('q') || query;
 
@@ -52,11 +59,20 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
           )}
         </div>
 
-        <SearchResults
-          query={currentQuery}
-          searchIndex={searchIndex}
-        />
+        <NoScriptSearchFallback />
+
+        <div className="js-only">
+          <SearchResults
+            query={currentQuery}
+            searchIndex={searchIndex}
+            searchIndexError={searchIndexError}
+          />
+        </div>
       </div>
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  return <SearchErrorBoundary />;
 }

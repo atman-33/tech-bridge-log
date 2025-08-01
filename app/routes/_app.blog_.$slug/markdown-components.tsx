@@ -1,5 +1,6 @@
 import type { Components } from 'react-markdown';
 import { generateHeadingId } from './article-utils';
+import { ImageWithFallback } from '~/components/blog/image-fallback';
 
 export const markdownComponents: Components = {
   // Headings with proper styling and IDs

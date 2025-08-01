@@ -187,7 +187,29 @@ export function SearchBox({
 
   return (
     <div className={`relative ${className}`}>
-      <div className="relative">
+      {/* Fallback form for users without JavaScript */}
+      <noscript>
+        <form action="/search" method="get" className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            type="text"
+            name="q"
+            placeholder={placeholder}
+            defaultValue={query}
+            className="pl-10 pr-20"
+          />
+          <Button
+            type="submit"
+            size="sm"
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 px-3"
+          >
+            Search
+          </Button>
+        </form>
+      </noscript>
+
+      {/* JavaScript-enhanced search */}
+      <div className="js-only relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           ref={inputRef}
@@ -212,7 +234,7 @@ export function SearchBox({
         )}
       </div>
 
-      {/* Suggestions dropdown */}
+      {/* Suggestions dropdown - JavaScript only */}
       {showSuggestionsList && (
         <Card
           ref={suggestionsRef}

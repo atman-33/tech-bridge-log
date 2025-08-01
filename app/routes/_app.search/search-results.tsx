@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
-import { TagBadge } from '~/components/blog/tag-badge';
+import { SearchIndexUnavailable, SearchErrorBoundary } from '~/components/error-boundaries/search-error-boundary';
 import {
   createDocumentIndex,
   performSearch,
@@ -13,9 +12,10 @@ import {
 interface SearchResultsProps {
   query: string;
   searchIndex: SearchIndex | null;
+  searchIndexError?: string | null;
 }
 
-export function SearchResults({ query, searchIndex }: SearchResultsProps) {
+export function SearchResults({ query, searchIndex, searchIndexError }: SearchResultsProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -56,12 +56,13 @@ export function SearchResults({ query, searchIndex }: SearchResultsProps) {
     }
   }, [query, searchIndex]);
 
+  // Handle search index errors
+  if (searchIndexError) {
+    return <SearchErrorBoundary error={new Error(searchIndexError)} />;
+  }
+
   if (!searchIndex) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Search index is not available.</p>
-      </div>
-    );
+    return <SearchIndexUnavailable />;
   }
 
   if (isLoading) {
