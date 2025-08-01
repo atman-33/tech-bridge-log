@@ -55,7 +55,7 @@
   - Implement `app/routes/_app/search-box.tsx` with real-time search suggestions
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 9. Add dark/light theme support
+- [x] 9. Add dark/light theme support
   - Implement theme toggle component with Tailwind CSS dark mode classes
   - Create theme persistence using local storage
   - Set up OS theme preference detection and default theme handling
