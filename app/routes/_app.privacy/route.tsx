@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 export function meta() {
   return [
-    { title: "Privacy Policy - React Router Boilerplate" },
-    { name: "description", content: "Privacy policy for React Router Boilerplate application." },
+    { title: "Privacy Policy - Tech Bridge Log" },
+    { name: "description", content: "Privacy policy for Tech Bridge Log - technical blog and insights platform." },
   ];
 }
 
@@ -25,12 +25,13 @@ const PrivacyPage = () => {
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
-                When you use our application, we may collect the following information:
+                When you use Tech Bridge Log, we may collect the following information:
               </p>
               <ul>
-                <li><strong>Account Information:</strong> When you sign in with Google OAuth, we collect your name, email address, and profile picture.</li>
-                <li><strong>Usage Data:</strong> We may collect information about how you use our application, including pages visited and features used.</li>
-                <li><strong>Technical Data:</strong> We automatically collect certain technical information, including your IP address, browser type, and device information.</li>
+                <li><strong>Reading Analytics:</strong> We collect information about which articles you read, search queries, and time spent on pages to improve content recommendations.</li>
+                <li><strong>Usage Data:</strong> We may collect information about how you navigate our blog, including pages visited, links clicked, and features used.</li>
+                <li><strong>Technical Data:</strong> We automatically collect certain technical information, including your IP address, browser type, device information, and referrer URLs.</li>
+                <li><strong>Search Data:</strong> Search queries and results to improve our search functionality and content discovery.</li>
               </ul>
             </CardContent>
           </Card>
@@ -42,11 +43,12 @@ const PrivacyPage = () => {
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>We use the collected information for the following purposes:</p>
               <ul>
-                <li>To provide and maintain our service</li>
-                <li>To authenticate and authorize your access</li>
-                <li>To improve our application and user experience</li>
-                <li>To communicate with you about service updates</li>
-                <li>To ensure the security and integrity of our service</li>
+                <li>To provide and maintain our technical blog platform</li>
+                <li>To improve content recommendations and search functionality</li>
+                <li>To analyze reading patterns and optimize our content strategy</li>
+                <li>To enhance user experience and site performance</li>
+                <li>To ensure the security and integrity of our platform</li>
+                <li>To generate anonymous analytics and usage statistics</li>
               </ul>
             </CardContent>
           </Card>
@@ -73,10 +75,10 @@ const PrivacyPage = () => {
               <CardTitle>Third-Party Services</CardTitle>
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
-              <p>Our application integrates with the following third-party services:</p>
+              <p>Our blog platform integrates with the following third-party services:</p>
               <ul>
-                <li><strong>Google OAuth:</strong> For authentication purposes</li>
-                <li><strong>Cloudflare:</strong> For hosting, database, and security services</li>
+                <li><strong>Cloudflare:</strong> For hosting, CDN, analytics, and security services</li>
+                <li><strong>GitHub:</strong> For content management and version control of articles</li>
               </ul>
               <p>
                 These services have their own privacy policies, and we encourage you to review them.
@@ -106,7 +108,7 @@ const PrivacyPage = () => {
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
                 If you have any questions about this Privacy Policy or our data practices,
-                please contact us at: <strong>privacy@yourapp.com</strong>
+                please contact us at: <strong>privacy@techbridgelog.com</strong>
               </p>
               <p>
                 We will respond to your inquiry within 30 days.

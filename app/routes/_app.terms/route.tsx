@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 export function meta() {
   return [
-    { title: "Terms of Service - React Router Boilerplate" },
-    { name: "description", content: "Terms of service for React Router Boilerplate application." },
+    { title: "Terms of Service - Tech Bridge Log" },
+    { name: "description", content: "Terms of service for Tech Bridge Log - technical blog and insights platform." },
   ];
 }
 
@@ -25,7 +25,7 @@ const TermsPage = () => {
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
-                By accessing and using this React Router Boilerplate application ("Service"),
+                By accessing and using Tech Bridge Log ("Service"),
                 you accept and agree to be bound by the terms and provision of this agreement.
               </p>
               <p>
@@ -40,17 +40,17 @@ const TermsPage = () => {
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
-                This application is a boilerplate template designed to help developers build
-                modern React applications with the following features:
+                Tech Bridge Log is a technical blog platform that provides:
               </p>
               <ul>
-                <li>React Router v7 with server-side rendering</li>
-                <li>Cloudflare Workers and D1 database integration</li>
-                <li>Authentication via Google OAuth</li>
-                <li>Modern development tooling and best practices</li>
+                <li>Technical articles and tutorials on modern web development</li>
+                <li>Insights on React, TypeScript, Cloudflare, and other technologies</li>
+                <li>Search functionality to discover relevant content</li>
+                <li>Tag-based content organization and filtering</li>
+                <li>Responsive design optimized for all devices</li>
               </ul>
               <p>
-                The Service is provided "as is" and is intended for development and educational purposes.
+                The Service is provided "as is" and is intended for educational and informational purposes.
               </p>
             </CardContent>
           </Card>
@@ -61,13 +61,13 @@ const TermsPage = () => {
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
-                To access certain features of the Service, you may be required to create an account:
+                Tech Bridge Log is currently a read-only platform that does not require user accounts:
               </p>
               <ul>
-                <li>You must provide accurate and complete information when creating an account</li>
-                <li>You are responsible for maintaining the security of your account</li>
-                <li>You must notify us immediately of any unauthorized use of your account</li>
-                <li>We reserve the right to suspend or terminate accounts that violate these terms</li>
+                <li>All content is freely accessible without registration</li>
+                <li>No personal information is required to read articles</li>
+                <li>Search and browsing features are available to all visitors</li>
+                <li>We may introduce user accounts in the future for enhanced features</li>
               </ul>
             </CardContent>
           </Card>
@@ -80,11 +80,11 @@ const TermsPage = () => {
               <p>You agree not to use the Service to:</p>
               <ul>
                 <li>Violate any applicable laws or regulations</li>
-                <li>Infringe on the rights of others</li>
-                <li>Transmit harmful, offensive, or inappropriate content</li>
                 <li>Attempt to gain unauthorized access to our systems</li>
-                <li>Interfere with or disrupt the Service</li>
-                <li>Use the Service for any commercial purpose without permission</li>
+                <li>Interfere with or disrupt the Service or its infrastructure</li>
+                <li>Use automated tools to scrape or download content excessively</li>
+                <li>Redistribute our content without proper attribution</li>
+                <li>Use the Service in any way that could damage our reputation</li>
               </ul>
             </CardContent>
           </Card>
@@ -95,12 +95,13 @@ const TermsPage = () => {
             </CardHeader>
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
-                The Service and its original content, features, and functionality are and will remain
-                the exclusive property of the service provider and its licensors.
+                All articles, tutorials, and original content on Tech Bridge Log are the exclusive
+                property of Tech Bridge Log and its authors, unless otherwise stated.
               </p>
               <p>
-                The Service is protected by copyright, trademark, and other laws. You may not reproduce,
-                distribute, or create derivative works without explicit permission.
+                The content is protected by copyright laws. You may share links to our articles and
+                quote brief excerpts with proper attribution, but you may not reproduce entire articles
+                or create derivative works without explicit permission.
               </p>
             </CardContent>
           </Card>
@@ -185,7 +186,7 @@ const TermsPage = () => {
             <CardContent className="prose dark:prose-invert max-w-none">
               <p>
                 If you have any questions about these Terms of Service, please contact us at:
-                <strong> legal@yourapp.com</strong>
+                <strong> legal@techbridgelog.com</strong>
               </p>
             </CardContent>
           </Card>
