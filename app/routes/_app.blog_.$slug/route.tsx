@@ -118,7 +118,7 @@ export function ErrorBoundary() {
           The article you're looking for doesn't exist or has been moved.
         </p>
         <a
-          href="/blog"
+          href="/"
           className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
           ← Back to Blog

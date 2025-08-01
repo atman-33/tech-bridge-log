@@ -60,8 +60,8 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
         <Link
           to="/tags"
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${!currentTag
-              ? 'bg-primary text-primary-foreground shadow-md'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            ? 'bg-primary text-primary-foreground shadow-md'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
         >
           <span className="text-base">📚</span>
@@ -74,8 +74,8 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
             key={tag.id}
             to={`/tags?tag=${encodeURIComponent(tag.id)}`}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${currentTag === tag.id
-                ? 'bg-primary text-primary-foreground shadow-md'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              ? 'bg-primary text-primary-foreground shadow-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
           >
             <span className="text-base" role="img" aria-label={`${tag.label} icon`}>
@@ -89,7 +89,7 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
       {/* Back to blog link */}
       <div className="text-center">
         <Link
-          to="/blog"
+          to="/"
           className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
         >
           <svg
