@@ -1,5 +1,6 @@
 import type { Route } from './+types/route';
 import { loadArticleMetadata } from '~/lib/blog/article-loader';
+import { getUsedTags } from '~/lib/blog/tags';
 import { generateBlogListingMetaTags } from '~/lib/seo';
 import { ArticleCard } from './article-card';
 
@@ -7,7 +8,7 @@ export const meta: Route.MetaFunction = () => {
   return generateBlogListingMetaTags();
 };
 
-export const loader = async ({ request }: Route.LoaderArgs): Promise<{ articles: Awaited<ReturnType<typeof loadArticleMetadata>>; }> => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const articles = await loadArticleMetadata(request);
 
   // Sort articles by publication date (newest first) and filter published articles
@@ -15,11 +16,17 @@ export const loader = async ({ request }: Route.LoaderArgs): Promise<{ articles:
     .filter(article => article.publishedAt <= new Date())
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
-  return { articles: publishedArticles };
+  // Get tags that are actually used in articles
+  const usedTags = await getUsedTags(publishedArticles);
+
+  return {
+    articles: publishedArticles,
+    tags: usedTags
+  };
 };
 
 export default function BlogPage({ loaderData }: Route.ComponentProps) {
-  const { articles } = loaderData;
+  const { articles, tags } = loaderData;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800/50">
@@ -33,9 +40,18 @@ export default function BlogPage({ loaderData }: Route.ComponentProps) {
             <h1 className="text-5xl font-bold tracking-tight mb-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-slate-100 dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
               Tech Blog
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6">
               Discover the latest technical articles, tutorials, and insights from our development team.
             </p>
+            <div className="flex justify-center">
+              <a
+                href="/tags"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+              >
+                <span className="text-base">🏷️</span>
+                Browse by Tags
+              </a>
+            </div>
           </header>
 
           {articles.length === 0 ? (
@@ -55,6 +71,7 @@ export default function BlogPage({ loaderData }: Route.ComponentProps) {
                   key={article.slug}
                   article={article}
                   index={index}
+                  tags={tags}
                 />
               ))}
             </div>

@@ -39,3 +39,4 @@ node_modules/
 
 # Auto generated data
 public/blog-metadata.json
+public/tags-metadata.json

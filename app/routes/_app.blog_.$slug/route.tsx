@@ -1,6 +1,7 @@
 import type { Route } from './+types/route';
 import { loadArticleBySlug, loadArticleMetadata } from '~/lib/blog/article-loader';
 import { loadArticleContent } from '~/lib/blog/mdx-processor';
+import { getTagsByIds } from '~/lib/blog/tags';
 import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
 import { ArticleContent } from './article-content';
 
@@ -67,16 +68,20 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const previousArticle = currentIndex > 0 ? publishedArticles[currentIndex - 1] : null;
   const nextArticle = currentIndex < publishedArticles.length - 1 ? publishedArticles[currentIndex + 1] : null;
 
+  // Load tags for the article
+  const articleTags = await getTagsByIds(article.tags);
+
   return {
     article,
     mdxContent,
     previousArticle,
     nextArticle,
+    tags: articleTags,
   };
 };
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
-  const { article, mdxContent, previousArticle, nextArticle } = loaderData;
+  const { article, mdxContent, previousArticle, nextArticle, tags } = loaderData;
 
   // Generate structured data for SEO
   const structuredData = generateArticleStructuredData(article);
@@ -96,6 +101,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             mdxContent={mdxContent}
             previousArticle={previousArticle}
             nextArticle={nextArticle}
+            tags={tags}
           />
         </div>
       </div>

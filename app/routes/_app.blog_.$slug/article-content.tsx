@@ -4,7 +4,8 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
-import { Badge } from '~/components/ui/badge';
+import type { Tag } from '~/lib/blog/tags';
+import { TagBadge } from '~/components/blog/tag-badge';
 import { formatDate } from '~/lib/utils';
 
 interface ArticleContentProps {
@@ -12,13 +13,15 @@ interface ArticleContentProps {
   mdxContent: string;
   previousArticle: ArticleMetadata | null;
   nextArticle: ArticleMetadata | null;
+  tags: Tag[];
 }
 
 export function ArticleContent({
   article,
   mdxContent,
   previousArticle,
-  nextArticle
+  nextArticle,
+  tags
 }: ArticleContentProps) {
   return (
     <article className="prose prose-lg max-w-none">
@@ -43,10 +46,14 @@ export function ArticleContent({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {article.tags.map((tag) => (
-            <Badge key={tag} variant="secondary">
-              {tag}
-            </Badge>
+          {tags.map((tag) => (
+            <TagBadge
+              key={tag.id}
+              tag={tag}
+              variant="default"
+              size="md"
+              showIcon={true}
+            />
           ))}
         </div>
 

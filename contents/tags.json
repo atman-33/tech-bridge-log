@@ -1,0 +1,77 @@
+{
+  "getting-started": {
+    "label": "Getting Started",
+    "icon": "🚀",
+    "description": "Introduction and beginner-friendly content"
+  },
+  "blog": {
+    "label": "Blog",
+    "icon": "📝",
+    "description": "General blog and content-related topics"
+  },
+  "introduction": {
+    "label": "Introduction",
+    "icon": "👋",
+    "description": "Introductory content and overviews"
+  },
+  "cloudflare": {
+    "label": "Cloudflare",
+    "icon": "☁️",
+    "description": "Cloudflare platform and services"
+  },
+  "edge-computing": {
+    "label": "Edge Computing",
+    "icon": "⚡",
+    "description": "Edge computing concepts and implementations"
+  },
+  "serverless": {
+    "label": "Serverless",
+    "icon": "🔧",
+    "description": "Serverless architecture and functions"
+  },
+  "performance": {
+    "label": "Performance",
+    "icon": "🚀",
+    "description": "Performance optimization and best practices"
+  },
+  "react": {
+    "label": "React",
+    "icon": "⚛️",
+    "description": "React library and ecosystem"
+  },
+  "react-router": {
+    "label": "React Router",
+    "icon": "🛣️",
+    "description": "React Router library and routing concepts"
+  },
+  "migration": {
+    "label": "Migration",
+    "icon": "🔄",
+    "description": "Migration guides and upgrade processes"
+  },
+  "frontend": {
+    "label": "Frontend",
+    "icon": "🎨",
+    "description": "Frontend development and user interfaces"
+  },
+  "typescript": {
+    "label": "TypeScript",
+    "icon": "🔧",
+    "description": "TypeScript language and type system"
+  },
+  "patterns": {
+    "label": "Patterns",
+    "icon": "🏗️",
+    "description": "Design patterns and architectural approaches"
+  },
+  "code-quality": {
+    "label": "Code Quality",
+    "icon": "✨",
+    "description": "Code quality, best practices, and maintainability"
+  },
+  "advanced": {
+    "label": "Advanced",
+    "icon": "🎯",
+    "description": "Advanced topics and techniques"
+  }
+}

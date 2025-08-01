@@ -1,12 +1,15 @@
 import { Link } from 'react-router';
 import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
+import type { Tag } from '~/lib/blog/tags';
+import { TagBadge } from '~/components/blog/tag-badge';
 
 interface ArticleCardProps {
   article: ArticleMetadata;
   index?: number;
+  tags?: Tag[];
 }
 
-export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
+export function ArticleCard({ article, index = 0, tags = [] }: ArticleCardProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -61,7 +64,32 @@ export function ArticleCard({ article, index = 0 }: ArticleCardProps) {
                   {formatDate(article.publishedAt)}
                 </time>
               </div>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <span>{article.readingTime} min read</span>
             </div>
+
+            {/* Tags */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {tags
+                  .filter(tag => article.tags.includes(tag.id))
+                  .slice(0, 3) // Limit to 3 tags to avoid overcrowding
+                  .map(tag => (
+                    <TagBadge
+                      key={tag.id}
+                      tag={tag}
+                      variant="outline"
+                      size="sm"
+                      showIcon={false}
+                    />
+                  ))}
+                {article.tags.length > 3 && (
+                  <span className="text-xs text-slate-400 dark:text-slate-500 px-2 py-1">
+                    +{article.tags.length - 3} more
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Arrow indicator */}
