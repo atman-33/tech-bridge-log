@@ -1,6 +1,7 @@
 import { useLoaderData, useSearchParams } from 'react-router';
 import type { Route } from './+types/route';
 import { SearchResults } from './search-results';
+import type { SearchIndex } from '~/lib/blog/search-index';
 
 export const meta: Route.MetaFunction = ({ location }) => {
   const url = new URL(location.pathname + location.search, 'https://example.com');
@@ -18,11 +19,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   // Load search index from public directory
   // In a real app, you might want to cache this or load it differently
-  let searchIndex = null;
+  let searchIndex: SearchIndex | null = null;
   try {
     const response = await fetch(new URL('/search-index.json', request.url));
     if (response.ok) {
-      searchIndex = await response.json();
+      searchIndex = await response.json() as SearchIndex;
     }
   } catch (error) {
     console.error('Failed to load search index:', error);

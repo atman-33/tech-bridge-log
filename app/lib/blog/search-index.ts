@@ -1,5 +1,4 @@
-import FlexSearch from "flexsearch";
-import type { ArticleMetadata } from "./mdx-processor";
+import { Document, Index } from "flexsearch";
 
 export interface SearchableArticle {
   slug: string;
@@ -7,6 +6,8 @@ export interface SearchableArticle {
   description: string;
   content: string;
   tags: string[];
+  // biome-ignore lint/suspicious/noExplicitAny: <>
+  [key: string]: any; // Index signature for FlexSearch compatibility
 }
 
 export interface SearchResult {
@@ -30,13 +31,10 @@ export interface SearchIndex {
  * Creates a FlexSearch index for client-side searching
  */
 export function createSearchIndex() {
-  return new FlexSearch.Index({
+  return new Index({
     tokenize: "forward",
     cache: true,
     resolution: 9,
-    minlength: 2,
-    optimize: true,
-    fastupdate: true,
   });
 }
 
@@ -44,13 +42,10 @@ export function createSearchIndex() {
  * Creates a document-based FlexSearch index for more complex searching
  */
 export function createDocumentIndex() {
-  return new FlexSearch.Document({
+  return new Document({
     tokenize: "forward",
     cache: true,
     resolution: 9,
-    minlength: 2,
-    optimize: true,
-    fastupdate: true,
     document: {
       id: "slug",
       index: ["title", "description", "content", "tags"],
@@ -119,7 +114,7 @@ export function extractSnippets(
 ): string {
   if (!searchTerms.length) {
     return content.length > maxLength
-      ? content.substring(0, maxLength) + "..."
+      ? `${content.substring(0, maxLength)}...`
       : content;
   }
 
@@ -141,7 +136,7 @@ export function extractSnippets(
 
   if (positions.length === 0) {
     return content.length > maxLength
-      ? content.substring(0, maxLength) + "..."
+      ? `${content.substring(0, maxLength)}...`
       : content;
   }
 
@@ -156,8 +151,8 @@ export function extractSnippets(
   let snippet = content.substring(start, end);
 
   // Add ellipsis if needed
-  if (start > 0) snippet = "..." + snippet;
-  if (end < content.length) snippet = snippet + "...";
+  if (start > 0) snippet = `...${snippet}`;
+  if (end < content.length) snippet = `${snippet}...`;
 
   return snippet;
 }
@@ -166,7 +161,8 @@ export function extractSnippets(
  * Performs client-side search using FlexSearch
  */
 export function performSearch(
-  index: FlexSearch.Document<SearchableArticle>,
+  // biome-ignore lint/suspicious/noExplicitAny: <>
+  index: any, // FlexSearch Document instance
   articles: SearchableArticle[],
   query: string,
   limit = 10,

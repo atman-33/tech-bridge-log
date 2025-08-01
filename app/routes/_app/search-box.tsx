@@ -34,7 +34,7 @@ export function SearchBox({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load search index on component mount
   useEffect(() => {
@@ -42,7 +42,7 @@ export function SearchBox({
       try {
         const response = await fetch('/search-index.json');
         if (response.ok) {
-          const index = await response.json();
+          const index = await response.json() as SearchIndex;
           setSearchIndex(index);
         }
       } catch (error) {

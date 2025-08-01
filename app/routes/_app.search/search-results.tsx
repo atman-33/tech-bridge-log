@@ -165,7 +165,12 @@ function SearchResultCard({ result }: SearchResultCardProps) {
         {result.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {result.tags.map((tag) => (
-              <TagBadge key={tag} tag={tag} />
+              <span
+                key={tag}
+                className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md"
+              >
+                {tag}
+              </span>
             ))}
           </div>
         )}
