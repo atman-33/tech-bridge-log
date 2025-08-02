@@ -5,6 +5,8 @@ import { SearchIndexUnavailable, SearchErrorBoundary } from '~/components/error-
 import {
   createDocumentIndex,
   performSearch,
+  deduplicateSearchableArticles,
+  deduplicateSearchResults,
   type SearchResult,
   type SearchIndex
 } from '~/lib/blog/search-index';
@@ -30,11 +32,14 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
     setSearchError(null);
 
     try {
+      // Deduplicate articles before indexing to prevent duplicate entries
+      const deduplicatedArticles = deduplicateSearchableArticles(searchIndex.articles);
+
       // Create FlexSearch index
       const index = createDocumentIndex();
 
-      // Add articles to the index
-      for (const article of searchIndex.articles) {
+      // Add deduplicated articles to the index
+      for (const article of deduplicatedArticles) {
         index.add({
           slug: article.slug,
           title: article.title,
@@ -44,9 +49,13 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
         });
       }
 
-      // Perform search
-      const searchResults = performSearch(index, searchIndex.articles, query, 20);
-      setResults(searchResults);
+      // Perform search with deduplicated articles
+      const searchResults = performSearch(index, deduplicatedArticles, query, 20);
+
+      // Apply final deduplication as a safety measure
+      const uniqueResults = deduplicateSearchResults(searchResults);
+
+      setResults(uniqueResults);
     } catch (error) {
       console.error('Search error:', error);
       setSearchError('An error occurred while searching. Please try again.');

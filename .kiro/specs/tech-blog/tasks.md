@@ -104,12 +104,20 @@
   - Maintain consistent branding across all pages
   - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-- [ ] 16. Fix search result deduplication
-  - Identify and resolve duplicate article issues in search results
-  - Implement result deduplication logic in search index generation
-  - Ensure unique article display across different search criteria
-  - Update search results component to handle deduplicated results
+- [x] 16. Fix search result deduplication
+  - ✅ Identify and resolve duplicate article issues in search results
+  - ✅ Implement result deduplication logic in search index generation
+  - ✅ Ensure unique article display across different search criteria
+  - ✅ Update search results component to handle deduplicated results
   - _Requirements: 12.1, 12.2, 12.3, 12.4_
+  
+  **Implementation Summary:**
+  - Added `deduplicateSearchResults()` and `deduplicateSearchableArticles()` utility functions
+  - Enhanced search index generation with duplicate detection and warnings
+  - Updated search results component to apply deduplication at multiple layers
+  - Improved `performSearch()` function with built-in deduplication using Map for unique results
+  - Added comprehensive tests to verify deduplication functionality
+  - Applied final deduplication step before writing search index to public directory
 
 - [ ] 17. Add emoji support to article content
   - Enhance MDX processor to properly handle emoji characters

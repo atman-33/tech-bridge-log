@@ -105,6 +105,46 @@ export function highlightSearchTerms(
 }
 
 /**
+ * Deduplicates search results by slug to ensure unique articles
+ */
+export function deduplicateSearchResults(
+  results: SearchResult[],
+): SearchResult[] {
+  const seen = new Set<string>();
+  const deduplicated: SearchResult[] = [];
+
+  for (const result of results) {
+    if (!seen.has(result.slug)) {
+      seen.add(result.slug);
+      deduplicated.push(result);
+    }
+  }
+
+  return deduplicated;
+}
+
+/**
+ * Validates and deduplicates searchable articles
+ */
+export function deduplicateSearchableArticles(
+  articles: SearchableArticle[],
+): SearchableArticle[] {
+  const seen = new Set<string>();
+  const deduplicated: SearchableArticle[] = [];
+
+  for (const article of articles) {
+    if (!seen.has(article.slug)) {
+      seen.add(article.slug);
+      deduplicated.push(article);
+    } else {
+      console.warn(`Duplicate article found in search index: ${article.slug}`);
+    }
+  }
+
+  return deduplicated;
+}
+
+/**
  * Extracts relevant snippets from content around search terms
  */
 export function extractSnippets(
@@ -176,14 +216,15 @@ export function performSearch(
   if (searchTerms.length === 0) return [];
 
   try {
-    // Perform the search
-    const results = index.search(query, { limit, enrich: true });
+    // Perform the search with a higher limit to account for duplicates
+    const results = index.search(query, { limit: limit * 3, enrich: true });
 
     if (!Array.isArray(results) || results.length === 0) {
       return [];
     }
 
-    const searchResults: SearchResult[] = [];
+    // Use a Map to deduplicate results by slug
+    const uniqueResults = new Map<string, SearchResult>();
 
     // Process results from the document index
     for (const result of results) {
@@ -196,6 +237,9 @@ export function performSearch(
           if (typeof item === "object" && "id" in item && "doc" in item) {
             const article = articles.find((a) => a.slug === item.id);
             if (!article) continue;
+
+            // Skip if we already have this article (deduplication)
+            if (uniqueResults.has(article.slug)) continue;
 
             const searchResult: SearchResult = {
               slug: article.slug,
@@ -215,13 +259,20 @@ export function performSearch(
               },
             };
 
-            searchResults.push(searchResult);
+            uniqueResults.set(article.slug, searchResult);
+
+            // Stop when we have enough unique results
+            if (uniqueResults.size >= limit) break;
           }
         }
       }
+
+      // Stop outer loop when we have enough unique results
+      if (uniqueResults.size >= limit) break;
     }
 
-    return searchResults;
+    // Convert Map values to array and return
+    return Array.from(uniqueResults.values());
   } catch (error) {
     console.error("Search error:", error);
     return [];

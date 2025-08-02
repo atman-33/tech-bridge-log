@@ -3,7 +3,7 @@
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { generateArticleCache, loadArticleContent } from '../app/lib/blog/mdx-processor.js';
-import { stripMarkdown, type SearchIndex } from '../app/lib/blog/search-index.js';
+import { stripMarkdown, deduplicateSearchableArticles, type SearchIndex } from '../app/lib/blog/search-index.js';
 
 interface TagConfig {
   label: string;
@@ -111,7 +111,16 @@ async function buildBlog() {
       generatedAt: new Date().toISOString(),
     };
 
+    // Use a Set to track processed slugs and prevent duplicates
+    const processedSlugs = new Set<string>();
+
     for (const article of cache.articles) {
+      // Skip if we've already processed this slug
+      if (processedSlugs.has(article.slug)) {
+        console.warn(`⚠️  Duplicate article slug detected in search index: ${article.slug}`);
+        continue;
+      }
+
       try {
         const content = await loadArticleContent(article.slug);
         if (content) {
@@ -122,6 +131,7 @@ async function buildBlog() {
             content: stripMarkdown(content),
             tags: article.tags,
           });
+          processedSlugs.add(article.slug);
         }
       } catch (error) {
         console.warn(`⚠️  Failed to load content for search index: ${article.slug}`, error);
@@ -161,8 +171,14 @@ async function buildBlog() {
 
     await writeFile('public/tags-metadata.json', JSON.stringify(tagsMetadata, null, 2));
 
+    // Final deduplication of search index before writing
+    const finalSearchIndex: SearchIndex = {
+      articles: deduplicateSearchableArticles(searchIndex.articles),
+      generatedAt: searchIndex.generatedAt,
+    };
+
     // Write search index to public directory
-    await writeFile('public/search-index.json', JSON.stringify(searchIndex, null, 2));
+    await writeFile('public/search-index.json', JSON.stringify(finalSearchIndex, null, 2));
 
     console.log(`✅ Generated metadata for ${cache.articles.length} articles`);
     console.log(`✅ Generated metadata for ${tags.length} tags`);
