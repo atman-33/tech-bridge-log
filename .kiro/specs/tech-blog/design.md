@@ -37,6 +37,10 @@ graph TB
 │   └── cover.jpg
 └── ...
 
+/contents/
+├── apps.json                      # Apps section configuration
+└── tags.json                      # Tag definitions with SVG icons
+
 /app/
 ├── routes/
 │   ├── blog/
@@ -46,28 +50,49 @@ graph TB
 │   ├── blog.$slug/
 │   │   ├── route.tsx              # Individual article page
 │   │   ├── article-content.tsx    # Article content component
-│   │   └── reading-progress.tsx   # Reading progress indicator
+│   │   ├── reading-progress.tsx   # Reading progress indicator
+│   │   ├── table-of-contents.tsx  # TOC component
+│   │   ├── navigation-menu.tsx    # Navigation when TOC hidden
+│   │   ├── related-articles.tsx   # Related articles component
+│   │   └── markdown-components.tsx # Enhanced MDX components
 │   ├── blog.tag.$tag/
 │   │   ├── route.tsx              # Tag filtering page
 │   │   └── tag-header.tsx         # Tag page header component
+│   ├── apps/
+│   │   ├── route.tsx              # Apps section page
+│   │   └── app-card.tsx           # App card component
 │   └── search/
-│       ├── route.tsx              # Search results page
-│       └── search-results.tsx     # Search results component
+│       ├── route.tsx              # Search results page (with deduplication)
+│       └── search-results.tsx     # Enhanced search results component
 ├── lib/
 │   ├── blog/
-│   │   ├── mdx-processor.ts       # MDX compilation
+│   │   ├── mdx-processor.ts       # Enhanced MDX compilation with emoji support
 │   │   ├── article-loader.ts      # Article metadata loading
-│   │   └── search-index.ts        # Search index generation
+│   │   ├── search-index.ts        # Enhanced search index with deduplication
+│   │   └── related-articles.ts    # Related articles logic
 │   └── utils/
 └── components/
     ├── blog/
-    │   ├── tag-badge.tsx
-    │   └── theme-toggle.tsx
+    │   ├── tag-badge.tsx          # Enhanced with SVG icons
+    │   ├── theme-toggle.tsx
+    │   ├── code-block.tsx         # Enhanced with copy/wrap buttons
+    │   └── embedded-image.tsx     # Image embedding component
+    ├── layout/
+    │   ├── header.tsx             # Enhanced with custom logo
+    │   └── navigation.tsx         # Mobile-responsive navigation
+    ├── logo.tsx                   # Custom logo component
     └── ui/
 
 /public/
 ├── blog-assets/                   # Generated from article images
-└── search-index.json             # Generated search index
+├── search-index.json             # Enhanced search index
+├── icons/
+│   ├── tags/                      # SVG tag icons
+│   │   ├── react.svg
+│   │   ├── typescript.svg
+│   │   └── ...
+│   └── logo.svg                   # Custom blog logo
+└── app-assets/                    # App thumbnails and assets
 ```
 
 ## Components and Interfaces
@@ -85,6 +110,7 @@ interface Article {
   thumbnail: string;
   content?: string; // Only loaded on article detail page
   readingTime: number; // Calculated during build
+  relatedArticles?: ArticleMetadata[]; // Related articles based on tags
 }
 
 interface ArticleMetadata {
@@ -101,8 +127,18 @@ interface ArticleMetadata {
 interface Tag {
   id: string;
   label: string;
-  icon: string;
+  icon: string; // SVG file path
   description?: string;
+}
+
+interface App {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  url: string;
+  technologies: string[];
+  featured: boolean;
 }
 
 interface SearchIndex {
@@ -113,6 +149,13 @@ interface SearchIndex {
     content: string;
     tags: string[];
   }[];
+}
+
+interface NavigationSection {
+  id: string;
+  title: string;
+  level: number;
+  anchor: string;
 }
 ```
 
@@ -153,10 +196,24 @@ interface SearchIndex {
 - Co-located with `tag-header.tsx` component
 
 **Search Interface (`app/routes/search/route.tsx`)**
-- Client-side search with FlexSearch
+- Client-side search with FlexSearch and result deduplication
 - Real-time search suggestions
 - Keyboard navigation support
-- Co-located with `search-results.tsx` component
+- Mobile-responsive search interface
+- Co-located with enhanced `search-results.tsx` component
+
+**Apps Section (`app/routes/apps/route.tsx`)**
+- Displays web application portfolio
+- Supports featured and regular app categories
+- Responsive card layout for different screen sizes
+- Co-located with `app-card.tsx` component
+
+**Enhanced Article Components**
+- **Code Block Enhancement**: Copy button and word wrap toggle functionality
+- **Embedded Images**: Inline image support with progressive loading
+- **Related Articles**: Tag-based article recommendations
+- **Navigation Menu**: Alternative navigation when TOC is hidden
+- **Mobile Responsiveness**: Optimized layouts for all screen sizes
 
 ## Data Models
 
@@ -178,14 +235,46 @@ thumbnail: "./thumbnail.png"
 {
   "react": {
     "label": "React",
-    "icon": "react-icon.svg",
+    "icon": "/icons/tags/react.svg",
     "description": "React library and ecosystem"
   },
   "cloudflare": {
     "label": "Cloudflare",
-    "icon": "cloudflare-icon.svg",
+    "icon": "/icons/tags/cloudflare.svg",
     "description": "Cloudflare platform and services"
+  },
+  "typescript": {
+    "label": "TypeScript",
+    "icon": "/icons/tags/typescript.svg",
+    "description": "TypeScript language and tooling"
   }
+}
+```
+
+### Apps Configuration (`/contents/apps.json`)
+
+```json
+{
+  "apps": [
+    {
+      "id": "task-manager",
+      "title": "Task Manager Pro",
+      "description": "A modern task management application built with React and TypeScript",
+      "thumbnail": "/app-assets/task-manager/thumbnail.png",
+      "url": "https://taskmanager.example.com",
+      "technologies": ["react", "typescript", "tailwind"],
+      "featured": true
+    },
+    {
+      "id": "code-formatter",
+      "title": "Code Formatter",
+      "description": "Online code formatting tool supporting multiple languages",
+      "thumbnail": "/app-assets/code-formatter/thumbnail.png",
+      "url": "https://formatter.example.com",
+      "technologies": ["javascript", "web-apis"],
+      "featured": false
+    }
+  ]
 }
 ```
 

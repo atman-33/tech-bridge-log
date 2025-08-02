@@ -93,3 +93,113 @@ This feature involves building a modern technical blog platform, designed for in
 2. WHEN adding images THEN the system SHALL store them in the same directory as the article
 3. WHEN the site builds THEN the system SHALL automatically discover all articles in the contents directory
 4. WHEN articles are processed THEN the system SHALL validate required frontmatter fields and file structure
+
+### Requirement 9
+
+**User Story:** As a blog visitor, I want to see tag icons displayed as SVG files instead of text, so that I can visually identify different technology categories more easily.
+
+#### Acceptance Criteria
+
+1. WHEN a tag is displayed THEN the system SHALL show an SVG icon instead of text-based icons
+2. WHEN loading tag icons THEN the system SHALL support SVG file format for scalable display
+3. WHEN a tag icon is missing THEN the system SHALL provide a default fallback SVG icon
+4. WHEN displaying tags THEN the system SHALL maintain consistent icon sizing across all components
+
+### Requirement 10
+
+**User Story:** As a blog visitor using mobile devices, I want the blog interface to be fully responsive, so that I can read articles and navigate the site comfortably on any screen size.
+
+#### Acceptance Criteria
+
+1. WHEN accessing the blog on mobile devices THEN the system SHALL provide a responsive layout that adapts to screen size
+2. WHEN viewing articles on mobile THEN the system SHALL optimize text readability and image display
+3. WHEN using navigation on mobile THEN the system SHALL provide touch-friendly interface elements
+4. WHEN searching on mobile THEN the system SHALL adapt the search interface for mobile interaction
+
+### Requirement 11
+
+**User Story:** As a blog visitor, I want to see a custom logo that represents the blog's identity, so that I can easily recognize and remember the brand.
+
+#### Acceptance Criteria
+
+1. WHEN the blog loads THEN the system SHALL display a custom-designed logo in the header
+2. WHEN clicking the logo THEN the system SHALL navigate to the blog homepage
+3. WHEN the logo is displayed THEN the system SHALL maintain consistent branding across all pages
+4. WHEN using dark/light themes THEN the system SHALL adapt the logo appearance appropriately
+
+### Requirement 12
+
+**User Story:** As a blog visitor, I want search results to show unique articles without duplicates, so that I can efficiently browse through relevant content.
+
+#### Acceptance Criteria
+
+1. WHEN performing a keyword search THEN the system SHALL ensure each article appears only once in results
+2. WHEN search results are displayed THEN the system SHALL deduplicate articles that match multiple criteria
+3. WHEN filtering search results THEN the system SHALL maintain result uniqueness across different search terms
+4. WHEN search indexing occurs THEN the system SHALL prevent duplicate entries in the search index
+
+### Requirement 13
+
+**User Story:** As a blog visitor reading articles, I want to see emoji support in article content, so that authors can use expressive visual elements in their technical writing.
+
+#### Acceptance Criteria
+
+1. WHEN articles contain emoji characters THEN the system SHALL render them properly in all browsers
+2. WHEN displaying emojis THEN the system SHALL maintain consistent sizing and alignment with text
+3. WHEN using emojis in headings THEN the system SHALL preserve proper formatting and spacing
+4. WHEN emojis are used THEN the system SHALL ensure accessibility with proper alt text or descriptions
+
+### Requirement 14
+
+**User Story:** As a blog visitor reading code-heavy articles, I want code blocks to have copy and word wrap functionality, so that I can easily use the code examples and read long lines.
+
+#### Acceptance Criteria
+
+1. WHEN viewing code blocks THEN the system SHALL provide a copy button to copy code to clipboard
+2. WHEN code lines are long THEN the system SHALL provide a toggle button for word wrapping
+3. WHEN copying code THEN the system SHALL provide visual feedback confirming the copy action
+4. WHEN toggling word wrap THEN the system SHALL preserve code formatting and indentation
+
+### Requirement 15
+
+**User Story:** As a blog visitor reading articles, I want to see a navigation menu when the table of contents is hidden, so that I can still navigate through the article structure.
+
+#### Acceptance Criteria
+
+1. WHEN the table of contents is not displayed THEN the system SHALL show a navigation menu
+2. WHEN the navigation menu is displayed THEN the system SHALL provide access to article sections
+3. WHEN clicking navigation items THEN the system SHALL scroll to the corresponding article section
+4. WHEN the article structure changes THEN the system SHALL update the navigation menu accordingly
+
+### Requirement 16
+
+**User Story:** As a blog visitor reading articles, I want to see embedded images within article content, so that I can view visual content that supports the technical explanations.
+
+#### Acceptance Criteria
+
+1. WHEN articles contain embedded images THEN the system SHALL display them inline with the content
+2. WHEN images are embedded THEN the system SHALL support various image formats (PNG, JPG, SVG, WebP)
+3. WHEN images load THEN the system SHALL provide progressive loading with placeholder states
+4. WHEN images fail to load THEN the system SHALL display appropriate fallback content
+
+### Requirement 17
+
+**User Story:** As a blog visitor, I want to see related articles based on shared tags, so that I can discover more content on topics that interest me.
+
+#### Acceptance Criteria
+
+1. WHEN viewing an article THEN the system SHALL display related articles with shared tags
+2. WHEN showing related articles THEN the system SHALL randomly select from articles with matching tags
+3. WHEN no related articles exist THEN the system SHALL gracefully handle the empty state
+4. WHEN displaying related articles THEN the system SHALL show article title, thumbnail, and publication date
+
+### Requirement 18
+
+**User Story:** As a blog visitor, I want to access a dedicated Apps section showcasing web applications, so that I can explore the author's projects and tools.
+
+#### Acceptance Criteria
+
+1. WHEN navigating the blog THEN the system SHALL provide an "Apps" tab in the main navigation
+2. WHEN accessing the Apps section THEN the system SHALL display web application cards with project information
+3. WHEN viewing app cards THEN the system SHALL show app title, description, thumbnail, and link to the application
+4. WHEN clicking on app cards THEN the system SHALL navigate to the respective web application

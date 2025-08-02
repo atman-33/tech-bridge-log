@@ -82,3 +82,73 @@
   - Add fallback components for missing images and failed searches
   - Build graceful degradation for JavaScript-disabled environments
   - _Requirements: 2.1, 3.1, 4.1, 5.1_
+
+- [ ] 13. Enhance tag system with SVG icons
+  - Update tags.json configuration to use SVG file paths instead of text icons
+  - Create SVG icon collection for common technology tags
+  - Modify tag-badge component to render SVG icons
+  - Implement fallback icon for tags without specific SVG icons
+  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+
+- [ ] 14. Implement mobile-responsive design improvements
+  - Enhance header and navigation components for mobile devices
+  - Optimize article reading experience for mobile screens
+  - Implement touch-friendly interface elements throughout the application
+  - Adapt search interface for mobile interaction patterns
+  - _Requirements: 10.1, 10.2, 10.3, 10.4_
+
+- [ ] 15. Create and integrate custom blog logo
+  - Design and implement custom logo component
+  - Integrate logo into header with homepage navigation functionality
+  - Ensure logo adapts properly to light and dark themes
+  - Maintain consistent branding across all pages
+  - _Requirements: 11.1, 11.2, 11.3, 11.4_
+
+- [ ] 16. Fix search result deduplication
+  - Identify and resolve duplicate article issues in search results
+  - Implement result deduplication logic in search index generation
+  - Ensure unique article display across different search criteria
+  - Update search results component to handle deduplicated results
+  - _Requirements: 12.1, 12.2, 12.3, 12.4_
+
+- [ ] 17. Add emoji support to article content
+  - Enhance MDX processor to properly handle emoji characters
+  - Ensure consistent emoji rendering across different browsers
+  - Implement proper emoji sizing and alignment with text content
+  - Add accessibility considerations for emoji usage
+  - _Requirements: 13.1, 13.2, 13.3, 13.4_
+
+- [ ] 18. Enhance code blocks with copy and wrap functionality
+  - Create enhanced code block component with copy button
+  - Implement word wrap toggle functionality for long code lines
+  - Add visual feedback for copy operations
+  - Ensure code formatting preservation during wrap toggling
+  - _Requirements: 14.1, 14.2, 14.3, 14.4_
+
+- [ ] 19. Implement conditional navigation menu
+  - Create navigation menu component for when TOC is hidden
+  - Implement logic to show navigation menu when table of contents is not displayed
+  - Add section navigation functionality with smooth scrolling
+  - Ensure navigation menu updates dynamically with article structure
+  - _Requirements: 15.1, 15.2, 15.3, 15.4_
+
+- [ ] 20. Add embedded image support to articles
+  - Enhance MDX processor to handle inline image embedding
+  - Support multiple image formats (PNG, JPG, SVG, WebP)
+  - Implement progressive image loading with placeholder states
+  - Create fallback handling for failed image loads
+  - _Requirements: 16.1, 16.2, 16.3, 16.4_
+
+- [ ] 21. Implement related articles feature
+  - Create related articles logic based on shared tags
+  - Build related articles component for article detail pages
+  - Implement random selection from articles with matching tags
+  - Handle empty state when no related articles exist
+  - _Requirements: 17.1, 17.2, 17.3, 17.4_
+
+- [ ] 22. Create Apps section with web application showcase
+  - Create apps.json configuration file for application data
+  - Implement `app/routes/apps/route.tsx` for Apps section page
+  - Build `app/routes/apps/app-card.tsx` component for application display
+  - Add Apps tab to main navigation and integrate with routing
+  - _Requirements: 18.1, 18.2, 18.3, 18.4_
