@@ -4,12 +4,14 @@ import { TableOfContents } from './table-of-contents';
 import { NavigationMenu } from './navigation-menu';
 import { MarkdownRenderer } from './markdown-renderer';
 import { ArticleNavigation } from './article-navigation';
+import { RelatedArticles } from './related-articles';
 
 interface ArticleContentProps {
   mdxContent: string;
   slug: string;
   previousArticle: ArticleMetadata | null;
   nextArticle: ArticleMetadata | null;
+  relatedArticles: ArticleMetadata[];
 }
 
 export function ArticleContent({
@@ -17,6 +19,7 @@ export function ArticleContent({
   slug,
   previousArticle,
   nextArticle,
+  relatedArticles,
 }: ArticleContentProps) {
   return (
     <>
@@ -29,6 +32,7 @@ export function ArticleContent({
         {/* Main Content */}
         <article className="prose prose-lg max-w-none flex-1 min-w-0">
           <MarkdownRenderer content={mdxContent} slug={slug} />
+          <RelatedArticles articles={relatedArticles} />
           <ArticleNavigation previousArticle={previousArticle} nextArticle={nextArticle} />
         </article>
 

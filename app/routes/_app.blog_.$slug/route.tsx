@@ -3,6 +3,7 @@ import { loadArticleBySlug, loadArticleMetadata } from '~/lib/blog/article-loade
 import { loadArticleContent } from '~/lib/blog/mdx-processor';
 import { getTagsByIds } from '~/lib/blog/tags';
 import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
+import { findRelatedArticles } from '~/lib/blog/related-articles';
 import { ArticleContent } from './article-content';
 import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
 import { ArticleHeader } from './article-header';
@@ -73,17 +74,21 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   // Load tags for the article
   const articleTags = await getTagsByIds(article.tags);
 
+  // Find related articles based on shared tags
+  const relatedArticles = findRelatedArticles(article, allArticles, 3);
+
   return {
     article,
     mdxContent,
     previousArticle,
     nextArticle,
     tags: articleTags,
+    relatedArticles,
   };
 };
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
-  const { article, mdxContent, previousArticle, nextArticle, tags } = loaderData;
+  const { article, mdxContent, previousArticle, nextArticle, tags, relatedArticles } = loaderData;
 
   // Generate structured data for SEO
   const structuredData = generateArticleStructuredData(article);
@@ -104,6 +109,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             slug={article.slug}
             previousArticle={previousArticle}
             nextArticle={nextArticle}
+            relatedArticles={relatedArticles}
           />
         </div>
       </div>

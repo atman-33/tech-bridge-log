@@ -147,7 +147,7 @@
   - Create fallback handling for failed image loads
   - _Requirements: 16.1, 16.2, 16.3, 16.4_
 
-- [ ] 21. Implement related articles feature
+- [x] 21. Implement related articles feature
   - Create related articles logic based on shared tags
   - Build related articles component for article detail pages
   - Implement random selection from articles with matching tags
