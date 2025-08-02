@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from 'react-router';
+import { useState } from 'react';
 import type { Tag } from '~/lib/blog/tags';
 
 interface TagHeaderProps {
@@ -10,6 +11,40 @@ interface TagHeaderProps {
 export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps) {
   const [searchParams] = useSearchParams();
   const currentTag = searchParams.get('tag');
+  const [iconErrors, setIconErrors] = useState<Set<string>>(new Set());
+
+  const handleIconError = (tagId: string) => {
+    setIconErrors(prev => new Set(prev).add(tagId));
+  };
+
+  const renderTagIcon = (tag: Tag, size: 'large' | 'small' = 'small') => {
+    const iconSize = size === 'large' ? 32 : 16;
+
+    // Check if icon is an SVG file path
+    if (tag.icon.endsWith('.svg')) {
+      return (
+        <img
+          src={iconErrors.has(tag.id) ? '/icons/tags/default.svg' : tag.icon}
+          alt={`${tag.label} icon`}
+          width={iconSize}
+          height={iconSize}
+          className="flex-shrink-0"
+          onError={() => handleIconError(tag.id)}
+        />
+      );
+    }
+
+    // Fallback for emoji or text icons
+    return (
+      <span
+        className={size === 'large' ? 'text-4xl' : 'text-base'}
+        role="img"
+        aria-label={`${tag.label} icon`}
+      >
+        {tag.icon}
+      </span>
+    );
+  };
 
   return (
     <header className="mb-16">
@@ -23,9 +58,7 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
         {selectedTag ? (
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
-              <span className="text-4xl" role="img" aria-label={`${selectedTag.label} icon`}>
-                {selectedTag.icon}
-              </span>
+              {renderTagIcon(selectedTag, 'large')}
               <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-slate-100 dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
                 {selectedTag.label}
               </h1>
@@ -72,9 +105,7 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
           >
-            <span className="text-base" role="img" aria-label={`${tag.label} icon`}>
-              {tag.icon}
-            </span>
+            {renderTagIcon(tag)}
             {tag.label}
           </Link>
         ))}

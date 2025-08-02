@@ -1,77 +1,77 @@
 {
   "getting-started": {
     "label": "Getting Started",
-    "icon": "🚀",
+    "icon": "/icons/tags/getting-started.svg",
     "description": "Introduction and beginner-friendly content"
   },
   "blog": {
     "label": "Blog",
-    "icon": "📝",
+    "icon": "/icons/tags/blog.svg",
     "description": "General blog and content-related topics"
   },
   "introduction": {
     "label": "Introduction",
-    "icon": "👋",
+    "icon": "/icons/tags/introduction.svg",
     "description": "Introductory content and overviews"
   },
   "cloudflare": {
     "label": "Cloudflare",
-    "icon": "☁️",
+    "icon": "/icons/tags/cloudflare.svg",
     "description": "Cloudflare platform and services"
   },
   "edge-computing": {
     "label": "Edge Computing",
-    "icon": "⚡",
+    "icon": "/icons/tags/edge-computing.svg",
     "description": "Edge computing concepts and implementations"
   },
   "serverless": {
     "label": "Serverless",
-    "icon": "🔧",
+    "icon": "/icons/tags/serverless.svg",
     "description": "Serverless architecture and functions"
   },
   "performance": {
     "label": "Performance",
-    "icon": "🚀",
+    "icon": "/icons/tags/performance.svg",
     "description": "Performance optimization and best practices"
   },
   "react": {
     "label": "React",
-    "icon": "⚛️",
+    "icon": "/icons/tags/react.svg",
     "description": "React library and ecosystem"
   },
   "react-router": {
     "label": "React Router",
-    "icon": "🛣️",
+    "icon": "/icons/tags/react-router.svg",
     "description": "React Router library and routing concepts"
   },
   "migration": {
     "label": "Migration",
-    "icon": "🔄",
+    "icon": "/icons/tags/migration.svg",
     "description": "Migration guides and upgrade processes"
   },
   "frontend": {
     "label": "Frontend",
-    "icon": "🎨",
+    "icon": "/icons/tags/frontend.svg",
     "description": "Frontend development and user interfaces"
   },
   "typescript": {
     "label": "TypeScript",
-    "icon": "🔧",
+    "icon": "/icons/tags/typescript.svg",
     "description": "TypeScript language and type system"
   },
   "patterns": {
     "label": "Patterns",
-    "icon": "🏗️",
+    "icon": "/icons/tags/patterns.svg",
     "description": "Design patterns and architectural approaches"
   },
   "code-quality": {
     "label": "Code Quality",
-    "icon": "✨",
+    "icon": "/icons/tags/code-quality.svg",
     "description": "Code quality, best practices, and maintainability"
   },
   "advanced": {
     "label": "Advanced",
-    "icon": "🎯",
+    "icon": "/icons/tags/advanced.svg",
     "description": "Advanced topics and techniques"
   }
 }

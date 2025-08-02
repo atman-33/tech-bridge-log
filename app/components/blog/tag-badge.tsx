@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { useState } from 'react';
 import type { Tag } from '~/lib/blog/tags';
 
 interface TagBadgeProps {
@@ -16,9 +17,11 @@ export function TagBadge({
   showIcon = true,
   asLink = true
 }: TagBadgeProps) {
+  const [iconError, setIconError] = useState(false);
+
   const baseClasses = `inline-flex items-center gap-1.5 font-medium transition-all duration-200 ${size === 'sm'
-      ? 'px-2.5 py-1 text-xs rounded-md'
-      : 'px-3 py-1.5 text-sm rounded-lg'
+    ? 'px-2.5 py-1 text-xs rounded-md'
+    : 'px-3 py-1.5 text-sm rounded-lg'
     }`;
 
   const variantClasses = {
@@ -27,17 +30,40 @@ export function TagBadge({
     minimal: 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
   };
 
+  const iconSize = size === 'sm' ? 14 : 16;
+
+  const renderIcon = () => {
+    if (!showIcon) return null;
+
+    // Check if icon is an SVG file path
+    if (tag.icon.endsWith('.svg')) {
+      return (
+        <img
+          src={iconError ? '/icons/tags/default.svg' : tag.icon}
+          alt={`${tag.label} icon`}
+          width={iconSize}
+          height={iconSize}
+          className="flex-shrink-0"
+          onError={() => setIconError(true)}
+        />
+      );
+    }
+
+    // Fallback for emoji or text icons
+    return (
+      <span
+        className={size === 'sm' ? 'text-xs' : 'text-sm'}
+        role="img"
+        aria-label={`${tag.label} icon`}
+      >
+        {tag.icon}
+      </span>
+    );
+  };
+
   const content = (
     <>
-      {showIcon && (
-        <span
-          className={size === 'sm' ? 'text-xs' : 'text-sm'}
-          role="img"
-          aria-label={`${tag.label} icon`}
-        >
-          {tag.icon}
-        </span>
-      )}
+      {renderIcon()}
       <span>{tag.label}</span>
     </>
   );
