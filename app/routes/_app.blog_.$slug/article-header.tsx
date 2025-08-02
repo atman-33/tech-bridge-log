@@ -10,15 +10,15 @@ interface ArticleHeaderProps {
 
 export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
   return (
-    <header className="mb-8 border-b border-border pb-8">
-      <div className="flex items-center gap-4 mb-4">
+    <header className="border-border pb-8">
+      <div className="flex flex-col items-center text-center gap-4 mb-4">
         <span className="text-6xl">{article.emoji}</span>
         <h1 className="text-4xl font-bold tracking-tight">
           {article.title}
         </h1>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+      <div className="flex flex-wrap items-center justify-center text-sm text-muted-foreground mb-4 gap-4">
         <time dateTime={article.publishedAt.toISOString()}>
           Published {formatDate(article.publishedAt)}
         </time>
@@ -32,7 +32,7 @@ export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
         <span>{article.readingTime} min read</span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 justify-center">
         {tags.map((tag) => (
           <TagBadge
             key={tag.id}
@@ -44,7 +44,7 @@ export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
         ))}
       </div>
 
-      <p className="text-xl text-muted-foreground mt-4">
+      <p className="text-md text-muted-foreground mt-4">
         {article.description}
       </p>
     </header>
