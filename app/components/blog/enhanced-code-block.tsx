@@ -88,7 +88,7 @@ export function EnhancedCodeBlock({
   return (
     <div className="relative group mb-4">
       {/* Header with language and controls */}
-      <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border border-border rounded-t-lg border-b-0">
+      <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border border-border rounded-t-lg border-b-1">
         <div className="flex items-center gap-2">
           {detectedLanguage && (
             <span className="text-xs font-mono text-muted-foreground uppercase tracking-wide">
@@ -97,7 +97,7 @@ export function EnhancedCodeBlock({
           )}
         </div>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <Button
             variant="ghost"
             size="sm"

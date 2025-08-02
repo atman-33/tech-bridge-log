@@ -133,7 +133,7 @@
   - Ensure code formatting preservation during wrap toggling
   - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-- [ ] 19. Implement conditional navigation menu
+- [-] 19. Implement conditional navigation menu
   - Create navigation menu component for when TOC is hidden
   - Implement logic to show navigation menu when table of contents is not displayed
   - Add section navigation functionality with smooth scrolling
