@@ -25,10 +25,9 @@ export function ArticleContent({
     <>
       <ReadingProgress target="article" />
 
-      <div className="flex gap-8">
+      <div className="flex gap-8 max-w-full overflow-hidden">
         {/* Main Content */}
-        <article className="prose prose-lg max-w-none flex-1">
-          <ArticleHeader article={article} tags={tags} />
+        <article className="prose prose-lg max-w-none flex-1 min-w-0">
           <MarkdownRenderer content={mdxContent} />
           <ArticleNavigation previousArticle={previousArticle} nextArticle={nextArticle} />
         </article>

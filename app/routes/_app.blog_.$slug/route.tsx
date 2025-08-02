@@ -5,6 +5,7 @@ import { getTagsByIds } from '~/lib/blog/tags';
 import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
 import { ArticleContent } from './article-content';
 import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
+import { ArticleHeader } from './article-header';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data?.article) {
@@ -95,8 +96,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dangerouslySetInnerHTML={{ __html: structuredData }}
       />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="mx-auto px-2 md:px-8 py-8">
+        <div className="mx-auto">
+          <ArticleHeader article={article} tags={tags} />
           <ArticleContent
             article={article}
             mdxContent={mdxContent}
