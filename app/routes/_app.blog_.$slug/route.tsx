@@ -100,11 +100,9 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         <div className="mx-auto">
           <ArticleHeader article={article} tags={tags} />
           <ArticleContent
-            article={article}
             mdxContent={mdxContent}
             previousArticle={previousArticle}
             nextArticle={nextArticle}
-            tags={tags}
           />
         </div>
       </div>
