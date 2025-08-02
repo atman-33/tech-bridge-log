@@ -140,7 +140,7 @@
   - Ensure navigation menu updates dynamically with article structure
   - _Requirements: 15.1, 15.2, 15.3, 15.4_
 
-- [ ] 20. Add embedded image support to articles
+- [x] 20. Add embedded image support to articles
   - Enhance MDX processor to handle inline image embedding
   - Support multiple image formats (PNG, JPG, SVG, WebP)
   - Implement progressive image loading with placeholder states

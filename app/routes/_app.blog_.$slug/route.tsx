@@ -101,6 +101,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           <ArticleHeader article={article} tags={tags} />
           <ArticleContent
             mdxContent={mdxContent}
+            slug={article.slug}
             previousArticle={previousArticle}
             nextArticle={nextArticle}
           />

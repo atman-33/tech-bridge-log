@@ -7,12 +7,14 @@ import { ArticleNavigation } from './article-navigation';
 
 interface ArticleContentProps {
   mdxContent: string;
+  slug: string;
   previousArticle: ArticleMetadata | null;
   nextArticle: ArticleMetadata | null;
 }
 
 export function ArticleContent({
   mdxContent,
+  slug,
   previousArticle,
   nextArticle,
 }: ArticleContentProps) {
@@ -26,7 +28,7 @@ export function ArticleContent({
       <div className="flex gap-8 max-w-full">
         {/* Main Content */}
         <article className="prose prose-lg max-w-none flex-1 min-w-0">
-          <MarkdownRenderer content={mdxContent} />
+          <MarkdownRenderer content={mdxContent} slug={slug} />
           <ArticleNavigation previousArticle={previousArticle} nextArticle={nextArticle} />
         </article>
 
