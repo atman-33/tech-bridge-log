@@ -126,7 +126,7 @@
   - Add accessibility considerations for emoji usage
   - _Requirements: 13.1, 13.2, 13.3, 13.4_
 
-- [-] 18. Enhance code blocks with copy and wrap functionality
+- [x] 18. Enhance code blocks with copy and wrap functionality
   - Create enhanced code block component with copy button
   - Implement word wrap toggle functionality for long code lines
   - Add visual feedback for copy operations

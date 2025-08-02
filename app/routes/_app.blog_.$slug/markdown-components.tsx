@@ -101,7 +101,14 @@ export const markdownComponents: Components = {
       codeChild.props?.className?.includes('language-');
 
     if (isCodeBlock) {
-      const language = codeChild.props.className?.replace('language-', '');
+      // Extract language from className, handling both "language-javascript" and "hljs language-javascript"
+      const extractLanguage = (className: string): string => {
+        const cleaned = className.replace(/^hljs\s+/, '');
+        const match = cleaned.match(/language-(\w+)/);
+        return match ? match[1] : '';
+      };
+
+      const language = extractLanguage(codeChild.props.className || '');
       return (
         <EnhancedCodeBlock
           className={codeChild.props.className}

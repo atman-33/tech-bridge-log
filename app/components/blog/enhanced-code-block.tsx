@@ -72,13 +72,23 @@ export function EnhancedCodeBlock({
     setIsWrapped(!isWrapped);
   };
 
-  // Extract language from className (e.g., "language-javascript" -> "javascript")
-  const detectedLanguage = language || className?.replace('language-', '') || '';
+  // Extract language from className 
+  // Handle both "language-javascript" and "hljs language-javascript" formats
+  const extractLanguage = (className?: string): string => {
+    if (!className) return '';
+
+    // Remove hljs prefix and extract language
+    const cleaned = className.replace(/^hljs\s+/, '');
+    const match = cleaned.match(/language-(\w+)/);
+    return match ? match[1] : '';
+  };
+
+  const detectedLanguage = language || extractLanguage(className) || '';
 
   return (
     <div className="relative group mb-4">
       {/* Header with language and controls */}
-      <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border border-border rounded-t-lg border-b-0">
+      <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border border-border rounded-t-lg border-b-0">
         <div className="flex items-center gap-2">
           {detectedLanguage && (
             <span className="text-xs font-mono text-muted-foreground uppercase tracking-wide">
@@ -106,12 +116,15 @@ export function EnhancedCodeBlock({
             variant="ghost"
             size="sm"
             onClick={handleCopy}
-            className="h-7 px-2 text-xs"
+            className={cn(
+              "h-7 px-2 text-xs transition-colors",
+              copied && "text-green-600 dark:text-green-400"
+            )}
             title="Copy code"
           >
             {copied ? (
               <>
-                <Check className="w-3 h-3 text-green-500" />
+                <Check className="w-3 h-3" />
                 <span className="ml-1">Copied!</span>
               </>
             ) : (
