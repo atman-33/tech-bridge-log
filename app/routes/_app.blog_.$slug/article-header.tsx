@@ -11,9 +11,12 @@ interface ArticleHeaderProps {
 export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
   return (
     <header className="mb-8 border-b border-border pb-8">
-      <h1 className="text-4xl font-bold tracking-tight mb-4">
-        {article.title}
-      </h1>
+      <div className="flex items-center gap-4 mb-4">
+        <span className="text-6xl">{article.emoji}</span>
+        <h1 className="text-4xl font-bold tracking-tight">
+          {article.title}
+        </h1>
+      </div>
 
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
         <time dateTime={article.publishedAt.toISOString()}>
