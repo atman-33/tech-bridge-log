@@ -1,6 +1,7 @@
 import type { Components } from 'react-markdown';
 import { generateHeadingId } from './article-utils';
 import { ImageWithFallback } from '~/components/blog/image-fallback';
+import { EnhancedCodeBlock } from '~/components/blog/enhanced-code-block';
 
 export const markdownComponents: Components = {
   // Headings with proper styling and IDs
@@ -90,12 +91,34 @@ export const markdownComponents: Components = {
     </a>
   ),
 
-  // Code blocks with syntax highlighting
-  pre: ({ children, ...props }) => (
-    <pre className="mb-4 overflow-x-auto rounded-lg bg-muted border border-border p-4 text-sm" {...props}>
-      {children}
-    </pre>
-  ),
+  // Enhanced code blocks with copy and wrap functionality
+  pre: ({ children, ...props }) => {
+    // Check if this is a code block (has a code child with language class)
+    const codeChild = Array.isArray(children) ? children[0] : children;
+    const isCodeBlock = codeChild &&
+      typeof codeChild === 'object' &&
+      'props' in codeChild &&
+      codeChild.props?.className?.includes('language-');
+
+    if (isCodeBlock) {
+      const language = codeChild.props.className?.replace('language-', '');
+      return (
+        <EnhancedCodeBlock
+          className={codeChild.props.className}
+          language={language}
+        >
+          {codeChild.props.children}
+        </EnhancedCodeBlock>
+      );
+    }
+
+    // Fallback for non-code pre elements
+    return (
+      <pre className="mb-4 overflow-x-auto rounded-lg bg-muted border border-border p-4 text-sm" {...props}>
+        {children}
+      </pre>
+    );
+  },
   code: ({ children, className, ...props }) => {
     const isInline = !className?.includes('language-');
 
@@ -107,6 +130,7 @@ export const markdownComponents: Components = {
       );
     }
 
+    // For code blocks, this will be handled by the pre component above
     return (
       <code className={className} {...props}>
         {children}
