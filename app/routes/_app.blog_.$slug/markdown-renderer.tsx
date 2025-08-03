@@ -17,6 +17,12 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
   // Process standalone URLs to convert them to LinkCard components
   const processedContent = processLinkCards(content);
 
+  // Debug logging
+  if (content !== processedContent) {
+    console.log('Original content:', content.substring(0, 200));
+    console.log('Processed content:', processedContent.substring(0, 200));
+  }
+
   // Create a custom sanitization schema that allows HTML elements commonly used in markdown
   const sanitizeSchema = {
     ...defaultSchema,

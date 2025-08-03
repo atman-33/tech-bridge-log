@@ -2,7 +2,7 @@ import type { Components } from 'react-markdown';
 import { generateHeadingId } from '~/utils/heading-utils';
 import { EnhancedCodeBlock } from '~/components/blog/enhanced-code-block';
 import { EnhancedImage } from '~/components/blog/enhanced-image';
-import { LinkCard } from '~/components/blog/link-card';
+import { LinkCard as LinkCardComponent } from '~/components/blog/link-card';
 
 export function createMarkdownComponents(slug: string): Components {
   return {
@@ -297,5 +297,11 @@ export function createMarkdownComponents(slug: string): Components {
         {children}
       </small>
     ),
+
+    // Custom LinkCard component for standalone URLs
+    LinkCard: ({ url, ...props }: { url?: string; }) => {
+      if (!url) return null;
+      return <LinkCardComponent url={url} {...props} />;
+    },
   };
 }
