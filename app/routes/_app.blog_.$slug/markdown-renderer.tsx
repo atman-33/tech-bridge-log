@@ -4,7 +4,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import { createMarkdownComponents } from './markdown-components';
-import { processLinkCards } from '~/utils/link-card-processor';
+import { processLinkCards } from '~/lib/blog/link-card-processor';
 
 interface MarkdownRendererProps {
   content: string;
@@ -47,7 +47,7 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
       'output',
       'progress',
       'meter',
-      'LinkCard'
+      'linkcard' // Allow lowercase version
     ],
     attributes: {
       ...defaultSchema.attributes,
@@ -70,7 +70,7 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
       output: ['for'],
       progress: ['value', 'max'],
       meter: ['value', 'min', 'max', 'low', 'high', 'optimum'],
-      LinkCard: ['url']
+      linkcard: ['url'] // Allow url attribute for lowercase version
     }
   };
 
@@ -81,7 +81,7 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
         rehypePlugins={[
           rehypeRaw,
           [rehypeSanitize, sanitizeSchema],
-          rehypeHighlight
+          rehypeHighlight,
         ]}
         components={markdownComponents}
       >

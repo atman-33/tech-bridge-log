@@ -5,7 +5,7 @@ import { EnhancedImage } from '~/components/blog/enhanced-image';
 import { LinkCard as LinkCardComponent } from '~/components/blog/link-card';
 
 interface CustomComponents extends Components {
-  LinkCard?: React.ComponentType<{ url?: string; }>;
+  linkcard?: React.ComponentType<{ url?: string; }>;
 }
 
 export function createMarkdownComponents(slug: string): CustomComponents {
@@ -302,8 +302,9 @@ export function createMarkdownComponents(slug: string): CustomComponents {
       </small>
     ),
 
-    // Custom LinkCard component for standalone URLs
-    LinkCard: ({ url, ...props }: { url?: string; }) => {
+    // Custom linkcard component for standalone URLs
+    // The key must be lowercase to match the HTML tag rendered by rehypeRaw.
+    linkcard: ({ url, ...props }: { url?: string; }) => {
       if (!url) return null;
       return <LinkCardComponent url={url} {...props} />;
     },
