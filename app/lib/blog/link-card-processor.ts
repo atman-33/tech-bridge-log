@@ -37,20 +37,25 @@ export function processLinkCards(content: string): string {
     );
   };
 
-  // Regex to match standalone URLs (URLs that are on their own line)
-  const standaloneUrlRegex = /^(https?:\/\/[^\s]+)$/gm;
+  // Regex to match standalone URLs. This is more specific to avoid being too greedy.
+  // It looks for a URL on its own line, possibly surrounded by whitespace.
+  const standaloneUrlRegex = /^(\s*https?:\/\/[^\s<>"']+?\s*)$/gm;
 
-  const result = content.replace(standaloneUrlRegex, (match, url, offset) => {
-    // Check if this URL is inside a code block
-    if (isInCodeBlock(offset)) {
-      console.log("Skipping URL in code block:", url);
-      return match; // Return original match without conversion
-    }
+  const result = content.replace(
+    standaloneUrlRegex,
+    (match, urlWithWhitespace, offset) => {
+      const url = urlWithWhitespace.trim();
+      // Check if this URL is inside a code block
+      if (isInCodeBlock(offset)) {
+        console.log("Skipping URL in code block:", url);
+        return match; // Return original match without conversion
+      }
 
-    console.log("Found standalone URL:", url);
-    // Convert standalone URL to a custom component marker
-    return `<LinkCard url="${url}" />`;
-  });
+      console.log("Found standalone URL:", url);
+      // Convert standalone URL to a custom component marker
+      return `<LinkCard url="${url}" />`;
+    },
+  );
 
   return result;
 }
