@@ -244,5 +244,57 @@ export function createMarkdownComponents(slug: string): Components {
         </a>
       );
     },
+
+    // HTML elements for enhanced markdown
+    details: ({ children, ...props }) => (
+      <details className="mb-4 border border-border rounded-lg overflow-hidden" {...props}>
+        {children}
+      </details>
+    ),
+    summary: ({ children, ...props }) => (
+      <summary className="bg-muted px-4 py-2 cursor-pointer hover:bg-muted/80 font-medium border-b border-border" {...props}>
+        {children}
+      </summary>
+    ),
+    kbd: ({ children, ...props }) => (
+      <kbd className="inline-flex items-center px-2 py-1 text-xs font-mono bg-muted border border-border rounded shadow-sm" {...props}>
+        {children}
+      </kbd>
+    ),
+    mark: ({ children, ...props }) => (
+      <mark className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded" {...props}>
+        {children}
+      </mark>
+    ),
+    sub: ({ children, ...props }) => (
+      <sub className="text-xs" {...props}>
+        {children}
+      </sub>
+    ),
+    sup: ({ children, ...props }) => (
+      <sup className="text-xs" {...props}>
+        {children}
+      </sup>
+    ),
+    ins: ({ children, ...props }) => (
+      <ins className="text-green-600 dark:text-green-400 no-underline bg-green-100 dark:bg-green-900/30 px-1 rounded" {...props}>
+        {children}
+      </ins>
+    ),
+    del: ({ children, ...props }) => (
+      <del className="text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-1 rounded" {...props}>
+        {children}
+      </del>
+    ),
+    abbr: ({ children, ...props }) => (
+      <abbr className="border-b border-dotted border-muted-foreground cursor-help" {...props}>
+        {children}
+      </abbr>
+    ),
+    small: ({ children, ...props }) => (
+      <small className="text-sm text-muted-foreground" {...props}>
+        {children}
+      </small>
+    ),
   };
 }
