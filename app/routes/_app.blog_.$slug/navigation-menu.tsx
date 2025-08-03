@@ -67,6 +67,26 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
     return () => observer.disconnect();
   }, [sections]);
 
+  // Handle ESC key to close menu
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   const handleSectionClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -106,10 +126,22 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
 
           {/* Menu Content */}
           <nav className="fixed top-20 right-4 left-4 z-50 bg-background border border-border rounded-lg shadow-xl max-h-[calc(100vh-6rem)] overflow-y-auto">
-            <div className="p-4">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
+            {/* Header with close button */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                 Article Sections
               </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 hover:bg-muted rounded-md transition-colors"
+                aria-label="Close navigation menu"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Menu content */}
+            <div className="p-4">
               <ul className="space-y-1">
                 {sections.map(({ id, title, level }) => (
                   <li key={id}>
