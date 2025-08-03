@@ -38,7 +38,7 @@ export function ArticleContent({
 
         {/* Table of Contents Sidebar - hidden on mobile */}
         <aside className="hidden md:block w-64 flex-shrink-0">
-          <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
+          <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto overflow-x-hidden">
             <TableOfContents content={mdxContent} className="p-4 border border-border rounded-lg bg-muted/50" />
           </div>
         </aside>

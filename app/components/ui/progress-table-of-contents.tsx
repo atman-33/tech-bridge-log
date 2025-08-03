@@ -38,7 +38,7 @@ export function ProgressTableOfContents({
           const isRead = readHeadings.has(id);
           const isSmallDot = level >= 3;
           const dotSize = isSmallDot ? 'w-3 h-3' : 'w-4 h-4';
-          const dotPosition = isSmallDot ? 'top-3' : 'top-2.5';
+          const dotPosition = isSmallDot ? 'top-2' : 'top-1.5';
           const innerDotInset = isSmallDot ? 'inset-0.5' : 'inset-1';
 
           return (
@@ -64,7 +64,7 @@ export function ProgressTableOfContents({
               <button
                 onClick={() => onHeadingClick(id)}
                 className={`
-                  block w-full text-left text-sm transition-all duration-200 pl-6 py-2 pr-2 rounded-r-md hover:bg-muted/50
+                  block w-full text-left text-sm transition-all duration-200 pl-6 py-1 pr-2 rounded-r-md hover:bg-muted/50
                   ${level === 1 ? 'font-semibold' : level === 2 ? 'font-medium' : ''}
                   ${level === 2 ? 'ml-2' : ''}
                   ${level === 3 ? 'ml-4' : ''}
