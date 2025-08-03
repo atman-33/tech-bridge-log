@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react';
 import { useHeadings } from '~/hooks/use-headings';
 import { useActiveHeading } from '~/hooks/use-active-heading';
 import { scrollToHeading } from '~/utils/heading-utils';
+import { ProgressTableOfContents } from '~/components/ui/progress-table-of-contents';
 
 interface NavigationMenuProps {
   content: string;
@@ -11,7 +12,7 @@ interface NavigationMenuProps {
 
 export function NavigationMenu({ content, className = '' }: NavigationMenuProps) {
   const headings = useHeadings(content);
-  const activeId = useActiveHeading(headings);
+  const { activeId, readHeadings } = useActiveHeading(headings);
   const [isOpen, setIsOpen] = useState(false);
 
   // Handle ESC key to close menu
@@ -86,30 +87,12 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
 
             {/* Menu content */}
             <div className="p-4">
-              <ul className="space-y-1">
-                {headings.map(({ id, text, level }) => (
-                  <li key={id}>
-                    <button
-                      onClick={() => handleSectionClick(id)}
-                      className={`
-                        block w-full text-left text-sm transition-colors hover:text-primary py-2 px-2 rounded hover:bg-muted
-                        ${level === 1 ? 'font-medium' : ''}
-                        ${level === 2 ? 'pl-4' : ''}
-                        ${level === 3 ? 'pl-6' : ''}
-                        ${level === 4 ? 'pl-8' : ''}
-                        ${level === 5 ? 'pl-10' : ''}
-                        ${level === 6 ? 'pl-12' : ''}
-                        ${activeId === id
-                          ? 'text-primary font-medium bg-muted'
-                          : 'text-muted-foreground'
-                        }
-                      `}
-                    >
-                      {text}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <ProgressTableOfContents
+                headings={headings}
+                activeId={activeId}
+                readHeadings={readHeadings}
+                onHeadingClick={handleSectionClick}
+              />
             </div>
           </nav>
         </>

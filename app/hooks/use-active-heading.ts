@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import type { HeadingItem } from "~/types/heading";
 
-export function useActiveHeading(headings: HeadingItem[]): string {
+interface ReadingProgress {
+  activeId: string;
+  readHeadings: Set<string>;
+}
+
+export function useActiveHeading(headings: HeadingItem[]): ReadingProgress {
   const [activeId, setActiveId] = useState<string>("");
+  const [readHeadings, setReadHeadings] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (headings.length === 0) return;
@@ -15,7 +21,18 @@ export function useActiveHeading(headings: HeadingItem[]): string {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setActiveId(entry.target.id);
+          const headingId = entry.target.id;
+          setActiveId(headingId);
+
+          // Mark this heading and all previous headings as read
+          const currentIndex = headings.findIndex((h) => h.id === headingId);
+          if (currentIndex !== -1) {
+            const newReadHeadings = new Set<string>();
+            for (let i = 0; i <= currentIndex; i++) {
+              newReadHeadings.add(headings[i].id);
+            }
+            setReadHeadings(newReadHeadings);
+          }
         }
       });
     }, observerOptions);
@@ -31,5 +48,5 @@ export function useActiveHeading(headings: HeadingItem[]): string {
     return () => observer.disconnect();
   }, [headings]);
 
-  return activeId;
+  return { activeId, readHeadings };
 }
