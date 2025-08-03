@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { useHeadings } from '~/hooks/use-headings';
 import { useActiveHeading } from '~/hooks/use-active-heading';
 import { scrollToHeading } from '~/utils/heading-utils';
 import { ProgressTableOfContents } from '~/components/ui/progress-table-of-contents';
@@ -11,8 +10,7 @@ interface NavigationMenuProps {
 }
 
 export function NavigationMenu({ content, className = '' }: NavigationMenuProps) {
-  const headings = useHeadings(content);
-  const { activeId, readHeadings } = useActiveHeading(headings);
+  const { headings, activeId, readHeadings } = useActiveHeading();
   const [isOpen, setIsOpen] = useState(false);
 
   // Handle ESC key to close menu

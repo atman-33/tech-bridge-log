@@ -1,4 +1,3 @@
-import { useHeadings } from '~/hooks/use-headings';
 import { useActiveHeading } from '~/hooks/use-active-heading';
 import { scrollToHeading } from '~/utils/heading-utils';
 import { ProgressTableOfContents } from '~/components/ui/progress-table-of-contents';
@@ -9,8 +8,7 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ content, className = '' }: TableOfContentsProps) {
-  const headings = useHeadings(content);
-  const { activeId, readHeadings } = useActiveHeading(headings);
+  const { headings, activeId, readHeadings } = useActiveHeading();
 
   if (headings.length === 0) {
     return null;

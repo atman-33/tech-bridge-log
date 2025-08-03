@@ -1,5 +1,5 @@
 import type { Components } from 'react-markdown';
-import { generateHeadingId } from './article-utils';
+import { generateHeadingId } from '~/utils/heading-utils';
 import { ImageWithFallback } from '~/components/blog/image-fallback';
 import { EnhancedCodeBlock } from '~/components/blog/enhanced-code-block';
 import { EnhancedImage } from '~/components/blog/enhanced-image';
