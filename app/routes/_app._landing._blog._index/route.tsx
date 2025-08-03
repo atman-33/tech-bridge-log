@@ -2,7 +2,7 @@ import type { Route } from './+types/route';
 import { loadArticleMetadata } from '~/lib/blog/article-loader';
 import { getUsedTags } from '~/lib/blog/tags';
 import { generateBlogListingMetaTags } from '~/lib/seo';
-import { ArticleCard } from './article-card';
+import { ArticleCard } from '../../components/blog/article-card';
 import { ArticleLoadingErrorBoundary } from '~/components/error-boundaries/article-error-boundary';
 
 export const meta: Route.MetaFunction = () => {

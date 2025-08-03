@@ -1,7 +1,7 @@
 import type { Route } from './+types/route';
 import { loadArticleMetadata } from '~/lib/blog/article-loader';
 import { loadTagsConfig, getUsedTags } from '~/lib/blog/tags';
-import { ArticleCard } from '~/routes/_app._landing._blog._index/article-card';
+import { ArticleCard } from '~/components/blog/article-card';
 import { TagHeader } from './tag-header';
 import { TagErrorBoundary } from '~/components/error-boundaries/tag-error-boundary';
 
@@ -90,7 +90,7 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
               {articles.map((article, index) => (
                 <ArticleCard
                   key={article.slug}

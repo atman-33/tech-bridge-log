@@ -29,7 +29,7 @@ export function ArticleCard({ article, index = 0, tags = [] }: ArticleCardProps)
       >
         <div className="flex items-start gap-5">
           {/* Emoji */}
-          <div className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-700 dark:to-slate-800 border border-slate-200/50 dark:border-slate-600/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+          <div className="flex h-14 w-14 min-w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-700 dark:to-slate-800 border border-slate-200/50 dark:border-slate-600/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
             <span
               className="text-2xl filter drop-shadow-sm"
               role="img"
@@ -93,7 +93,7 @@ export function ArticleCard({ article, index = 0, tags = [] }: ArticleCardProps)
           </div>
 
           {/* Arrow indicator */}
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-1">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-1 hidden md:block">
             <svg
               className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors"
               fill="none"
