@@ -90,7 +90,7 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
               {articles.map((article, index) => (
                 <ArticleCard
                   key={article.slug}

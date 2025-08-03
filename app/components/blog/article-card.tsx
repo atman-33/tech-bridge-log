@@ -80,7 +80,7 @@ export function ArticleCard({ article, index = 0, tags = [] }: ArticleCardProps)
                       tag={tag}
                       variant="outline"
                       size="sm"
-                      showIcon={false}
+                      showIcon={true}
                     />
                   ))}
                 {article.tags.length > 3 && (
