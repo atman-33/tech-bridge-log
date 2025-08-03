@@ -168,6 +168,24 @@ export function createMarkdownComponents(slug: string): Components {
 
     // Enhanced images with loading states and path resolution
     img: ({ src, alt, title, ...props }) => {
+      // DEBUG: Log image component information (debug-image-link only)
+      if (slug === 'debug-image-link') {
+        console.log('=== IMAGE DEBUG INFO ===');
+        console.log('img src:', src);
+        console.log('img alt:', alt);
+        console.log('img title:', title);
+        console.log('img props:', props);
+        console.log('img all props keys:', Object.keys(props));
+
+        // Check if there are any parent-related props or context
+        console.log('img props has node:', 'node' in props);
+        console.log('img props has parent:', 'parent' in props);
+
+        // Log the entire props object to see if there's any link information
+        console.log('img full props object:', JSON.stringify(props, null, 2));
+        console.log('========================');
+      }
+
       if (!src) {
         return (
           <div className="mb-4 p-4 bg-muted border border-border rounded-lg text-center text-muted-foreground">
@@ -196,6 +214,43 @@ export function createMarkdownComponents(slug: string): Components {
 
     // Links with proper styling - handle image links specially
     a: ({ children, href, ...props }) => {
+      // DEBUG: Log the structure of children to understand how image links are parsed (debug-image-link only)
+      if (slug === 'debug-image-link') {
+        console.log('=== LINK DEBUG INFO ===');
+        console.log('href:', href);
+        console.log('children:', children);
+        console.log('children type:', typeof children);
+        console.log('children is array:', Array.isArray(children));
+
+        if (Array.isArray(children)) {
+          console.log('children length:', children.length);
+          children.forEach((child, index) => {
+            console.log(`child[${index}]:`, child);
+            console.log(`child[${index}] type:`, typeof child);
+            if (typeof child === 'object' && child) {
+              console.log(`child[${index}] constructor:`, child.constructor?.name);
+              console.log(`child[${index}] has type prop:`, 'type' in child);
+              if ('type' in child) {
+                console.log(`child[${index}].type:`, child.type);
+              }
+              if ('props' in child) {
+                console.log(`child[${index}].props:`, child.props);
+              }
+            }
+          });
+        } else if (typeof children === 'object' && children) {
+          console.log('single child constructor:', children.constructor?.name);
+          console.log('single child has type prop:', 'type' in children);
+          if ('type' in children) {
+            console.log('single child type:', children.type);
+          }
+          if ('props' in children) {
+            console.log('single child props:', children.props);
+          }
+        }
+        console.log('======================');
+      }
+
       // Check if this link contains only an image
       const isImageLink = Array.isArray(children) &&
         children.length === 1 &&
@@ -203,6 +258,10 @@ export function createMarkdownComponents(slug: string): Components {
         children[0] &&
         'type' in children[0] &&
         children[0].type === 'img';
+
+      if (slug === 'debug-image-link') {
+        console.log('isImageLink result:', isImageLink);
+      }
 
       if (isImageLink) {
         const imgElement = children[0] as any;
