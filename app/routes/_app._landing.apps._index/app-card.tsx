@@ -8,7 +8,7 @@ interface AppItem {
   icon: string;
   description: string;
   imageUrl: string;
-  demoUrl: string;
+  appUrl: string;
   tags: string[];
 }
 
@@ -53,12 +53,12 @@ export function AppCard({ app }: AppCardProps) {
 
         <Button asChild className="w-full">
           <a
-            href={app.demoUrl}
+            href={app.appUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2"
           >
-            View Demo
+            Visit App
             <ExternalLink className="w-4 h-4" />
           </a>
         </Button>

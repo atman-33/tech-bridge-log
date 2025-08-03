@@ -4,7 +4,7 @@
     "icon": "https://github.com/atman-33/manga-log/blob/main/public/favicons/favicon-32x32.png?raw=true",
     "description": "Track & Organize Your Manga Reading Journey",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/manga-log/refs/heads/main/public/ogp-image.png",
-    "demoUrl": "https://mangalogs.com/",
+    "appUrl": "https://mangalogs.com/",
     "tags": [
       "Manga",
       "Tracker",
@@ -16,22 +16,11 @@
     "icon": "https://raw.githubusercontent.com/atman-33/tube-loop-player/refs/heads/main/public/favicons/favicon-32x32.png",
     "description": "Loop & Playlist Your Favorite YouTube Videos",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/tube-loop-player/refs/heads/main/public/ogp-image.png",
-    "demoUrl": "https://tubeloopplayer.com/",
+    "appUrl": "https://tubeloopplayer.com/",
     "tags": [
       "YouTube",
       "Music",
       "Video Player"
-    ]
-  },
-  {
-    "title": "Infinite Runner",
-    "icon": "",
-    "description": "Control a running mouse, dodge obstacles, and grab coins!",
-    "imageUrl": "https://github.com/atman-33/phaser3-webpack-typescript-template/blob/master/img/game.png?raw=true",
-    "demoUrl": "https://atman-33.github.io/phaser3-webpack-typescript-template/",
-    "tags": [
-      "Game",
-      "Phaser"
     ]
   }
 ]
