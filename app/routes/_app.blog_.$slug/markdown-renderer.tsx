@@ -4,6 +4,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import { createMarkdownComponents } from './markdown-components';
+import { processLinkCards } from '~/utils/link-card-processor';
 
 interface MarkdownRendererProps {
   content: string;
@@ -12,6 +13,9 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
   const markdownComponents = createMarkdownComponents(slug);
+
+  // Process standalone URLs to convert them to LinkCard components
+  const processedContent = processLinkCards(content);
 
   // Create a custom sanitization schema that allows HTML elements commonly used in markdown
   const sanitizeSchema = {
@@ -36,7 +40,8 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
       'samp',
       'output',
       'progress',
-      'meter'
+      'meter',
+      'LinkCard'
     ],
     attributes: {
       ...defaultSchema.attributes,
@@ -58,7 +63,8 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
       samp: [],
       output: ['for'],
       progress: ['value', 'max'],
-      meter: ['value', 'min', 'max', 'low', 'high', 'optimum']
+      meter: ['value', 'min', 'max', 'low', 'high', 'optimum'],
+      LinkCard: ['url']
     }
   };
 
@@ -73,7 +79,7 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
         ]}
         components={markdownComponents}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );
