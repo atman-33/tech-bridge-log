@@ -4,7 +4,11 @@ import { EnhancedCodeBlock } from '~/components/blog/enhanced-code-block';
 import { EnhancedImage } from '~/components/blog/enhanced-image';
 import { LinkCard as LinkCardComponent } from '~/components/blog/link-card';
 
-export function createMarkdownComponents(slug: string): Components {
+interface CustomComponents extends Components {
+  LinkCard?: React.ComponentType<{ url?: string; }>;
+}
+
+export function createMarkdownComponents(slug: string): CustomComponents {
   return {
     // Headings with proper styling and IDs
     h1: ({ children, ...props }) => {
