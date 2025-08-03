@@ -38,11 +38,11 @@ export function ProgressTableOfContents({
           const isRead = readHeadings.has(id);
           const isSmallDot = level >= 3;
           const dotSize = isSmallDot ? 'w-3 h-3' : 'w-4 h-4';
-          const dotPosition = isSmallDot ? 'top-3.5' : 'top-3';
+          const dotPosition = isSmallDot ? 'top-3' : 'top-2.5';
           const innerDotInset = isSmallDot ? 'inset-0.5' : 'inset-1';
 
           return (
-            <li key={id} className="relative py-1">
+            <li key={id} className="relative py-0">
               {/* Dot indicator */}
               <div
                 className={`
