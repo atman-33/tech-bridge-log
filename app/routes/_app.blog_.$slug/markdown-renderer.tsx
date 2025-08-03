@@ -5,6 +5,7 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import { createMarkdownComponents } from './markdown-components';
 import { remarkLinkCard } from '~/lib/blog/remark-link-card';
+import { rehypeLinkCardTransform } from '~/lib/blog/rehype-link-card-transform';
 
 interface MarkdownRendererProps {
   content: string;
@@ -68,9 +69,13 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
   return (
     <div className="prose prose-lg max-w-none prose-headings:scroll-mt-20 prose-pre:bg-muted prose-pre:border prose-pre:border-border border p-2 md:p-8 rounded-md">
       <ReactMarkdown
-        remarkPlugins={[remarkLinkCard, [remarkGfm, { autolinkLiterals: false }]]}
+        remarkPlugins={[
+          remarkLinkCard,
+          [remarkGfm],
+        ]}
         rehypePlugins={[
           rehypeRaw,
+          rehypeLinkCardTransform, // Add the new rehype plugin
           [rehypeSanitize, sanitizeSchema],
           rehypeHighlight,
         ]}
