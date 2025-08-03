@@ -154,9 +154,9 @@
   - Handle empty state when no related articles exist
   - _Requirements: 17.1, 17.2, 17.3, 17.4_
 
-- [ ] 22. Create Apps section with web application showcase
+- [x] 22. Create Apps section with web application showcase
   - Create apps.json configuration file for application data
-  - Implement `app/routes/apps/route.tsx` for Apps section page
-  - Build `app/routes/apps/app-card.tsx` component for application display
+  - Implement `app/routes/_app._landing.apps._index/route.tsx` for Apps section page
+  - Build `app/routes/_app._landing.apps._index/app-card.tsx` component for application display
   - Add Apps tab to main navigation and integrate with routing
   - _Requirements: 18.1, 18.2, 18.3, 18.4_

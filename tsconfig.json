@@ -18,6 +18,9 @@
       "~/database/*": [
         "./database/*"
       ],
+      "~/contents/*": [
+        "./contents/*"
+      ],
       "~/*": [
         "./app/*"
       ]
