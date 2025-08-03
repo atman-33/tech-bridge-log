@@ -1,47 +1,45 @@
-import type { HTML, Html, Paragraph, Root, Text } from "mdast";
+import type { HTML, Link, Paragraph, Root, Text } from "mdast";
 import type { Plugin } from "unified";
-import { visit } from "unist-util-visit";
-
-const URL_REGEX = /^https?:\/\/[^\s<>"']+$/;
-
-type Replacement = {
-  parent: Root | Paragraph;
-  index: number;
-  newNode: Html;
-};
+import { SKIP, visit } from "unist-util-visit";
 
 /**
- * A remark plugin to transform standalone URLs into custom LinkCard components.
- * It operates on the Markdown AST (mdast).
+ * A remark plugin that transforms standalone URLs into custom LinkCard components.
+ * It identifies paragraphs that contain only a single link where the link's text
+ * is the same as its URL.
  */
 export const remarkLinkCard: Plugin<[], Root> = () => {
   return (tree: Root) => {
-    const replacements: Replacement[] = [];
-
     visit(tree, "paragraph", (node: Paragraph, index, parent) => {
       if (!parent || typeof index !== "number") {
         return;
       }
 
-      if (node.children.length === 1 && node.children[0].type === "text") {
-        const textNode = node.children[0] as Text;
-        const url = textNode.value.trim();
+      // Check if the paragraph contains a single child which is a link node
+      if (node.children.length === 1 && node.children[0].type === "link") {
+        const linkNode = node.children[0] as Link;
 
-        if (URL_REGEX.test(url)) {
-          const newNode: Html = {
-            type: "html",
-            value: `<LinkCard url="${url}" />`,
-          };
-          // Schedule the replacement instead of doing it immediately.
-          replacements.push({ parent: parent as any, index, newNode });
+        // Check if the link contains a single text node
+        if (
+          linkNode.children.length === 1 &&
+          linkNode.children[0].type === "text"
+        ) {
+          const textNode = linkNode.children[0] as Text;
+
+          // Check if the link's text is the same as its URL
+          if (linkNode.url === textNode.value) {
+            const newNode: HTML = {
+              type: "html",
+              value: `<LinkCard url="${linkNode.url}" />`,
+            };
+
+            // Replace the original paragraph node with the new HTML node
+            parent.children.splice(index, 1, newNode);
+
+            // Skip further processing of this node
+            return SKIP;
+          }
         }
       }
     });
-
-    // Perform replacements in reverse order to avoid index issues.
-    for (let i = replacements.length - 1; i >= 0; i--) {
-      const { parent, index, newNode } = replacements[i];
-      parent.children.splice(index, 1, newNode);
-    }
   };
 };
