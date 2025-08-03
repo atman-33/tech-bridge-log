@@ -36,13 +36,18 @@ export function ProgressTableOfContents({
         {headings.map(({ id, text, level }) => {
           const isActive = activeId === id;
           const isRead = readHeadings.has(id);
+          const isSmallDot = level >= 3;
+          const dotSize = isSmallDot ? 'w-3 h-3' : 'w-4 h-4';
+          const dotPosition = isSmallDot ? 'top-3.5' : 'top-3';
+          const innerDotInset = isSmallDot ? 'inset-0.5' : 'inset-1';
 
           return (
-            <li key={id} className="relative py-2">
+            <li key={id} className="relative py-1">
               {/* Dot indicator */}
               <div
                 className={`
-                  absolute left-0 top-3 w-4 h-4 rounded-full border-2 transition-all duration-300 z-10
+                  absolute ${dotPosition} ${dotSize} rounded-full border-2 transition-all duration-300 z-10
+                  ${isSmallDot ? 'left-[3px]' : 'left-[1px]'}
                   ${isActive
                     ? 'bg-primary border-primary scale-125 shadow-lg shadow-primary/25'
                     : isRead
@@ -52,7 +57,7 @@ export function ProgressTableOfContents({
                 `}
               >
                 {isActive && (
-                  <div className="absolute inset-1 bg-background rounded-full"></div>
+                  <div className={`absolute ${innerDotInset} bg-background rounded-full`}></div>
                 )}
               </div>
 
