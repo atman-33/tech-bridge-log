@@ -1,6 +1,5 @@
 import type { Components } from 'react-markdown';
 import { generateHeadingId } from '~/utils/heading-utils';
-import { ImageWithFallback } from '~/components/blog/image-fallback';
 import { EnhancedCodeBlock } from '~/components/blog/enhanced-code-block';
 import { EnhancedImage } from '~/components/blog/enhanced-image';
 
@@ -80,18 +79,7 @@ export function createMarkdownComponents(slug: string): Components {
       </li>
     ),
 
-    // Links with proper styling
-    a: ({ children, href, ...props }) => (
-      <a
-        href={href}
-        className="text-primary hover:text-primary/80 underline underline-offset-4"
-        target={href?.startsWith('http') ? '_blank' : undefined}
-        rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
-        {...props}
-      >
-        {children}
-      </a>
-    ),
+
 
     // Enhanced code blocks with copy and wrap functionality
     pre: ({ children, ...props }) => {
@@ -179,7 +167,7 @@ export function createMarkdownComponents(slug: string): Components {
     ),
 
     // Enhanced images with loading states and path resolution
-    img: ({ src, alt, ...props }) => {
+    img: ({ src, alt, title, ...props }) => {
       if (!src) {
         return (
           <div className="mb-4 p-4 bg-muted border border-border rounded-lg text-center text-muted-foreground">
@@ -197,12 +185,63 @@ export function createMarkdownComponents(slug: string): Components {
             className="max-w-full"
             {...props}
           />
-          {alt && (
+          {title && (
             <p className="text-sm text-muted-foreground text-center mt-2 italic">
-              {alt}
+              {title}
             </p>
           )}
         </div>
+      );
+    },
+
+    // Links with proper styling - handle image links specially
+    a: ({ children, href, ...props }) => {
+      // Check if this link contains only an image
+      const isImageLink = Array.isArray(children) &&
+        children.length === 1 &&
+        typeof children[0] === 'object' &&
+        children[0] &&
+        'type' in children[0] &&
+        children[0].type === 'img';
+
+      if (isImageLink) {
+        const imgElement = children[0] as any;
+        return (
+          <div className="mb-4">
+            <a
+              href={href}
+              className="block"
+              target={href?.startsWith('http') ? '_blank' : undefined}
+              rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+              {...props}
+            >
+              <EnhancedImage
+                src={imgElement.props.src}
+                alt={imgElement.props.alt || 'Article image'}
+                slug={slug}
+                className="max-w-full hover:opacity-80 transition-opacity"
+              />
+            </a>
+            {imgElement.props.title && (
+              <p className="text-sm text-muted-foreground text-center mt-2 italic">
+                {imgElement.props.title}
+              </p>
+            )}
+          </div>
+        );
+      }
+
+      // Regular links
+      return (
+        <a
+          href={href}
+          className="text-primary hover:text-primary/80 underline underline-offset-4"
+          target={href?.startsWith('http') ? '_blank' : undefined}
+          rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+          {...props}
+        >
+          {children}
+        </a>
       );
     },
   };
