@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
-
-interface NavigationSection {
-  id: string;
-  title: string;
-  level: number;
-}
+import { useHeadings } from '~/hooks/use-headings';
+import { useActiveHeading } from '~/hooks/use-active-heading';
+import { scrollToHeading } from '~/utils/heading-utils';
 
 interface NavigationMenuProps {
   content: string;
@@ -13,59 +10,9 @@ interface NavigationMenuProps {
 }
 
 export function NavigationMenu({ content, className = '' }: NavigationMenuProps) {
-  const [sections, setSections] = useState<NavigationSection[]>([]);
-  const [activeId, setActiveId] = useState<string>('');
+  const headings = useHeadings(content);
+  const activeId = useActiveHeading(headings);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    // Extract headings from markdown content
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-    const items: NavigationSection[] = [];
-    let match;
-
-    while ((match = headingRegex.exec(content)) !== null) {
-      const level = match[1].length;
-      const title = match[2].trim();
-      // Create a simple ID from the heading text
-      const id = title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-
-      items.push({ id, title, level });
-    }
-
-    setSections(items);
-  }, [content]);
-
-  useEffect(() => {
-    if (sections.length === 0) return;
-
-    const observerOptions = {
-      rootMargin: '-20% 0% -35% 0%',
-      threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveId(entry.target.id);
-        }
-      });
-    }, observerOptions);
-
-    // Observe all headings
-    sections.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [sections]);
 
   // Handle ESC key to close menu
   useEffect(() => {
@@ -88,19 +35,16 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
   }, [isOpen]);
 
   const handleSectionClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setIsOpen(false); // Close menu after navigation
-    }
+    scrollToHeading(id);
+    setIsOpen(false); // Close menu after navigation
   };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Don't render if no sections found
-  if (sections.length === 0) {
+  // Don't render if no headings found
+  if (headings.length === 0) {
     return null;
   }
 
@@ -133,7 +77,7 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
               </h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-muted rounded-md transition-colors"
+                className="p-1 hover:bg-muted rounded-md transition-colors cursor-pointer"
                 aria-label="Close navigation menu"
               >
                 <X size={16} />
@@ -143,7 +87,7 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
             {/* Menu content */}
             <div className="p-4">
               <ul className="space-y-1">
-                {sections.map(({ id, title, level }) => (
+                {headings.map(({ id, text, level }) => (
                   <li key={id}>
                     <button
                       onClick={() => handleSectionClick(id)}
@@ -161,7 +105,7 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
                         }
                       `}
                     >
-                      {title}
+                      {text}
                     </button>
                   </li>
                 ))}
