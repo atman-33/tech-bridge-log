@@ -35,7 +35,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleTheme}
-      className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+      className="w-9 h-9 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 rounded-full"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
