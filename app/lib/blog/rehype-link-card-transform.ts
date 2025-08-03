@@ -14,29 +14,27 @@ export const rehypeLinkCardTransform: Plugin<[], Root> = () => {
       }
 
       // Check if this is a paragraph element marked by remarkLinkCard
+      // console.log("node", node);
+
       if (
         node.tagName === "p" &&
         node.properties &&
-        node.properties["data-linkcard-url"]
+        node.properties.dataLinkcardUrl
       ) {
-        const url = String(node.properties["data-linkcard-url"]);
+        const url = String(node.properties.dataLinkcardUrl);
+        console.log("url", url);
 
         // Transform the node into an mdxJsxFlowElement
-        const newNode: any = {
-          type: "mdxJsxFlowElement",
-          name: "LinkCard", // This must match the key in components prop of ReactMarkdown
-          attributes: [
-            {
-              type: "mdxJsxAttribute",
-              name: "url",
-              value: url,
-            },
-          ],
-          children: [], // LinkCard component will handle its own children
+        const newNode: Element = {
+          type: "element",
+          tagName: "linkcard",
+          properties: { url },
+          children: [],
         };
 
         // Replace the original paragraph node with the new mdxJsxFlowElement
         parent.children.splice(index, 1, newNode);
+        console.log("newNode", newNode);
       }
     });
   };

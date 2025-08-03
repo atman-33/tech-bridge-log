@@ -73,6 +73,7 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
     for (let i = replacements.length - 1; i >= 0; i--) {
       const { parent, index, newNode } = replacements[i];
       parent.children.splice(index, 1, newNode);
+      // console.log("new node", newNode);
     }
   };
 };
