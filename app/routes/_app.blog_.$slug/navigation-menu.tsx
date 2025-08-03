@@ -89,7 +89,7 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
       {/* Menu Toggle Button */}
       <button
         onClick={toggleMenu}
-        className="fixed top-20 right-4 z-50 p-3 bg-background border border-border rounded-lg shadow-lg hover:bg-muted transition-colors cursor-pointer"
+        className="fixed top-20 right-4 z-50 p-3 bg-background border border-border rounded-full shadow-lg hover:bg-muted transition-colors cursor-pointer"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}

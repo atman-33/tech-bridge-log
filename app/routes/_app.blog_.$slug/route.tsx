@@ -7,6 +7,7 @@ import { findRelatedArticles } from '~/lib/blog/related-articles';
 import { ArticleContent } from './article-content';
 import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
 import { ArticleHeader } from './article-header';
+import { ScrollToTopButton } from '~/components/ui/scroll-to-top-button';
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data?.article) {
@@ -113,6 +114,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
           />
         </div>
       </div>
+
+      <ScrollToTopButton />
     </>
   );
 }
