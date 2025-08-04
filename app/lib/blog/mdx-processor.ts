@@ -444,8 +444,8 @@ export async function processArticle(
   const slug = validatedFrontmatter.slug;
 
   // Process article images (for content images, not thumbnails)
-  // biome-ignore lint/suspicious/noExplicitAny: <>
   let imageResult: {
+    // biome-ignore lint/suspicious/noExplicitAny: <>
     assets: any[];
     thumbnailPath: string | null;
     errors: string[];
