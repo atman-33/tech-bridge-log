@@ -1,38 +1,8 @@
 {
-  "getting-started": {
-    "label": "Getting Started",
-    "icon": "/icons/tags/getting-started.svg",
-    "description": "Introduction and beginner-friendly content"
-  },
-  "blog": {
-    "label": "Blog",
-    "icon": "/icons/tags/blog.svg",
-    "description": "General blog and content-related topics"
-  },
-  "introduction": {
-    "label": "Introduction",
-    "icon": "/icons/tags/introduction.svg",
-    "description": "Introductory content and overviews"
-  },
-  "cloudflare": {
-    "label": "Cloudflare",
-    "icon": "/icons/tags/cloudflare.svg",
-    "description": "Cloudflare platform and services"
-  },
-  "edge-computing": {
-    "label": "Edge Computing",
-    "icon": "/icons/tags/edge-computing.svg",
-    "description": "Edge computing concepts and implementations"
-  },
-  "serverless": {
-    "label": "Serverless",
-    "icon": "/icons/tags/serverless.svg",
-    "description": "Serverless architecture and functions"
-  },
-  "performance": {
-    "label": "Performance",
-    "icon": "/icons/tags/performance.svg",
-    "description": "Performance optimization and best practices"
+  "markdown": {
+    "label": "Markdown",
+    "icon": "/icons/tags/markdown.svg",
+    "description": "Markdown"
   },
   "react": {
     "label": "React",
@@ -43,35 +13,5 @@
     "label": "React Router",
     "icon": "/icons/tags/react-router.svg",
     "description": "React Router library and routing concepts"
-  },
-  "migration": {
-    "label": "Migration",
-    "icon": "/icons/tags/migration.svg",
-    "description": "Migration guides and upgrade processes"
-  },
-  "frontend": {
-    "label": "Frontend",
-    "icon": "/icons/tags/frontend.svg",
-    "description": "Frontend development and user interfaces"
-  },
-  "typescript": {
-    "label": "TypeScript",
-    "icon": "/icons/tags/typescript.svg",
-    "description": "TypeScript language and type system"
-  },
-  "patterns": {
-    "label": "Patterns",
-    "icon": "/icons/tags/patterns.svg",
-    "description": "Design patterns and architectural approaches"
-  },
-  "code-quality": {
-    "label": "Code Quality",
-    "icon": "/icons/tags/code-quality.svg",
-    "description": "Code quality, best practices, and maintainability"
-  },
-  "advanced": {
-    "label": "Advanced",
-    "icon": "/icons/tags/advanced.svg",
-    "description": "Advanced topics and techniques"
   }
 }
