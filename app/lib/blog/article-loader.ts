@@ -1,15 +1,5 @@
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { ArticleMetadata } from "./mdx-processor";
 import { validateArticleMetadata } from "./mdx-processor";
-
-// Get the current file's directory and resolve project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const PROJECT_ROOT = join(__dirname, "../../..");
-const METADATA_FILE_PATH = join(PROJECT_ROOT, "public/blog-metadata.json");
 
 interface ArticleCache {
   articles: ArticleMetadata[];
@@ -23,37 +13,23 @@ export async function loadArticleMetadata(
   request?: Request,
 ): Promise<ArticleMetadata[]> {
   try {
-    let cache: ArticleCache;
+    // Always fetch from the static file endpoint
+    let url = "/blog-metadata.json";
 
-    // console.log('loadArticleMetadata - METADATA_FILE_PATH:', METADATA_FILE_PATH);
-    // console.log('loadArticleMetadata - file exists:', existsSync(METADATA_FILE_PATH));
-
-    // In test/build environment, read from file system
-    if (typeof window === "undefined" && existsSync(METADATA_FILE_PATH)) {
-      // console.log('loadArticleMetadata - Reading from file system');
-      const content = await readFile(METADATA_FILE_PATH, "utf-8");
-      cache = JSON.parse(content);
-      // console.log('loadArticleMetadata - Loaded cache from file:', cache);
-    } else {
-      // In browser environment, fetch from server
-      let url = "/blog-metadata.json";
-
-      // If we have a request object (SSR), construct absolute URL
-      if (request) {
-        const requestUrl = new URL(request.url);
-        url = `${requestUrl.origin}/blog-metadata.json`;
-      }
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        console.warn(
-          "Failed to load blog metadata cache, returning empty array",
-        );
-        return [];
-      }
-
-      cache = await response.json();
+    // If we have a request object (SSR), construct absolute URL
+    if (request) {
+      const requestUrl = new URL(request.url);
+      url = `${requestUrl.origin}/blog-metadata.json`;
     }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.warn("Failed to load blog metadata cache, returning empty array");
+      return [];
+    }
+
+    const cache: ArticleCache = await response.json();
 
     // Convert date strings back to Date objects and validate metadata
     return cache.articles.map((article, index) => {

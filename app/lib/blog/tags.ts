@@ -1,8 +1,3 @@
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 export interface Tag {
   id: string;
   label: string;
@@ -15,50 +10,36 @@ interface TagsMetadata {
   generatedAt: string;
 }
 
-// Get the current file's directory and resolve project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const PROJECT_ROOT = join(__dirname, "../../..");
-
 // Cache for tags data
 let tagsCache: Tag[] | null = null;
-
-// Use import.meta.glob to load tags metadata at build time (Vite + SSR compatible)
-// This will be undefined in Node.js environment
-const tagsModule =
-  typeof import.meta.glob !== "undefined"
-    ? import.meta.glob("/public/tags-metadata.json", {
-        query: "?raw",
-        import: "default",
-      })
-    : {};
 
 /**
  * Loads tags metadata from the pre-built JSON file
  */
-async function loadTagsMetadata(): Promise<Tag[]> {
+async function loadTagsMetadata(request?: Request): Promise<Tag[]> {
   if (tagsCache) {
     return tagsCache;
   }
 
-  let content: string;
+  try {
+    // Always fetch from the static file endpoint
+    let url = "/tags-metadata.json";
 
-  // Load content using import.meta.glob in Vite environment
-  const moduleLoader = tagsModule["/public/tags-metadata.json"];
-  if (moduleLoader) {
-    content = (await moduleLoader()) as string;
-  } else {
-    // In Node.js environment, read from file system
-    const tagsMetadataPath = join(PROJECT_ROOT, "public/tags-metadata.json");
-    if (!existsSync(tagsMetadataPath)) {
+    // If we have a request object (SSR), construct absolute URL
+    if (request) {
+      const requestUrl = new URL(request.url);
+      url = `${requestUrl.origin}/tags-metadata.json`;
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
       throw new Error(
-        `Tags metadata not found: ${tagsMetadataPath}. Run 'npm run blog:build' first.`,
+        `Tags metadata not found. Run 'npm run blog:build' first.`,
       );
     }
-    content = await readFile(tagsMetadataPath, "utf-8");
-  }
 
-  try {
+    const content = await response.text();
     const metadata: TagsMetadata = JSON.parse(content);
 
     if (!metadata.tags || !Array.isArray(metadata.tags)) {
@@ -78,23 +59,29 @@ async function loadTagsMetadata(): Promise<Tag[]> {
 /**
  * Loads and validates the tags configuration
  */
-export async function loadTagsConfig(): Promise<Tag[]> {
-  return loadTagsMetadata();
+export async function loadTagsConfig(request?: Request): Promise<Tag[]> {
+  return loadTagsMetadata(request);
 }
 
 /**
  * Gets a specific tag by ID
  */
-export async function getTagById(tagId: string): Promise<Tag | null> {
-  const tags = await loadTagsConfig();
+export async function getTagById(
+  tagId: string,
+  request?: Request,
+): Promise<Tag | null> {
+  const tags = await loadTagsConfig(request);
   return tags.find((tag) => tag.id === tagId) || null;
 }
 
 /**
  * Gets multiple tags by their IDs
  */
-export async function getTagsByIds(tagIds: string[]): Promise<Tag[]> {
-  const allTags = await loadTagsConfig();
+export async function getTagsByIds(
+  tagIds: string[],
+  request?: Request,
+): Promise<Tag[]> {
+  const allTags = await loadTagsConfig(request);
   const tagMap = new Map(allTags.map((tag) => [tag.id, tag]));
 
   return tagIds
@@ -109,9 +96,10 @@ export async function getTagsByIds(tagIds: string[]): Promise<Tag[]> {
 export async function validateArticleTags(
   articleTags: string[],
   articleSlug: string,
+  request?: Request,
 ): Promise<void> {
   try {
-    const allTags = await loadTagsConfig();
+    const allTags = await loadTagsConfig(request);
     const validTagIds = new Set(allTags.map((tag) => tag.id));
 
     const invalidTags = articleTags.filter((tag) => !validTagIds.has(tag));
@@ -136,6 +124,7 @@ export async function validateArticleTags(
  */
 export async function getUsedTags(
   articles: { tags: string[] }[],
+  request?: Request,
 ): Promise<Tag[]> {
   const usedTagIds = new Set<string>();
 
@@ -145,5 +134,5 @@ export async function getUsedTags(
     }
   }
 
-  return getTagsByIds(Array.from(usedTagIds));
+  return getTagsByIds(Array.from(usedTagIds), request);
 }

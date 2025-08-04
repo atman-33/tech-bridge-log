@@ -52,7 +52,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   // Load MDX content
   // console.log('Loading MDX content for slug:', slug);
-  const mdxContent = await loadArticleContent(slug);
+  const mdxContent = await loadArticleContent(slug, request);
   // console.log('MDX content loaded:', mdxContent ? 'success' : 'failed');
   // console.log('MDX content length:', mdxContent?.length);
 
@@ -73,7 +73,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const nextArticle = currentIndex < publishedArticles.length - 1 ? publishedArticles[currentIndex + 1] : null;
 
   // Load tags for the article
-  const articleTags = await getTagsByIds(article.tags);
+  const articleTags = await getTagsByIds(article.tags, request);
 
   // Find related articles based on shared tags
   const relatedArticles = findRelatedArticles(article, allArticles, 3);

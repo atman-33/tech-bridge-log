@@ -180,9 +180,31 @@ async function buildBlog() {
     // Write search index to public directory
     await writeFile('public/search-index.json', JSON.stringify(finalSearchIndex, null, 2));
 
+    // Create blog-content directory for MDX files
+    const blogContentDir = 'public/blog-content';
+    if (!existsSync(blogContentDir)) {
+      await mkdir(blogContentDir, { recursive: true });
+    }
+
+    // Generate static MDX content files for each article
+    let mdxFilesGenerated = 0;
+    for (const article of cache.articles) {
+      try {
+        const content = await loadArticleContent(article.slug);
+        if (content) {
+          const mdxFilePath = `${blogContentDir}/${article.slug}.mdx`;
+          await writeFile(mdxFilePath, content);
+          mdxFilesGenerated++;
+        }
+      } catch (error) {
+        console.warn(`⚠️  Failed to generate MDX file for: ${article.slug}`, error);
+      }
+    }
+
     console.log(`✅ Generated metadata for ${cache.articles.length} articles`);
     console.log(`✅ Generated metadata for ${tags.length} tags`);
     console.log(`✅ Generated search index for ${searchIndex.articles.length} articles`);
+    console.log(`✅ Generated ${mdxFilesGenerated} MDX content files`);
     console.log(`📊 Processing stats: ${cache.stats.processed}/${cache.stats.total} successful, ${cache.stats.failed} failed`);
 
     if (cache.errors.length > 0) {
@@ -193,6 +215,7 @@ async function buildBlog() {
     console.log(`📝 Cache written to public/blog-metadata.json`);
     console.log(`📝 Tags written to public/tags-metadata.json`);
     console.log(`📝 Search index written to public/search-index.json`);
+    console.log(`📝 MDX content files written to public/blog-content/`);
 
   } catch (error) {
     console.error('❌ Failed to build blog:', error);
