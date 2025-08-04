@@ -1,4 +1,4 @@
-import type { Paragraph, Root } from "mdast";
+import type { Root } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 
@@ -14,6 +14,7 @@ export const remarkDebugLog: Plugin<[], Root> = (options?: {
     visit(
       tree,
       ["paragraph", "link", "html", "mdxJsxFlowElement"],
+      // biome-ignore lint/suspicious/noExplicitAny: <>
       (node: any, index, parent) => {
         console.log(`${label}Node Type: ${node.type}, Index: ${index}`);
         console.log(JSON.stringify(node, null, 2));

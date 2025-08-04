@@ -55,17 +55,17 @@ export function findRelatedArticles(
     const sharedTagCount = article.tags.filter((tag) =>
       currentArticle.tags.includes(tag),
     ).length;
-    if (!tagGroups.has(sharedTagCount)) {
-      tagGroups.set(sharedTagCount, []);
-    }
-    tagGroups.get(sharedTagCount)!.push(article);
+    const group = tagGroups.get(sharedTagCount) || [];
+    group.push(article);
+    tagGroups.set(sharedTagCount, group);
   });
 
   // Randomly select from each group, starting with highest shared tag count
   const sortedTagCounts = Array.from(tagGroups.keys()).sort((a, b) => b - a);
 
   for (const tagCount of sortedTagCounts) {
-    const group = tagGroups.get(tagCount)!;
+    const group = tagGroups.get(tagCount);
+    if (!group) continue;
     const shuffled = shuffleArray([...group]);
 
     for (const article of shuffled) {
