@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "react-router-app",
+  "name": "tech-bridge-log",
   "compatibility_date": "2025-04-04",
   "compatibility_flags": [
     "nodejs_compat"
@@ -14,8 +14,14 @@
     {
       "binding": "DB",
       "database_name": "d1-app-test-db",
-      "database_id": "1b05145e-904f-4c9b-9234-9450cd66eb02",
+      "database_id": "xxxx",
       "migrations_dir": "drizzle"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "tech-bridge-log.com",
+      "custom_domain": true
     }
   ]
 }

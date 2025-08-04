@@ -36,6 +36,7 @@ const PUBLIC_ASSETS_DIR = "public/blog-assets";
  */
 export function isSupportedImageFormat(filename: string): boolean {
   const ext = extname(filename).toLowerCase();
+  // biome-ignore lint/suspicious/noExplicitAny: <>
   return SUPPORTED_IMAGE_EXTENSIONS.includes(ext as any);
 }
 
@@ -236,7 +237,7 @@ export function validateThumbnailPath(
 export async function optimizeImage(
   imagePath: string,
   outputPath: string,
-  options: {
+  _options: {
     quality?: number;
     width?: number;
     height?: number;
@@ -274,7 +275,7 @@ export async function optimizeImage(
 export async function generateResponsiveImages(
   imagePath: string,
   outputDir: string,
-  sizes: number[] = [320, 640, 1024, 1920],
+  _sizes: number[] = [320, 640, 1024, 1920],
 ): Promise<{
   variants: Array<{ width: number; path: string; size: number }>;
   errors: string[];

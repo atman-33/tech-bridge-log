@@ -1,10 +1,5 @@
-import { existsSync } from "node:fs";
-import { readdir, readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import readingTime from "reading-time";
-import { processArticleImages } from "./image-processor";
 
 export interface ArticleMetadata {
   slug: string;
@@ -70,13 +65,9 @@ const FRONTMATTER_VALIDATION = {
   },
 } as const;
 
-// Get the current file's directory and resolve project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const PROJECT_ROOT = join(__dirname, "../../..");
-
-const BLOG_CONTENT_DIR = join(PROJECT_ROOT, "contents/blog");
-const _PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
+// These constants are only used in build-time functions
+const BLOG_CONTENT_DIR = "contents/blog";
+const _PUBLIC_ASSETS_DIR = "public/blog-assets";
 
 // Use import.meta.glob to load MDX files at build time (Vite + SSR compatible)
 // This will be undefined in Node.js environment
@@ -376,30 +367,39 @@ export async function discoverArticles(): Promise<string[]> {
     return moduleKeys;
   }
 
-  // In Node.js environment, use file system
-  if (!existsSync(BLOG_CONTENT_DIR)) {
-    console.log(
-      "discoverArticles - blog content directory does not exist:",
-      BLOG_CONTENT_DIR,
-    );
-    return [];
-  }
+  // In Node.js environment, use file system with dynamic imports
+  try {
+    const { existsSync } = await import("node:fs");
+    const { readdir } = await import("node:fs/promises");
+    const { join } = await import("node:path");
 
-  const articles: string[] = [];
-  const entries = await readdir(BLOG_CONTENT_DIR, { withFileTypes: true });
+    if (!existsSync(BLOG_CONTENT_DIR)) {
+      console.log(
+        "discoverArticles - blog content directory does not exist:",
+        BLOG_CONTENT_DIR,
+      );
+      return [];
+    }
 
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const indexPath = join(BLOG_CONTENT_DIR, entry.name, "index.mdx");
-      if (existsSync(indexPath)) {
-        // Convert to the format expected by import.meta.glob
-        articles.push(`/contents/blog/${entry.name}/index.mdx`);
+    const articles: string[] = [];
+    const entries = await readdir(BLOG_CONTENT_DIR, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const indexPath = join(BLOG_CONTENT_DIR, entry.name, "index.mdx");
+        if (existsSync(indexPath)) {
+          // Convert to the format expected by import.meta.glob
+          articles.push(`/contents/blog/${entry.name}/index.mdx`);
+        }
       }
     }
-  }
 
-  console.log("discoverArticles - found articles:", articles);
-  return articles;
+    console.log("discoverArticles - found articles:", articles);
+    return articles;
+  } catch (error) {
+    console.error("discoverArticles - error:", error);
+    return [];
+  }
 }
 
 /**
@@ -415,12 +415,21 @@ export async function processArticle(
   if (moduleLoader) {
     content = (await moduleLoader()) as string;
   } else {
-    // In Node.js environment, read from file system
-    const absolutePath = join(PROJECT_ROOT, filePath.replace(/^\//, ""));
-    if (!existsSync(absolutePath)) {
-      throw new Error(`Article not found: ${absolutePath}`);
+    // In Node.js environment, read from file system with dynamic imports
+    try {
+      const { existsSync } = await import("node:fs");
+      const { readFile } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+
+      // Use relative path from current working directory
+      const absolutePath = join(process.cwd(), filePath.replace(/^\//, ""));
+      if (!existsSync(absolutePath)) {
+        throw new Error(`Article not found: ${absolutePath}`);
+      }
+      content = await readFile(absolutePath, "utf-8");
+    } catch (error) {
+      throw new Error(`Failed to read article ${filePath}: ${error}`);
     }
-    content = await readFile(absolutePath, "utf-8");
   }
   const { data: frontmatter, content: mdxContent } = matter(content);
 
@@ -433,10 +442,23 @@ export async function processArticle(
   // Get article directory and slug from the file path
   // filePath is like "/contents/blog/getting-started/index.mdx"
   const slug = validatedFrontmatter.slug;
-  const articleDir = join(PROJECT_ROOT, "contents/blog", slug);
 
   // Process article images (for content images, not thumbnails)
-  const imageResult = await processArticleImages(articleDir, slug);
+  let imageResult: {
+    // biome-ignore lint/suspicious/noExplicitAny: <>
+    assets: any[];
+    thumbnailPath: string | null;
+    errors: string[];
+  };
+  try {
+    const { join } = await import("node:path");
+    const articleDir = join(process.cwd(), "contents/blog", slug);
+    const { processArticleImages } = await import("./image-processor");
+    imageResult = await processArticleImages(articleDir, slug);
+  } catch (error) {
+    console.warn(`Failed to process images for ${slug}:`, error);
+    imageResult = { assets: [], thumbnailPath: null, errors: [] };
+  }
 
   // Log any image processing errors
   if (imageResult.errors.length > 0) {
@@ -461,35 +483,74 @@ export async function processArticle(
 /**
  * Loads raw MDX content for a specific article (without compilation)
  */
-export async function loadArticleContent(slug: string): Promise<string | null> {
-  const pattern = `/contents/blog/${slug}/index.mdx`;
+export async function loadArticleContent(
+  slug: string,
+  request?: Request,
+): Promise<string | null> {
+  // Check if we're in a build environment (Node.js without request object)
+  if (typeof window === "undefined" && !request) {
+    // Build time: use the original Node.js approach
+    const pattern = `/contents/blog/${slug}/index.mdx`;
+    const moduleLoader = mdxModules[pattern];
 
-  // In Vite environment, use import.meta.glob
-  const moduleLoader = mdxModules[pattern];
-  if (moduleLoader) {
+    if (moduleLoader) {
+      try {
+        const rawContent = (await moduleLoader()) as string;
+        const { content: mdxContent } = matter(rawContent);
+        return mdxContent;
+      } catch (error) {
+        console.error("loadArticleContent - error loading module:", error);
+        return null;
+      }
+    }
+
+    // Fallback to file system for build time
     try {
-      const rawContent = (await moduleLoader()) as string;
+      const { existsSync } = await import("node:fs");
+      const { readFile } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+
+      const absolutePath = join(
+        process.cwd(),
+        `contents/blog/${slug}/index.mdx`,
+      );
+
+      if (!existsSync(absolutePath)) {
+        console.log("loadArticleContent - file not found:", absolutePath);
+        return null;
+      }
+
+      const rawContent = await readFile(absolutePath, "utf-8");
+      const matter = (await import("gray-matter")).default;
       const { content: mdxContent } = matter(rawContent);
       return mdxContent;
     } catch (error) {
-      console.error("loadArticleContent - error loading module:", error);
+      console.error("loadArticleContent - error reading file:", error);
       return null;
     }
   }
 
-  // In Node.js environment, read from file system
+  // Runtime: fetch from static file endpoint
   try {
-    const absolutePath = join(PROJECT_ROOT, `contents/blog/${slug}/index.mdx`);
-    if (!existsSync(absolutePath)) {
-      console.log("loadArticleContent - file not found:", absolutePath);
+    let url = `/blog-content/${slug}.mdx`;
+
+    // If we have a request object (SSR), construct absolute URL
+    if (request) {
+      const requestUrl = new URL(request.url);
+      url = `${requestUrl.origin}/blog-content/${slug}.mdx`;
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.log(`MDX content not found for slug: ${slug}`);
       return null;
     }
 
-    const rawContent = await readFile(absolutePath, "utf-8");
-    const { content: mdxContent } = matter(rawContent);
+    const mdxContent = await response.text();
     return mdxContent;
   } catch (error) {
-    console.error("loadArticleContent - error reading file:", error);
+    console.error("loadArticleContent - error loading content:", error);
     return null;
   }
 }

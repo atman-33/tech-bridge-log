@@ -20,7 +20,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     // Load all articles and tags
     const [articles, allTags] = await Promise.all([
       loadArticleMetadata(request),
-      loadTagsConfig(),
+      loadTagsConfig(request),
     ]);
 
     // Filter published articles
@@ -29,7 +29,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Get tags that are actually used in articles
-    const usedTags = await getUsedTags(publishedArticles);
+    const usedTags = await getUsedTags(publishedArticles, request);
 
     // If a specific tag is requested but doesn't exist, throw 404
     if (selectedTag && !usedTags.find(tag => tag.id === selectedTag)) {
