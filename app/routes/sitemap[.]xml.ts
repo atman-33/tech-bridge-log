@@ -1,13 +1,26 @@
+import { loadArticleMetadata } from "~/lib/blog/article-loader";
 import {
   type DynamicRouteGenerator,
   generateSitemapUrls,
   generateSitemapXml,
 } from "~/lib/sitemap-generator";
+import type { Route } from "./+types/sitemap[.]xml";
 
-export const loader = async () => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   try {
     // Define dynamic route generators (extensible for future use)
     const dynamicGenerators: DynamicRouteGenerator[] = [
+      // Blog articles generator
+      async () => {
+        const articles = await loadArticleMetadata(request);
+        return articles.map((article) => ({
+          path: `/blog/${article.slug}`,
+          isPublic: true,
+          priority: 0.8,
+          changefreq: "weekly" as const,
+          lastmod: article.updatedAt,
+        }));
+      },
       // Example: If there are public manga reviews
       // async () => {
       //   const reviews = await db.query.publicMangaReviews.findMany();

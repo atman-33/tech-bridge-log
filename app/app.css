@@ -1,6 +1,28 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -130,5 +152,55 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
+
+/* Markdown HTML elements styling */
+@layer components {
+  .prose details {
+    @apply mb-4 border border-border rounded-lg overflow-hidden;
+  }
+  
+  .prose details > summary {
+    @apply bg-muted px-4 py-2 cursor-pointer hover:bg-muted/80 font-medium border-b border-border;
+    @apply transition-colors duration-200;
+  }
+  
+  .prose details[open] > summary {
+    @apply border-b border-border;
+  }
+  
+  .prose details > *:not(summary) {
+    @apply px-4 py-3;
+  }
+  
+  .prose details > *:last-child {
+    @apply pb-4;
+  }
+  
+  .prose kbd {
+    @apply inline-flex items-center px-2 py-1 text-xs font-mono bg-muted border border-border rounded shadow-sm;
+  }
+  
+  .prose mark {
+    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
   }
 }

@@ -13,6 +13,7 @@ interface RouteDefinition {
     | "monthly"
     | "yearly"
     | "never";
+  lastmod?: Date;
 }
 
 // Public routes definition (requires manual management)
@@ -21,6 +22,18 @@ export const publicRoutes: RouteDefinition[] = [
     path: "/",
     isPublic: true,
     priority: 1.0,
+    changefreq: "daily",
+  },
+  {
+    path: "/tags",
+    isPublic: true,
+    priority: 0.9,
+    changefreq: "daily",
+  },
+  {
+    path: "/apps",
+    isPublic: true,
+    priority: 0.9,
     changefreq: "daily",
   },
   // Add future public pages here
@@ -58,7 +71,7 @@ export const generateSitemapUrls = async (
     .filter((route) => route.isPublic)
     .map((route) => ({
       loc: route.path,
-      lastmod: new Date().toISOString(),
+      lastmod: route.lastmod?.toISOString() || new Date().toISOString(),
       changefreq: route.changefreq,
       priority: route.priority,
     }));
@@ -72,7 +85,7 @@ export const generateSitemapUrls = async (
         .filter((route) => route.isPublic)
         .map((route) => ({
           loc: route.path,
-          lastmod: new Date().toISOString(),
+          lastmod: route.lastmod?.toISOString() || new Date().toISOString(),
           changefreq: route.changefreq,
           priority: route.priority,
         }));

@@ -13,29 +13,8 @@ import { ReactCallRoots } from './components/react-call';
 import { AdScripts } from './components/ad-scripts';
 import { CustomToaster } from './components/custom-sonner';
 import { ThemeProvider } from './components/theme-provider';
-import { getAuth } from '~/lib/auth/auth.server';
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-	// Get base URL for auth client
-	const url = new URL(request.url);
-	const baseURL = `${url.protocol}//${url.host}`;
-
-	// Check if user is authenticated (optional, doesn't redirect)
-	const auth = getAuth(context);
-	let user = null;
-
-	try {
-		const session = await auth.api.getSession({ headers: request.headers });
-		user = session?.user || null;
-	} catch (error) {
-		// Ignore auth errors on root loader
-		console.log('Auth check failed in root loader:', error);
-	}
-
-	return {
-		baseURL,
-		user
-	};
+export const loader = async ({ }: Route.LoaderArgs) => {
 };
 
 export const links: Route.LinksFunction = () => [
@@ -48,6 +27,10 @@ export const links: Route.LinksFunction = () => [
 	{
 		rel: "stylesheet",
 		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+	},
+	{
+		rel: "stylesheet",
+		href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
 	},
 	{
 		rel: 'apple-touch-icon',
@@ -79,6 +62,52 @@ export function Layout({ children }: { children: React.ReactNode; }) {
 				<AdScripts />
 				<Meta />
 				<Links />
+
+				{/* Noscript styles for graceful degradation */}
+				<noscript>
+					<style>
+						{`
+							/* Hide JavaScript-only elements */
+							.js-only {
+								display: none !important;
+							}
+							
+							/* Show noscript elements */
+							noscript {
+								display: block;
+							}
+							
+							/* Default to light theme for noscript users */
+							:root {
+								--background: 0 0% 100%;
+								--foreground: 222.2 84% 4.9%;
+								--muted: 210 40% 96%;
+								--muted-foreground: 215.4 16.3% 46.9%;
+								--popover: 0 0% 100%;
+								--popover-foreground: 222.2 84% 4.9%;
+								--card: 0 0% 100%;
+								--card-foreground: 222.2 84% 4.9%;
+								--border: 214.3 31.8% 91.4%;
+								--input: 214.3 31.8% 91.4%;
+								--primary: 222.2 47.4% 11.2%;
+								--primary-foreground: 210 40% 98%;
+								--secondary: 210 40% 96%;
+								--secondary-foreground: 222.2 47.4% 11.2%;
+								--accent: 210 40% 96%;
+								--accent-foreground: 222.2 47.4% 11.2%;
+								--destructive: 0 84.2% 60.2%;
+								--destructive-foreground: 210 40% 98%;
+								--ring: 222.2 84% 4.9%;
+								--radius: 0.5rem;
+							}
+							
+							/* Hide theme toggle for noscript users */
+							.theme-toggle {
+								display: none;
+							}
+						`}
+					</style>
+				</noscript>
 			</head>
 			<body>
 				<ThemeProvider

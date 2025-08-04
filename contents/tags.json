@@ -1,0 +1,17 @@
+{
+  "markdown": {
+    "label": "Markdown",
+    "icon": "/icons/tags/markdown.svg",
+    "description": "Markdown"
+  },
+  "react": {
+    "label": "React",
+    "icon": "/icons/tags/react.svg",
+    "description": "React library and ecosystem"
+  },
+  "react-router": {
+    "label": "React Router",
+    "icon": "/icons/tags/react-router.svg",
+    "description": "React Router library and routing concepts"
+  }
+}
