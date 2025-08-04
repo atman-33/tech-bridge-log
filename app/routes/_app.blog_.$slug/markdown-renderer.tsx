@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
@@ -72,6 +73,7 @@ export function MarkdownRenderer({ content, slug }: MarkdownRendererProps) {
         remarkPlugins={[
           remarkLinkCard,
           [remarkGfm],
+          remarkBreaks, // Add breaks plugin to convert line breaks to <br> tags
         ]}
         rehypePlugins={[
           rehypeRaw,

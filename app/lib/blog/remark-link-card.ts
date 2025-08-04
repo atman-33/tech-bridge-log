@@ -65,6 +65,7 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
           children: [], // No children needed for this marker node
         };
         // Schedule the replacement
+        // biome-ignore lint/suspicious/noExplicitAny: <>
         replacements.push({ parent: parent as any, index, newNode });
       }
     });
