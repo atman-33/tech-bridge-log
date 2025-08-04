@@ -27,7 +27,10 @@ let tagsCache: Tag[] | null = null;
 // This will be undefined in Node.js environment
 const tagsModule =
   typeof import.meta.glob !== "undefined"
-    ? import.meta.glob("/public/tags-metadata.json", { as: "raw" })
+    ? import.meta.glob("/public/tags-metadata.json", {
+        query: "?raw",
+        import: "default",
+      })
     : {};
 
 /**
@@ -43,7 +46,7 @@ async function loadTagsMetadata(): Promise<Tag[]> {
   // Load content using import.meta.glob in Vite environment
   const moduleLoader = tagsModule["/public/tags-metadata.json"];
   if (moduleLoader) {
-    content = await moduleLoader();
+    content = (await moduleLoader()) as string;
   } else {
     // In Node.js environment, read from file system
     const tagsMetadataPath = join(PROJECT_ROOT, "public/tags-metadata.json");
