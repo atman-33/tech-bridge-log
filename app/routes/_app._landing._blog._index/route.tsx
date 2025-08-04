@@ -19,7 +19,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Get tags that are actually used in articles
-    const usedTags = await getUsedTags(publishedArticles);
+    const usedTags = await getUsedTags(publishedArticles, request);
 
     return {
       articles: publishedArticles,
