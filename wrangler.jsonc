@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "d1-app-test-db",
-      "database_id": "xxxx",
+      "database_id": "1b05145e-904f-4c9b-9234-9450cd66eb02",
       "migrations_dir": "drizzle"
     }
   ],
