@@ -82,7 +82,10 @@ const _PUBLIC_ASSETS_DIR = join(PROJECT_ROOT, "public/blog-assets");
 // This will be undefined in Node.js environment
 const mdxModules =
   typeof import.meta.glob !== "undefined"
-    ? import.meta.glob("/contents/blog/**/index.mdx", { as: "raw" })
+    ? import.meta.glob("/contents/blog/**/index.mdx", {
+        query: "?raw",
+        import: "default",
+      })
     : {};
 
 /**
@@ -410,7 +413,7 @@ export async function processArticle(
   // Load content using import.meta.glob in Vite environment
   const moduleLoader = mdxModules[filePath];
   if (moduleLoader) {
-    content = await moduleLoader();
+    content = (await moduleLoader()) as string;
   } else {
     // In Node.js environment, read from file system
     const absolutePath = join(PROJECT_ROOT, filePath.replace(/^\//, ""));
@@ -465,7 +468,7 @@ export async function loadArticleContent(slug: string): Promise<string | null> {
   const moduleLoader = mdxModules[pattern];
   if (moduleLoader) {
     try {
-      const rawContent = await moduleLoader();
+      const rawContent = (await moduleLoader()) as string;
       const { content: mdxContent } = matter(rawContent);
       return mdxContent;
     } catch (error) {
