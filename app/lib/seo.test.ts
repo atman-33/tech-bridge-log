@@ -25,7 +25,7 @@ describe("SEO utilities", () => {
         description: "Test description",
       });
 
-      expect(metaTags).toContainEqual({ title: "Test Page - Tech Blog" });
+      expect(metaTags).toContainEqual({ title: "Test Page - Tech Bridge Log" });
       expect(metaTags).toContainEqual({
         name: "description",
         content: "Test description",
@@ -124,7 +124,7 @@ describe("SEO utilities", () => {
           "property" in tag && tag.property === "og:image",
       );
       expect(ogImageTag?.content).toBe(
-        "https://your-app.pages.dev/test-image.png",
+        "https://techbridgelog.pages.dev/test-image.png",
       );
     });
   });
@@ -134,7 +134,7 @@ describe("SEO utilities", () => {
       const metaTags = generateArticleMetaTags(mockArticle);
 
       expect(metaTags).toContainEqual({
-        title: "Test Article Title - Tech Blog",
+        title: "Test Article Title - Tech Bridge Log",
       });
       expect(metaTags).toContainEqual({
         name: "description",
@@ -146,7 +146,7 @@ describe("SEO utilities", () => {
       });
       expect(metaTags).toContainEqual({
         property: "og:url",
-        content: "https://your-app.pages.dev/blog/test-article",
+        content: "https://techbridgelog.pages.dev/blog/test-article",
       });
       expect(metaTags).toContainEqual({
         property: "article:published_time",
@@ -181,13 +181,13 @@ describe("SEO utilities", () => {
       expect(structuredData.headline).toBe(mockArticle.title);
       expect(structuredData.description).toBe(mockArticle.description);
       expect(structuredData.url).toBe(
-        "https://your-app.pages.dev/blog/test-article",
+        "https://techbridgelog.pages.dev/blog/test-article",
       );
       expect(structuredData.datePublished).toBe("2024-01-15T10:00:00.000Z");
       expect(structuredData.dateModified).toBe("2024-01-16T14:30:00.000Z");
       expect(structuredData.keywords).toBe("react, typescript, testing");
-      expect(structuredData.author.name).toBe("Your Name");
-      expect(structuredData.publisher.name).toBe("Tech Blog");
+      expect(structuredData.author.name).toBe("Tech Bridge Log");
+      expect(structuredData.publisher.name).toBe("Tech Bridge Log");
     });
 
     it("should include reading time and word count estimates", () => {
