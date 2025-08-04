@@ -60,7 +60,7 @@ async function loadTagsMetadata(request?: Request): Promise<Tag[]> {
  * Loads and validates the tags configuration
  */
 export async function loadTagsConfig(request?: Request): Promise<Tag[]> {
-  return loadTagsMetadata(request);
+  return await loadTagsMetadata(request);
 }
 
 /**

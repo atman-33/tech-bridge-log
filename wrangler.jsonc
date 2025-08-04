@@ -10,6 +10,14 @@
   "vars": {
     "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "d1-app-test-db",
+      "database_id": "xxxx",
+      "migrations_dir": "drizzle"
+    }
+  ],
   "routes": [
     {
       "pattern": "tech-bridge-log.com",
