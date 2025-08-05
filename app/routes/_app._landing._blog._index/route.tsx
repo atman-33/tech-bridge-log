@@ -9,9 +9,9 @@ export const meta: Route.MetaFunction = () => {
   return generateBlogListingMetaTags();
 };
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
-    const articles = await loadArticleMetadata(request);
+    const articles = await loadArticleMetadata(context, request);
 
     // Sort articles by publication date (newest first) and filter published articles
     const publishedArticles = articles
@@ -19,7 +19,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Get tags that are actually used in articles
-    const usedTags = await getUsedTags(publishedArticles, request);
+    const usedTags = await getUsedTags(publishedArticles, context, request);
 
     return {
       articles: publishedArticles,

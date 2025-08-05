@@ -22,7 +22,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
   return generateArticleMetaTags(article);
 };
 
-export const loader = async ({ params, request }: Route.LoaderArgs) => {
+export const loader = async ({ params, request, context }: Route.LoaderArgs) => {
   const { slug } = params;
 
   // console.log('Article loader called with slug:', slug);
@@ -32,7 +32,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 
   // Load article metadata
-  const article = await loadArticleBySlug(slug, request);
+  const article = await loadArticleBySlug(slug, context, request);
   // console.log('Found article:', article);
 
   if (!article) {
@@ -52,7 +52,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
 
   // Load MDX content
   // console.log('Loading MDX content for slug:', slug);
-  const mdxContent = await loadArticleContent(slug, request);
+  const mdxContent = await loadArticleContent(slug, context, request);
   // console.log('MDX content loaded:', mdxContent ? 'success' : 'failed');
   // console.log('MDX content length:', mdxContent?.length);
 
@@ -62,7 +62,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   }
 
   // Load all articles for navigation
-  const allArticles = await loadArticleMetadata(request);
+  const allArticles = await loadArticleMetadata(context, request);
   const publishedArticles = allArticles
     .filter(a => a.publishedAt <= new Date())
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
@@ -73,7 +73,7 @@ export const loader = async ({ params, request }: Route.LoaderArgs) => {
   const nextArticle = currentIndex < publishedArticles.length - 1 ? publishedArticles[currentIndex + 1] : null;
 
   // Load tags for the article
-  const articleTags = await getTagsByIds(article.tags, request);
+  const articleTags = await getTagsByIds(article.tags, context, request);
 
   // Find related articles based on shared tags
   const relatedArticles = findRelatedArticles(article, allArticles, 3);

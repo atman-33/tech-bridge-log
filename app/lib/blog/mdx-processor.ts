@@ -485,10 +485,11 @@ export async function processArticle(
  */
 export async function loadArticleContent(
   slug: string,
+  context?: { cloudflare?: { env: Env } },
   request?: Request,
 ): Promise<string | null> {
   // Check if we're in a build environment (Node.js without request object)
-  if (typeof window === "undefined" && !request) {
+  if (typeof window === "undefined" && !request && !context) {
     // Build time: use the original Node.js approach
     const pattern = `/contents/blog/${slug}/index.mdx`;
     const moduleLoader = mdxModules[pattern];
@@ -530,27 +531,17 @@ export async function loadArticleContent(
     }
   }
 
-  // Runtime: fetch from static file endpoint
+  // Runtime: fetch from static file endpoint using utility
   try {
-    let url = `/blog-content/${slug}.mdx`;
-
-    // If we have a request object (SSR), construct absolute URL
-    if (request) {
-      const requestUrl = new URL(request.url);
-      url = `${requestUrl.origin}/blog-content/${slug}.mdx`;
-    }
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.log(`MDX content not found for slug: ${slug}`);
-      return null;
-    }
-
-    const mdxContent = await response.text();
+    const { fetchStaticText } = await import("~/lib/utils/static-assets");
+    const mdxContent = await fetchStaticText(
+      `/blog-content/${slug}.mdx`,
+      context,
+      request,
+    );
     return mdxContent;
   } catch (error) {
-    console.error("loadArticleContent - error loading content:", error);
+    console.log(`MDX content not found for slug: ${slug}`);
     return null;
   }
 }

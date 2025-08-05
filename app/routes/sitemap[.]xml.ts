@@ -12,7 +12,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     const dynamicGenerators: DynamicRouteGenerator[] = [
       // Blog articles generator
       async () => {
-        const articles = await loadArticleMetadata(request);
+        const articles = await loadArticleMetadata(undefined, request);
         return articles.map((article) => ({
           path: `/blog/${article.slug}`,
           isPublic: true,

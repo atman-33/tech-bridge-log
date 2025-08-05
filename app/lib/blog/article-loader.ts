@@ -1,3 +1,7 @@
+import {
+  fetchStaticJSON,
+  type ReactRouterContext,
+} from "~/lib/utils/static-assets";
 import type { ArticleMetadata } from "./mdx-processor";
 import { validateArticleMetadata } from "./mdx-processor";
 
@@ -10,26 +14,15 @@ interface ArticleCache {
  * Loads article metadata from the generated cache file
  */
 export async function loadArticleMetadata(
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<ArticleMetadata[]> {
   try {
-    // Always fetch from the static file endpoint
-    let url = "/blog-metadata.json";
-
-    // If we have a request object (SSR), construct absolute URL
-    if (request) {
-      const requestUrl = new URL(request.url);
-      url = `${requestUrl.origin}/blog-metadata.json`;
-    }
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.warn("Failed to load blog metadata cache, returning empty array");
-      return [];
-    }
-
-    const cache: ArticleCache = await response.json();
+    const cache = await fetchStaticJSON<ArticleCache>(
+      "/blog-metadata.json",
+      context,
+      request,
+    );
 
     // Convert date strings back to Date objects and validate metadata
     return cache.articles.map((article, index) => {
@@ -56,9 +49,10 @@ export async function loadArticleMetadata(
  */
 export async function loadArticleBySlug(
   slug: string,
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<ArticleMetadata | null> {
-  const articles = await loadArticleMetadata(request);
+  const articles = await loadArticleMetadata(context, request);
   // console.log('loadArticleBySlug - Looking for slug:', slug);
   // console.log('loadArticleBySlug - Available articles:', articles.map(a => a.slug));
   const found = articles.find((article) => article.slug === slug) || null;
@@ -71,17 +65,21 @@ export async function loadArticleBySlug(
  */
 export async function loadArticlesByTag(
   tag: string,
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<ArticleMetadata[]> {
-  const articles = await loadArticleMetadata(request);
+  const articles = await loadArticleMetadata(context, request);
   return articles.filter((article) => article.tags.includes(tag));
 }
 
 /**
  * Gets all unique tags from articles
  */
-export async function getAllTags(request?: Request): Promise<string[]> {
-  const articles = await loadArticleMetadata(request);
+export async function getAllTags(
+  context?: ReactRouterContext,
+  request?: Request,
+): Promise<string[]> {
+  const articles = await loadArticleMetadata(context, request);
   const tagSet = new Set<string>();
 
   articles.forEach((article) => {
