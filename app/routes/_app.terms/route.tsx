@@ -179,17 +179,7 @@ const TermsPage = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent className="prose dark:prose-invert max-w-none">
-              <p>
-                If you have any questions about these Terms of Service, please contact us at:
-                <strong> legal@techbridgelog.com</strong>
-              </p>
-            </CardContent>
-          </Card>
+
         </div>
       </div>
     </div>

@@ -101,20 +101,7 @@ const PrivacyPage = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Us</CardTitle>
-            </CardHeader>
-            <CardContent className="prose dark:prose-invert max-w-none">
-              <p>
-                If you have any questions about this Privacy Policy or our data practices,
-                please contact us at: <strong>privacy@techbridgelog.com</strong>
-              </p>
-              <p>
-                We will respond to your inquiry within 30 days.
-              </p>
-            </CardContent>
-          </Card>
+
 
           <Card>
             <CardHeader>
