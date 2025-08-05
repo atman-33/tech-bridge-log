@@ -4,7 +4,7 @@ import appsData from '~/contents/apps.json';
 
 export function meta(): Route.MetaDescriptors {
   return [
-    { title: 'Apps - Tech Blog' },
+    { title: 'Apps - Tech Bridge Log' },
     { name: 'description', content: 'Showcase of web applications and projects' },
   ];
 }

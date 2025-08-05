@@ -7,7 +7,7 @@ import { TagErrorBoundary } from '~/components/error-boundaries/tag-error-bounda
 
 export const meta: Route.MetaFunction = () => {
   return [
-    { title: 'Browse by Tags - Tech Blog' },
+    { title: 'Browse by Tags - Tech Bridge Log' },
     { name: 'description', content: 'Explore our technical articles organized by topics and technologies.' },
   ];
 };
