@@ -1,0 +1,324 @@
+---
+title: "Solving Static Assets Issues with Cloudflare Workers + React Router"
+slug: "cloudflare-static-assets-solution"
+publishedAt: "2025-08-05T00:00:00Z"
+updatedAt: "2025-08-05T00:00:00Z"
+tags: ["cloudflare", "react-router", "static-assets"]
+description: "Learn how to fix the common issue where public files work in development but fail with 404 errors when deployed to Cloudflare Workers."
+emoji: "⚡"
+---
+
+# Solving Static Assets Issues with Cloudflare Workers + React Router
+
+When developing with React Router v7 and Cloudflare Workers, there's a frustrating problem many developers encounter: **files in the public directory work perfectly in development (`npm run dev`) but return 404 errors when deployed to Cloudflare Workers**.
+
+In this article, I'll share the problem I faced and walk you through a practical solution using Static Assets with automatic fallback handling.
+
+## The Problem
+
+### Works in Development, Fails in Production
+
+In my React Router application, I had JSON files and other static assets in the `public` directory, accessing them like this:
+
+```typescript
+// Works perfectly in development
+const response = await fetch('/data/config.json');
+const config = await response.json();
+```
+
+But after deploying to Cloudflare Workers:
+
+```
+Error: Failed to fetch '/data/config.json' - 404 Not Found
+```
+
+### Why This Happens
+
+The root cause is the **difference in how files are served between development and production environments**:
+
+- **Development (Vite)**: Files in the `public` directory are automatically served at the root path
+- **Cloudflare Workers**: Static files need to be configured separately as Static Assets
+
+So while `/data/config.json` works in development, the same path isn't accessible in production.
+
+## The Solution: Static Assets + Fallback Handling
+
+To solve this problem, I developed a solution combining these elements:
+
+1. **Cloudflare Static Assets** integration
+2. **Automatic environment-based fallback**
+3. **Type-safe utility functions**
+
+### 1. Configuring wrangler.jsonc
+
+First, enable Static Assets in Cloudflare Workers:
+
+```json
+{
+  "compatibility_date": "2024-11-18",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  }
+}
+```
+
+### 2. Implementing the Utility Functions
+
+Next, create utilities that access files appropriately based on the environment:
+
+```typescript
+/**
+ * Static Assets Utility
+ *
+ * Provides unified access to static files across different environments:
+ * - Development (Vite): Uses standard fetch()
+ * - Production (Cloudflare Workers): Uses ASSETS binding
+ * - Build time (Node.js): Falls back to file system access
+ */
+
+interface CloudflareContext {
+  cloudflare?: {
+    env: Env;
+  };
+}
+
+/**
+ * Determines if we have access to Cloudflare Workers ASSETS binding
+ */
+function hasAssetsBinding(context?: CloudflareContext): boolean {
+  return !!context?.cloudflare?.env?.ASSETS;
+}
+
+/**
+ * Fetches a static asset with automatic fallback between ASSETS and standard fetch
+ */
+export async function fetchStaticAsset(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<Response> {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  // Try Static Assets first if available
+  if (hasAssetsBinding(context) && context?.cloudflare?.env?.ASSETS) {
+    try {
+      const assetUrl = new URL(normalizedPath, "https://example.com");
+      const assetRequest = new Request(assetUrl.toString());
+
+      const response = await context.cloudflare.env.ASSETS.fetch(assetRequest);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // Log fallback only in development
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(
+          `[Static Assets] Failed for ${normalizedPath} (${response.status}), using fallback`,
+        );
+      }
+    } catch (error) {
+      // Log errors only in development
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(`[Static Assets] Error for ${normalizedPath}:`, error);
+      }
+    }
+  }
+
+  // Fallback: Use standard fetch
+  let url = normalizedPath;
+
+  if (request) {
+    const requestUrl = new URL(request.url);
+    url = `${requestUrl.origin}${normalizedPath}`;
+  }
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Static asset not found: ${normalizedPath} (${response.status})`,
+    );
+  }
+
+  return response;
+}
+```
+
+### 3. Type-Safe Helper Functions
+
+I also provide convenient helper functions for JSON and text files:
+
+```typescript
+/**
+ * Fetches and parses a JSON static asset
+ */
+export async function fetchStaticJSON<T>(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<T> {
+  try {
+    const response = await fetchStaticAsset(path, context, request);
+    const json = await response.json();
+    return json as T;
+  } catch (error) {
+    // Log detailed errors only in development
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static JSON ${path}:`, error);
+    }
+    throw new Error(`Failed to load JSON asset: ${path}`);
+  }
+}
+
+/**
+ * Fetches a text static asset
+ */
+export async function fetchStaticText(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<string> {
+  try {
+    const response = await fetchStaticAsset(path, context, request);
+    const text = await response.text();
+    return text;
+  } catch (error) {
+    // Log detailed errors only in development
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static text ${path}:`, error);
+    }
+    throw new Error(`Failed to load text asset: ${path}`);
+  }
+}
+```
+
+## Real-World Usage Examples
+
+### Using in React Router Loaders
+
+```typescript
+import type { Route } from './+types/route';
+import { fetchStaticJSON } from '~/lib/utils/static-assets';
+
+interface AppConfig {
+  apiUrl: string;
+  features: string[];
+}
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  // Same code works in all environments
+  const config = await fetchStaticJSON<AppConfig>(
+    '/data/config.json',
+    context,
+    request
+  );
+
+  return { config };
+}
+
+export default function ConfigPage({ loaderData }: Route.ComponentProps) {
+  const { config } = loaderData;
+  
+  return (
+    <div>
+      <h1>App Configuration</h1>
+      <p>API URL: {config.apiUrl}</p>
+      <ul>
+        {config.features.map(feature => (
+          <li key={feature}>{feature}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### React Router-Specific Helpers
+
+For easier use with React Router, I also provide dedicated helper functions:
+
+```typescript
+/**
+ * React Router specific helper for fetching static JSON
+ */
+export async function fetchStaticJSONFromRoute<T>(
+  path: string,
+  context: ReactRouterContext,
+  request?: Request,
+): Promise<T> {
+  return fetchStaticJSON<T>(path, context, request);
+}
+
+/**
+ * React Router specific helper for fetching static text
+ */
+export async function fetchStaticTextFromRoute(
+  path: string,
+  context: ReactRouterContext,
+  request?: Request,
+): Promise<string> {
+  return fetchStaticText(path, context, request);
+}
+```
+
+## Benefits of This Solution
+
+### 1. Environment-Agnostic Unified API
+
+The same code works in both development and production environments. You don't need to worry about environment differences.
+
+### 2. Automatic Fallback Functionality
+
+When Static Assets aren't available or fail, the system automatically falls back to standard fetch.
+
+### 3. Type Safety
+
+Leverages TypeScript's type system to handle JSON file structures in a type-safe manner.
+
+### 4. Proper Error Handling
+
+Outputs detailed logs in development while suppressing unnecessary logs in production.
+
+### 5. Performance Optimization
+
+Prioritizes Cloudflare Static Assets for fast file delivery at the edge.
+
+## Important Considerations
+
+### Security
+
+Make sure files you don't want to be public aren't included in the public directory.
+
+## Conclusion
+
+The static assets problem with Cloudflare Workers + React Router is a challenge many developers face. However, by combining Static Assets with fallback functionality, we can solve it reliably.
+
+This solution provides:
+
+- **Better Developer Experience**: Develop without worrying about environment differences
+- **Improved Reliability**: Robustness through automatic fallback
+- **Performance Optimization**: Fast file delivery at the edge
+
+I hope this helps anyone struggling with the same issue. If you have questions or suggestions for improvements, please let me know in the comments!
+
+## References
+
+https://developers.cloudflare.com/workers/static-assets/
+
+https://reactrouter.com/
+
+https://vitejs.dev/guide/assets.html

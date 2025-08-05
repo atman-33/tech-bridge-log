@@ -1,8 +1,8 @@
 ---
 title: "Cloudflare Workers + React Router でのStatic Assets問題を解決する"
 slug: "cloudflare-static-assets-solution"
-publishedAt: "2025-01-08T10:00:00Z"
-updatedAt: "2025-01-08T10:00:00Z"
+publishedAt: "2025-08-05T00:00:00Z"
+updatedAt: "2025-08-05T00:00:00Z"
 tags: ["cloudflare", "react-router"]
 description: "開発環境では動作するpublicファイルへのアクセスが、Cloudflare Workersデプロイ時にエラーになる問題の解決策を紹介します。"
 emoji: "⚡"
@@ -12,7 +12,7 @@ emoji: "⚡"
 
 React Router v7とCloudflare Workersを組み合わせた開発で、多くの人が遭遇するであろう問題があります。それは、**開発環境（`npm run dev`）では正常にアクセスできるpublicディレクトリのファイルが、Cloudflare Workersにデプロイすると404エラーになってしまう**という問題です。
 
-この記事では、私が実際に遭遇したこの問題と、Static Assetsを活用したエレガントな解決策について詳しく解説します。
+この記事では、私が実際に遭遇したこの問題と、Static Assetsを活用した実用的な解決策について詳しく解説します。
 
 ## 問題の背景
 
@@ -296,23 +296,15 @@ TypeScriptの型システムを活用して、JSONファイルの構造を型安
 
 Cloudflare Static Assetsを優先的に使用することで、エッジでの高速なファイル配信を実現します。
 
-## 注意点とベストプラクティス
+## 注意点
 
-### 1. ファイルサイズの制限
-
-Cloudflare Static Assetsには[ファイルサイズの制限](https://developers.cloudflare.com/workers/static-assets/binding/)があります。大きなファイルの場合は別の方法を検討してください。
-
-### 2. キャッシュの考慮
-
-Static Assetsはエッジでキャッシュされます。ファイルの更新頻度を考慮してキャッシュ戦略を決めましょう。
-
-### 3. セキュリティ
+### セキュリティ
 
 公開したくないファイルがpublicディレクトリに含まれないよう注意してください。
 
 ## まとめ
 
-Cloudflare Workers + React Routerでのstatic assets問題は、多くの開発者が遭遇する課題です。しかし、Static Assetsとフォールバック機能を組み合わせることで、エレガントに解決できます。
+Cloudflare Workers + React Routerでのstatic assets問題は、多くの開発者が遭遇する課題です。しかし、Static Assetsとフォールバック機能を組み合わせることで、確実に解決できます。
 
 この解決策により：
 
