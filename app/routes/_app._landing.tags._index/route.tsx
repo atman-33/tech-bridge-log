@@ -12,15 +12,15 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   const selectedTag = url.searchParams.get('tag');
 
   try {
     // Load all articles and tags
     const [articles, allTags] = await Promise.all([
-      loadArticleMetadata(request),
-      loadTagsConfig(request),
+      loadArticleMetadata(context, request),
+      loadTagsConfig(context, request),
     ]);
 
     // Filter published articles
@@ -29,7 +29,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
     // Get tags that are actually used in articles
-    const usedTags = await getUsedTags(publishedArticles, request);
+    const usedTags = await getUsedTags(publishedArticles, context, request);
 
     // If a specific tag is requested but doesn't exist, throw 404
     if (selectedTag && !usedTags.find(tag => tag.id === selectedTag)) {

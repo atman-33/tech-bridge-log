@@ -1,3 +1,8 @@
+import {
+  fetchStaticJSON,
+  type ReactRouterContext,
+} from "~/lib/utils/static-assets";
+
 export interface Tag {
   id: string;
   label: string;
@@ -16,31 +21,20 @@ let tagsCache: Tag[] | null = null;
 /**
  * Loads tags metadata from the pre-built JSON file
  */
-async function loadTagsMetadata(request?: Request): Promise<Tag[]> {
+async function loadTagsMetadata(
+  context?: ReactRouterContext,
+  request?: Request,
+): Promise<Tag[]> {
   if (tagsCache) {
     return tagsCache;
   }
 
   try {
-    // Always fetch from the static file endpoint
-    let url = "/tags-metadata.json";
-
-    // If we have a request object (SSR), construct absolute URL
-    if (request) {
-      const requestUrl = new URL(request.url);
-      url = `${requestUrl.origin}/tags-metadata.json`;
-    }
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(
-        `Tags metadata not found. Run 'npm run blog:build' first.`,
-      );
-    }
-
-    const content = await response.text();
-    const metadata: TagsMetadata = JSON.parse(content);
+    const metadata = await fetchStaticJSON<TagsMetadata>(
+      "/tags-metadata.json",
+      context,
+      request,
+    );
 
     if (!metadata.tags || !Array.isArray(metadata.tags)) {
       throw new Error("Invalid tags metadata format");
@@ -59,8 +53,11 @@ async function loadTagsMetadata(request?: Request): Promise<Tag[]> {
 /**
  * Loads and validates the tags configuration
  */
-export async function loadTagsConfig(request?: Request): Promise<Tag[]> {
-  return await loadTagsMetadata(request);
+export async function loadTagsConfig(
+  context?: ReactRouterContext,
+  request?: Request,
+): Promise<Tag[]> {
+  return await loadTagsMetadata(context, request);
 }
 
 /**
@@ -68,9 +65,10 @@ export async function loadTagsConfig(request?: Request): Promise<Tag[]> {
  */
 export async function getTagById(
   tagId: string,
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<Tag | null> {
-  const tags = await loadTagsConfig(request);
+  const tags = await loadTagsConfig(context, request);
   return tags.find((tag) => tag.id === tagId) || null;
 }
 
@@ -79,9 +77,10 @@ export async function getTagById(
  */
 export async function getTagsByIds(
   tagIds: string[],
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<Tag[]> {
-  const allTags = await loadTagsConfig(request);
+  const allTags = await loadTagsConfig(context, request);
   const tagMap = new Map(allTags.map((tag) => [tag.id, tag]));
 
   return tagIds
@@ -96,10 +95,11 @@ export async function getTagsByIds(
 export async function validateArticleTags(
   articleTags: string[],
   articleSlug: string,
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<void> {
   try {
-    const allTags = await loadTagsConfig(request);
+    const allTags = await loadTagsConfig(context, request);
     const validTagIds = new Set(allTags.map((tag) => tag.id));
 
     const invalidTags = articleTags.filter((tag) => !validTagIds.has(tag));
@@ -124,6 +124,7 @@ export async function validateArticleTags(
  */
 export async function getUsedTags(
   articles: { tags: string[] }[],
+  context?: ReactRouterContext,
   request?: Request,
 ): Promise<Tag[]> {
   const usedTagIds = new Set<string>();
@@ -134,5 +135,5 @@ export async function getUsedTags(
     }
   }
 
-  return getTagsByIds(Array.from(usedTagIds), request);
+  return getTagsByIds(Array.from(usedTagIds), context, request);
 }

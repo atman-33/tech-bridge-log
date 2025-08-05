@@ -15,21 +15,21 @@ export const meta: Route.MetaFunction = ({ location }) => {
   ];
 };
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams.get('q') || '';
 
-  // Load search index from public directory
+  // Load search index from public directory using static assets utility
   let searchIndex: SearchIndex | null = null;
   let searchIndexError: string | null = null;
 
   try {
-    const response = await fetch(new URL('/search-index.json', request.url));
-    if (response.ok) {
-      searchIndex = await response.json() as SearchIndex;
-    } else {
-      searchIndexError = `Failed to load search index: ${response.status} ${response.statusText}`;
-    }
+    const { fetchStaticJSON } = await import('~/lib/utils/static-assets');
+    searchIndex = await fetchStaticJSON<SearchIndex>(
+      '/search-index.json',
+      context,
+      request
+    );
   } catch (error) {
     console.error('Failed to load search index:', error);
     searchIndexError = error instanceof Error ? error.message : 'Unknown error loading search index';
