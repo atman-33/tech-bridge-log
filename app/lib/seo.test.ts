@@ -124,7 +124,7 @@ describe("SEO utilities", () => {
           "property" in tag && tag.property === "og:image",
       );
       expect(ogImageTag?.content).toBe(
-        "https://techbridgelog.pages.dev/test-image.png",
+        "https://tech-bridge-log.com/test-image.png",
       );
     });
   });
@@ -146,7 +146,7 @@ describe("SEO utilities", () => {
       });
       expect(metaTags).toContainEqual({
         property: "og:url",
-        content: "https://techbridgelog.pages.dev/blog/test-article",
+        content: "https://tech-bridge-log.com/blog/test-article",
       });
       expect(metaTags).toContainEqual({
         property: "article:published_time",
@@ -181,7 +181,7 @@ describe("SEO utilities", () => {
       expect(structuredData.headline).toBe(mockArticle.title);
       expect(structuredData.description).toBe(mockArticle.description);
       expect(structuredData.url).toBe(
-        "https://techbridgelog.pages.dev/blog/test-article",
+        "https://tech-bridge-log.com/blog/test-article",
       );
       expect(structuredData.datePublished).toBe("2024-01-15T10:00:00.000Z");
       expect(structuredData.dateModified).toBe("2024-01-16T14:30:00.000Z");
