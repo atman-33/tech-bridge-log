@@ -540,7 +540,7 @@ export async function loadArticleContent(
       request,
     );
     return mdxContent;
-  } catch (error) {
+  } catch (_error) {
     console.log(`MDX content not found for slug: ${slug}`);
     return null;
   }

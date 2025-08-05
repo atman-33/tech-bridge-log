@@ -28,54 +28,47 @@ export async function fetchStaticAsset(
   context?: CloudflareContext,
   request?: Request,
 ): Promise<Response> {
-  // Ensure path starts with /
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
   // Try Static Assets first if available
-  if (hasAssetsBinding(context)) {
+  if (hasAssetsBinding(context) && context?.cloudflare?.env?.ASSETS) {
     try {
-      console.log(
-        `[fetchStaticAsset] Trying ASSETS.fetch for ${normalizedPath}`,
-      );
-
-      // Create a request URL for ASSETS.fetch()
       const assetUrl = new URL(normalizedPath, "https://example.com");
       const assetRequest = new Request(assetUrl.toString());
 
-      const response =
-        await context!.cloudflare!.env.ASSETS.fetch(assetRequest);
+      const response = await context.cloudflare.env.ASSETS.fetch(assetRequest);
 
       if (response.ok) {
-        console.log(
-          `[fetchStaticAsset] ASSETS.fetch succeeded for ${normalizedPath}`,
-        );
         return response;
       }
 
-      // If not successful, log and fall through to standard fetch
-      console.warn(
-        `[fetchStaticAsset] ASSETS.fetch failed for ${normalizedPath} (${response.status}), falling back to standard fetch`,
-      );
+      // Log fallback only in development
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(
+          `[Static Assets] Failed for ${normalizedPath} (${response.status}), using fallback`,
+        );
+      }
     } catch (error) {
-      console.warn(
-        `[fetchStaticAsset] ASSETS.fetch error for ${normalizedPath}, falling back to standard fetch:`,
-        error,
-      );
+      // Log errors only in development
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(`[Static Assets] Error for ${normalizedPath}:`, error);
+      }
     }
   }
 
   // Fallback: Use standard fetch
-  console.log(`[fetchStaticAsset] Using standard fetch for ${normalizedPath}`);
-
   let url = normalizedPath;
 
-  // If we have a request object (SSR), construct absolute URL
   if (request) {
     const requestUrl = new URL(request.url);
     url = `${requestUrl.origin}${normalizedPath}`;
   }
-
-  console.log(`[fetchStaticAsset] Final URL: ${url}`);
 
   const response = await fetch(url);
 
@@ -85,9 +78,6 @@ export async function fetchStaticAsset(
     );
   }
 
-  console.log(
-    `[fetchStaticAsset] Standard fetch succeeded for ${normalizedPath}`,
-  );
   return response;
 }
 
@@ -104,7 +94,13 @@ export async function fetchStaticJSON<T>(
     const json = await response.json();
     return json as T;
   } catch (error) {
-    console.error(`Failed to fetch static JSON ${path}:`, error);
+    // Log detailed errors only in development
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static JSON ${path}:`, error);
+    }
     throw new Error(`Failed to load JSON asset: ${path}`);
   }
 }
@@ -122,7 +118,13 @@ export async function fetchStaticText(
     const text = await response.text();
     return text;
   } catch (error) {
-    console.error(`Failed to fetch static text ${path}:`, error);
+    // Log detailed errors only in development
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static text ${path}:`, error);
+    }
     throw new Error(`Failed to load text asset: ${path}`);
   }
 }
