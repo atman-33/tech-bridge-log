@@ -14,7 +14,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
     h1: ({ children, ...props }) => {
       const id = generateHeadingId(String(children));
       return (
-        <h1 id={id} className="text-4xl font-bold tracking-tight mb-6 mt-8 first:mt-0 scroll-mt-20 border-b border-border pb-2" {...props}>
+        <h1 id={id} className="text-4xl font-bold tracking-tight mb-6 mt-12 first:mt-0 scroll-mt-20 border-b border-border pb-2" {...props}>
           {children}
         </h1>
       );
@@ -22,7 +22,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
     h2: ({ children, ...props }) => {
       const id = generateHeadingId(String(children));
       return (
-        <h2 id={id} className="text-3xl font-semibold tracking-tight mb-4 mt-8 scroll-mt-20 border-b border-border pb-2" {...props}>
+        <h2 id={id} className="text-3xl font-semibold tracking-tight mb-4 mt-12 scroll-mt-20 border-b border-border pb-2" {...props}>
           {children}
         </h2>
       );

@@ -13,7 +13,7 @@ This feature involves building a modern technical blog platform, designed for in
 #### Acceptance Criteria
 
 1. WHEN an author creates a new article THEN the system SHALL support MDX file format with frontmatter metadata
-2. WHEN an article is created THEN the system SHALL require title, slug, publishedAt, updatedAt, tags, description, and thumbnail fields in frontmatter
+2. WHEN an article is created THEN the system SHALL require title, slug, publishedAt, updatedAt, tags, description, and emoji fields in frontmatter
 3. WHEN an article includes images THEN the system SHALL store images in the same directory as the article MDX file
 4. WHEN the site is built THEN the system SHALL copy article images to the public folder for serving
 
@@ -24,7 +24,7 @@ This feature involves building a modern technical blog platform, designed for in
 #### Acceptance Criteria
 
 1. WHEN a visitor accesses the blog homepage THEN the system SHALL display a list of all published articles
-2. WHEN displaying articles THEN the system SHALL show title, description, thumbnail, publication date, and tags for each article
+2. WHEN displaying articles THEN the system SHALL show title, description, emoji icon, publication date, and tags for each article
 3. WHEN the site builds THEN the system SHALL generate a cached JSON file containing all article metadata for efficient loading
 4. WHEN articles are sorted THEN the system SHALL order them by publication date (newest first)
 
@@ -79,9 +79,9 @@ This feature involves building a modern technical blog platform, designed for in
 #### Acceptance Criteria
 
 1. WHEN an article is accessed THEN the system SHALL generate appropriate meta tags for SEO
-2. WHEN an article is shared THEN the system SHALL provide proper OGP tags with title, description, and thumbnail
+2. WHEN an article is shared THEN the system SHALL provide proper OGP tags with title, description, and default OGP image
 3. WHEN generating meta tags THEN the system SHALL use server-side rendering on Cloudflare Workers
-4. WHEN a thumbnail is specified THEN the system SHALL use the article's custom thumbnail for OGP images
+4. WHEN an emoji is specified THEN the system SHALL use the default OGP image since social media platforms don't handle emoji images well
 
 ### Requirement 8
 
@@ -191,7 +191,7 @@ This feature involves building a modern technical blog platform, designed for in
 1. WHEN viewing an article THEN the system SHALL display related articles with shared tags
 2. WHEN showing related articles THEN the system SHALL randomly select from articles with matching tags
 3. WHEN no related articles exist THEN the system SHALL gracefully handle the empty state
-4. WHEN displaying related articles THEN the system SHALL show article title, thumbnail, and publication date
+4. WHEN displaying related articles THEN the system SHALL show article title, emoji icon, and publication date
 
 ### Requirement 18
 
@@ -201,5 +201,5 @@ This feature involves building a modern technical blog platform, designed for in
 
 1. WHEN navigating the blog THEN the system SHALL provide an "Apps" tab in the main navigation
 2. WHEN accessing the Apps section THEN the system SHALL display web application cards with project information
-3. WHEN viewing app cards THEN the system SHALL show app title, description, thumbnail, and link to the application
+3. WHEN viewing app cards THEN the system SHALL show app title, description, icon/image, and link to the application
 4. WHEN clicking on app cards THEN the system SHALL navigate to the respective web application

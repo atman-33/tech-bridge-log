@@ -13,5 +13,10 @@
     "label": "React Router",
     "icon": "/icons/tags/react-router.svg",
     "description": "React Router library and routing concepts"
+  },
+  "cloudflare": {
+    "label": "Cloudflare",
+    "icon": "/icons/tags/cloudflare.svg",
+    "description": "Cloudflare"
   }
 }

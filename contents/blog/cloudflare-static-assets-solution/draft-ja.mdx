@@ -1,0 +1,321 @@
+---
+title: "Cloudflare Workers + React Router でのStatic Assets問題を解決する"
+slug: "cloudflare-static-assets-solution"
+publishedAt: "2025-08-05T00:00:00Z"
+updatedAt: "2025-08-05T00:00:00Z"
+tags: ["cloudflare", "react-router"]
+description: "開発環境では動作するpublicファイルへのアクセスが、Cloudflare Workersデプロイ時にエラーになる問題の解決策を紹介します。"
+emoji: "⚡"
+---
+
+React Router v7とCloudflare Workersを組み合わせた開発で、多くの人が遭遇するであろう問題があります。それは、**開発環境（`npm run dev`）では正常にアクセスできるpublicディレクトリのファイルが、Cloudflare Workersにデプロイすると404エラーになってしまう**という問題です。
+
+この記事では、私が実際に遭遇したこの問題と、Static Assetsを活用した実用的な解決策について詳しく解説します。
+
+## 問題の背景
+
+### 開発環境では動作するが本番環境でエラー
+
+React Routerアプリケーションで、JSONファイルやその他の静的ファイルを`public`ディレクトリに配置し、以下のようなコードでアクセスしていました：
+
+```typescript
+// 開発環境では正常に動作
+const response = await fetch('/data/config.json');
+const config = await response.json();
+```
+
+しかし、Cloudflare Workersにデプロイすると：
+
+```
+Error: Failed to fetch '/data/config.json' - 404 Not Found
+```
+
+### なぜこの問題が発生するのか
+
+この問題の根本原因は、**開発環境と本番環境でのファイル配信の仕組みの違い**にあります：
+
+- **開発環境（Vite）**: `public`ディレクトリのファイルは自動的にルートパスで配信される
+- **Cloudflare Workers**: 静的ファイルは別途Static Assetsとして設定する必要がある
+
+つまり、開発時は`/data/config.json`でアクセスできても、本番環境では同じパスでアクセスできないのです。
+
+## 解決策：Static Assets + フォールバック処理
+
+この問題を解決するために、以下の要素を組み合わせたソリューションを開発しました：
+
+1. **Cloudflare Static Assets**の活用
+2. **環境に応じた自動フォールバック**
+3. **型安全なユーティリティ関数**
+
+### 1. wrangler.jsonc の設定
+
+まず、Cloudflare WorkersでStatic Assetsを有効にします：
+
+```json
+{
+  "compatibility_date": "2024-11-18",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  }
+}
+```
+
+### 2. ユーティリティ関数の実装
+
+次に、環境に応じて適切な方法でファイルにアクセスするユーティリティを作成します：
+
+```typescript
+/**
+ * Static Assets Utility
+ * 
+ * 異なる環境間で統一されたstatic fileアクセスを提供：
+ * - 開発環境（Vite）: 標準のfetch()を使用
+ * - 本番環境（Cloudflare Workers）: ASSETSバインディングを使用
+ * - ビルド時（Node.js）: ファイルシステムアクセスにフォールバック
+ */
+
+interface CloudflareContext {
+  cloudflare?: {
+    env: Env;
+  };
+}
+
+/**
+ * Cloudflare Workers ASSETSバインディングが利用可能かチェック
+ */
+function hasAssetsBinding(context?: CloudflareContext): boolean {
+  return !!context?.cloudflare?.env?.ASSETS;
+}
+
+/**
+ * ASSETSと標準fetchの自動フォールバックでstatic assetを取得
+ */
+export async function fetchStaticAsset(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<Response> {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  // Static Assetsが利用可能な場合は優先的に使用
+  if (hasAssetsBinding(context) && context?.cloudflare?.env?.ASSETS) {
+    try {
+      const assetUrl = new URL(normalizedPath, "https://example.com");
+      const assetRequest = new Request(assetUrl.toString());
+
+      const response = await context.cloudflare.env.ASSETS.fetch(assetRequest);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // 開発環境でのみフォールバックをログ出力
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(
+          `[Static Assets] Failed for ${normalizedPath} (${response.status}), using fallback`,
+        );
+      }
+    } catch (error) {
+      // 開発環境でのみエラーをログ出力
+      if (
+        typeof process !== "undefined" &&
+        process.env.NODE_ENV === "development"
+      ) {
+        console.warn(`[Static Assets] Error for ${normalizedPath}:`, error);
+      }
+    }
+  }
+
+  // フォールバック: 標準fetchを使用
+  let url = normalizedPath;
+
+  if (request) {
+    const requestUrl = new URL(request.url);
+    url = `${requestUrl.origin}${normalizedPath}`;
+  }
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Static asset not found: ${normalizedPath} (${response.status})`,
+    );
+  }
+
+  return response;
+}
+```
+
+### 3. 型安全なヘルパー関数
+
+JSONやテキストファイル用の便利なヘルパー関数も提供します：
+
+```typescript
+/**
+ * JSONファイルを取得してパース
+ */
+export async function fetchStaticJSON<T>(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<T> {
+  try {
+    const response = await fetchStaticAsset(path, context, request);
+    const json = await response.json();
+    return json as T;
+  } catch (error) {
+    // 開発環境でのみ詳細なエラーをログ出力
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static JSON ${path}:`, error);
+    }
+    throw new Error(`Failed to load JSON asset: ${path}`);
+  }
+}
+
+/**
+ * テキストファイルを取得
+ */
+export async function fetchStaticText(
+  path: string,
+  context?: CloudflareContext,
+  request?: Request,
+): Promise<string> {
+  try {
+    const response = await fetchStaticAsset(path, context, request);
+    const text = await response.text();
+    return text;
+  } catch (error) {
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV === "development"
+    ) {
+      console.error(`Failed to fetch static text ${path}:`, error);
+    }
+    throw new Error(`Failed to load text asset: ${path}`);
+  }
+}
+```
+
+## 実際の使用例
+
+### React Routerのloaderでの使用
+
+```typescript
+import type { Route } from './+types/route';
+import { fetchStaticJSON } from '~/lib/utils/static-assets';
+
+interface AppConfig {
+  apiUrl: string;
+  features: string[];
+}
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  // 環境に関係なく同じコードで動作
+  const config = await fetchStaticJSON<AppConfig>(
+    '/data/config.json',
+    context,
+    request
+  );
+
+  return { config };
+}
+
+export default function ConfigPage({ loaderData }: Route.ComponentProps) {
+  const { config } = loaderData;
+  
+  return (
+    <div>
+      <h1>App Configuration</h1>
+      <p>API URL: {config.apiUrl}</p>
+      <ul>
+        {config.features.map(feature => (
+          <li key={feature}>{feature}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### React Router専用のヘルパー
+
+React Routerでの使用をより簡単にするため、専用のヘルパー関数も提供しています：
+
+```typescript
+/**
+ * React Router専用のJSONファイル取得ヘルパー
+ */
+export async function fetchStaticJSONFromRoute<T>(
+  path: string,
+  context: ReactRouterContext,
+  request?: Request,
+): Promise<T> {
+  return fetchStaticJSON<T>(path, context, request);
+}
+
+/**
+ * React Router専用のテキストファイル取得ヘルパー
+ */
+export async function fetchStaticTextFromRoute(
+  path: string,
+  context: ReactRouterContext,
+  request?: Request,
+): Promise<string> {
+  return fetchStaticText(path, context, request);
+}
+```
+
+## この解決策の利点
+
+### 1. 環境に依存しない統一されたAPI
+
+開発環境でも本番環境でも同じコードが動作します。環境の違いを意識する必要がありません。
+
+### 2. 自動フォールバック機能
+
+Static Assetsが利用できない場合や失敗した場合、自動的に標準のfetchにフォールバックします。
+
+### 3. 型安全性
+
+TypeScriptの型システムを活用して、JSONファイルの構造を型安全に扱えます。
+
+### 4. 適切なエラーハンドリング
+
+開発環境では詳細なログを出力し、本番環境では不要なログを抑制します。
+
+### 5. パフォーマンス最適化
+
+Cloudflare Static Assetsを優先的に使用することで、エッジでの高速なファイル配信を実現します。
+
+## 注意点
+
+### セキュリティ
+
+公開したくないファイルがpublicディレクトリに含まれないよう注意してください。
+
+## まとめ
+
+Cloudflare Workers + React Routerでのstatic assets問題は、多くの開発者が遭遇する課題です。しかし、Static Assetsとフォールバック機能を組み合わせることで、確実に解決できます。
+
+この解決策により：
+
+- **開発体験の向上**: 環境の違いを意識せずに開発できる
+- **信頼性の向上**: 自動フォールバックによる堅牢性
+- **パフォーマンスの最適化**: エッジでの高速ファイル配信
+
+同じ問題で悩んでいる方の参考になれば幸いです。質問や改善案があれば、ぜひコメントでお聞かせください！
+
+## 参考リンク
+
+https://developers.cloudflare.com/workers/static-assets/
+
+https://reactrouter.com/
+
+https://vitejs.dev/guide/assets.html

@@ -30,7 +30,6 @@ graph TB
 /contents/blog/
 ├── article-slug-1/
 │   ├── index.mdx
-│   ├── thumbnail.png
 │   └── diagram.svg
 ├── article-slug-2/
 │   ├── index.mdx
@@ -107,7 +106,7 @@ interface Article {
   publishedAt: Date;
   updatedAt: Date;
   tags: string[];
-  thumbnail: string;
+  emoji: string;
   content?: string; // Only loaded on article detail page
   readingTime: number; // Calculated during build
   relatedArticles?: ArticleMetadata[]; // Related articles based on tags
@@ -120,7 +119,7 @@ interface ArticleMetadata {
   publishedAt: Date;
   updatedAt: Date;
   tags: string[];
-  thumbnail: string;
+  emoji: string;
   readingTime: number;
 }
 
@@ -226,7 +225,7 @@ publishedAt: "2024-01-15T10:00:00Z"
 updatedAt: "2024-01-16T14:30:00Z"
 tags: ["react", "routing", "web-development"]
 description: "A comprehensive guide to building modern web applications using React Router v7 with server-side rendering."
-thumbnail: "./thumbnail.png"
+emoji: "⚛️"
 ```
 
 ### Tags Configuration (`/contents/tags.json`)
@@ -290,7 +289,7 @@ thumbnail: "./thumbnail.png"
       "publishedAt": "2024-01-15T10:00:00Z",
       "updatedAt": "2024-01-16T14:30:00Z",
       "tags": ["react", "routing", "web-development"],
-      "thumbnail": "/blog-assets/react-router-v7-guide/thumbnail.png",
+      "emoji": "⚛️",
       "readingTime": 8
     }
   ],
