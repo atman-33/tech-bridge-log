@@ -8,8 +8,6 @@ description: "開発環境では動作するpublicファイルへのアクセス
 emoji: "⚡"
 ---
 
-# Cloudflare Workers + React Router でのStatic Assets問題を解決する
-
 React Router v7とCloudflare Workersを組み合わせた開発で、多くの人が遭遇するであろう問題があります。それは、**開発環境（`npm run dev`）では正常にアクセスできるpublicディレクトリのファイルが、Cloudflare Workersにデプロイすると404エラーになってしまう**という問題です。
 
 この記事では、私が実際に遭遇したこの問題と、Static Assetsを活用した実用的な解決策について詳しく解説します。
