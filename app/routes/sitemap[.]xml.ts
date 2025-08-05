@@ -6,13 +6,13 @@ import {
 } from "~/lib/sitemap-generator";
 import type { Route } from "./+types/sitemap[.]xml";
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     // Define dynamic route generators (extensible for future use)
     const dynamicGenerators: DynamicRouteGenerator[] = [
       // Blog articles generator
       async () => {
-        const articles = await loadArticleMetadata(undefined, request);
+        const articles = await loadArticleMetadata(context, request);
         return articles.map((article) => ({
           path: `/blog/${article.slug}`,
           isPublic: true,
@@ -21,16 +21,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
           lastmod: article.updatedAt,
         }));
       },
-      // Example: If there are public manga reviews
-      // async () => {
-      //   const reviews = await db.query.publicMangaReviews.findMany();
-      //   return reviews.map(review => ({
-      //     path: `/reviews/${review.slug}`,
-      //     isPublic: true,
-      //     priority: 0.7,
-      //     changefreq: 'weekly' as const,
-      //   }));
-      // },
     ];
 
     const urls = await generateSitemapUrls(dynamicGenerators);
