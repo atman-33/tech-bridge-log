@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Update file discovery patterns to support both .mdx and .md extensions
+- [x] 1. Update file discovery patterns to support both .mdx and .md extensions
   - Modify the `import.meta.glob` pattern in `app/lib/blog/mdx-processor.ts` to include both `/contents/blog/**/index.mdx` and `/contents/blog/**/index.md`
   - Update the `mdxModules` object to merge both glob patterns
   - _Requirements: 2.1, 2.2_
