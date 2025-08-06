@@ -13,6 +13,6 @@ export default defineConfig(({ mode }) => ({
   ],
   test: {
     globals: true,
-    setupFiles: ['./test/setup.ts'],    
+    setupFiles: ['./test/setup.ts'],
   },
 }));

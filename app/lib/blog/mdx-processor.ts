@@ -69,15 +69,8 @@ const FRONTMATTER_VALIDATION = {
 const BLOG_CONTENT_DIR = "contents/blog";
 const _PUBLIC_ASSETS_DIR = "public/blog-assets";
 
-// Use import.meta.glob to load MDX files at build time (Vite + SSR compatible)
-// This will be undefined in Node.js environment
-const mdxModules =
-  typeof import.meta.glob !== "undefined"
-    ? import.meta.glob("/contents/blog/**/index.mdx", {
-        query: "?raw",
-        import: "default",
-      })
-    : {};
+// Removed import.meta.glob to avoid build-time static imports
+// All file reading is now done dynamically at runtime
 
 /**
  * Enhanced reading time calculation with customizable options
@@ -360,12 +353,7 @@ function validateFrontmatter(
  * Discovers all MDX files in the blog content directory
  */
 export async function discoverArticles(): Promise<string[]> {
-  // In Vite environment, use import.meta.glob
-  if (Object.keys(mdxModules).length > 0) {
-    const moduleKeys = Object.keys(mdxModules);
-    console.log("discoverArticles - found modules:", moduleKeys);
-    return moduleKeys;
-  }
+  // Always use file system approach (no more import.meta.glob)
 
   // In Node.js environment, use file system with dynamic imports
   try {
@@ -386,10 +374,16 @@ export async function discoverArticles(): Promise<string[]> {
 
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const indexPath = join(BLOG_CONTENT_DIR, entry.name, "index.mdx");
-        if (existsSync(indexPath)) {
+        const mdxPath = join(BLOG_CONTENT_DIR, entry.name, "index.mdx");
+        const mdPath = join(BLOG_CONTENT_DIR, entry.name, "index.md");
+
+        // Check for .mdx first (priority), then .md
+        if (existsSync(mdxPath)) {
           // Convert to the format expected by import.meta.glob
           articles.push(`/contents/blog/${entry.name}/index.mdx`);
+        } else if (existsSync(mdPath)) {
+          // Convert to the format expected by import.meta.glob
+          articles.push(`/contents/blog/${entry.name}/index.md`);
         }
       }
     }
@@ -410,26 +404,20 @@ export async function processArticle(
 ): Promise<ArticleMetadata> {
   let content: string;
 
-  // Load content using import.meta.glob in Vite environment
-  const moduleLoader = mdxModules[filePath];
-  if (moduleLoader) {
-    content = (await moduleLoader()) as string;
-  } else {
-    // In Node.js environment, read from file system with dynamic imports
-    try {
-      const { existsSync } = await import("node:fs");
-      const { readFile } = await import("node:fs/promises");
-      const { join } = await import("node:path");
+  // Always read from file system (no more import.meta.glob)
+  try {
+    const { existsSync } = await import("node:fs");
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
 
-      // Use relative path from current working directory
-      const absolutePath = join(process.cwd(), filePath.replace(/^\//, ""));
-      if (!existsSync(absolutePath)) {
-        throw new Error(`Article not found: ${absolutePath}`);
-      }
-      content = await readFile(absolutePath, "utf-8");
-    } catch (error) {
-      throw new Error(`Failed to read article ${filePath}: ${error}`);
+    // Use relative path from current working directory
+    const absolutePath = join(process.cwd(), filePath.replace(/^\//, ""));
+    if (!existsSync(absolutePath)) {
+      throw new Error(`Article not found: ${absolutePath}`);
     }
+    content = await readFile(absolutePath, "utf-8");
+  } catch (error) {
+    throw new Error(`Failed to read article ${filePath}: ${error}`);
   }
   const { data: frontmatter, content: mdxContent } = matter(content);
 
@@ -490,22 +478,7 @@ export async function loadArticleContent(
 ): Promise<string | null> {
   // Check if we're in a build environment (Node.js without request object)
   if (typeof window === "undefined" && !request && !context) {
-    // Build time: use the original Node.js approach
-    const pattern = `/contents/blog/${slug}/index.mdx`;
-    const moduleLoader = mdxModules[pattern];
-
-    if (moduleLoader) {
-      try {
-        const rawContent = (await moduleLoader()) as string;
-        const { content: mdxContent } = matter(rawContent);
-        return mdxContent;
-      } catch (error) {
-        console.error("loadArticleContent - error loading module:", error);
-        return null;
-      }
-    }
-
-    // Fallback to file system for build time
+    // Build time: always use file system approach
     try {
       const { existsSync } = await import("node:fs");
       const { readFile } = await import("node:fs/promises");
