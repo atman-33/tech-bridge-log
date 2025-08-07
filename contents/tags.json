@@ -18,5 +18,14 @@
     "label": "Cloudflare",
     "icon": "/icons/tags/cloudflare.svg",
     "description": "Cloudflare"
+  },
+  "typescript": {
+    "label": "TypeScript",
+    "icon": "/icons/tags/typescript.svg",
+    "description": "TypeScript"
+  },
+  "dnd-kit": {
+    "label": "dnd kit",
+    "description": "dnd kit"
   }
 }

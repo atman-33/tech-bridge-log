@@ -1,0 +1,163 @@
+---
+title: "How to Create Sortable & Droppable Components with dnd-kit"
+slug: "dnd-kit-sortable-droppable"
+publishedAt: "2025-08-07T00:00:00Z"
+updatedAt: "2025-08-07T00:00:00Z"
+tags: ["react", "dnd-kit", "drag-and-drop", "typescript"]
+description: "Learn how to implement both useSortable and useDroppable in dnd-kit. A practical guide to achieving container reordering and item dropping simultaneously through conditional logic."
+emoji: "🎯"
+---
+
+When implementing drag-and-drop functionality in React development, you often encounter requirements like "I want to reorder containers" and "I want to drop items into containers."
+
+![sortable and droppable](image.gif)
+
+While dnd-kit seems like it should make this easy to implement, it's actually more complex than it appears. When you try to reorder containers, the items inside react unexpectedly, or when you try to move items, the containers start moving instead.
+
+Today, I'll share how to solve these problems with a practical implementation approach.
+
+## The Core Problem: Sortable and Droppable Conflicts
+
+The root cause of the problem is trying to use dnd-kit's `useSortable` and `useDroppable` on the same element.
+
+When you try to drag a container, dnd-kit thinks "this is a sort operation." But at the same time, it also considers "wait, this might be a drop operation." As a result, events conflict and don't work as expected.
+
+This confusion arises from trying to give a single element multiple roles.
+
+## Solution: Conditional Logic Based on Context
+
+The solution is surprisingly simple.
+
+**"Determine what's currently being dragged and switch functionality based on the situation"**
+
+Specifically:
+- When an item is being dragged: Disable the container's Sortable functionality
+- When a container is being dragged: Enable Sortable functionality as usual
+
+This conditional logic allows only the appropriate functionality to operate at the right time.
+
+## The Key: Context-Aware Logic
+
+Let's look at the actual code. First, we need to know "what's currently being dragged."
+
+```typescript
+const { active } = useDndContext();
+
+// If ID starts with "item-", it's an item; otherwise, it's a container
+const isDraggingItem = active && active.id.toString().startsWith('item-');
+```
+
+Next, we use this information to intelligently switch refs:
+
+```typescript
+// Pass an empty function to disable Sortable when dragging items
+const conditionalSortableRef = isDraggingItem ? () => {} : setSortableRef;
+
+return (
+  <div
+    ref={conditionalSortableRef}
+    // Disable event listeners when dragging items
+    {...(isDraggingItem ? {} : attributes)}
+    {...(isDraggingItem ? {} : listeners)}
+  >
+    {/* Droppable is always active */}
+    <div ref={setDroppableRef}>
+      {/* Content */}
+    </div>
+  </div>
+);
+```
+
+With this mechanism, when dragging items, containers behave as drop-only targets, and when dragging containers, they act as sortable elements.
+
+## Container Component Implementation
+
+Here's what the main container component looks like:
+
+```typescript
+const SortableDroppableContainer = ({ container }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setSortableRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: container.id });
+
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `container-${container.id}`,
+  });
+
+  const { active } = useDndContext();
+  const isDraggingItem = active && active.id.toString().startsWith('item-');
+
+  // This is the key! Switch refs based on context
+  const conditionalSortableRef = isDraggingItem ? () => {} : setSortableRef;
+
+  return (
+    <div
+      ref={conditionalSortableRef}
+      {...(isDraggingItem ? {} : attributes)}
+      {...(isDraggingItem ? {} : listeners)}
+    >
+      <div ref={setDroppableRef}>
+        {/* Card UI */}
+      </div>
+    </div>
+  );
+};
+```
+
+The key point is the `conditionalSortableRef` part. When an item is being dragged, we pass an empty function to disable the Sortable functionality.
+
+## Implementation Considerations
+
+### Preventing Duplicate Execution
+
+Drag events can sometimes execute the same process multiple times. This is particularly noticeable when testing on mobile environments. Use a processing flag to prevent duplicate execution:
+
+```typescript
+const isDragProcessingRef = useRef(false);
+
+const handleDragEnd = (event) => {
+  if (isDragProcessingRef.current) return; // Do nothing if already processing
+  
+  isDragProcessingRef.current = true;
+  // Actual processing...
+  isDragProcessingRef.current = false;
+};
+```
+
+### Deep Copying State
+
+In React state updates, components won't re-render if object references don't change. When updating arrays or objects, always create new references:
+
+```typescript
+// ❌ This won't trigger re-render
+containers[0].items.push(newItem);
+
+// ✅ This is correct
+setContainers(prev => prev.map(c => 
+  c.id === targetId 
+    ? { ...c, items: [...c.items, newItem] }
+    : c
+));
+```
+
+### ID Naming Convention
+
+To distinguish between items and containers, it's recommended to add prefixes to IDs:
+
+- Containers: `container-1`, `container-2`...
+- Items: `item-1`, `item-2`...
+
+This naming convention eliminates confusion when writing judgment logic later.
+
+## Summary
+
+The secret to making Sortable and Droppable work together in dnd-kit is **conditional logic based on context**. By determining "what's currently being dragged" and enabling only the appropriate functionality, you can create intuitive and user-friendly drag-and-drop interfaces.
+
+Once you master this implementation pattern, you can apply it to various scenarios like Kanban boards, file management systems, playlist editing features, and more.
+
+Even complex drag-and-drop functionality becomes manageable with this conditional logic technique.

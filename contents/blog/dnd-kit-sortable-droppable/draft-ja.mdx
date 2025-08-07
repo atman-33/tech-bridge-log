@@ -1,0 +1,163 @@
+---
+title: "dnd-kitでソート可能＆ドロップ可能なコンポーネントを作る方法"
+slug: "dnd-kit-sortable-droppable"
+publishedAt: "2025-01-08T00:00:00Z"
+updatedAt: "2025-01-08T00:00:00Z"
+tags: ["react", "dnd-kit", "drag-and-drop", "typescript"]
+description: "dnd-kitでuseSortableとuseDroppableを両立させる実装方法。状況に応じた条件分岐でコンテナの並び替えとアイテムのドロップを同時に実現する方法を解説します。"
+emoji: "🎯"
+---
+
+React開発でドラッグ＆ドロップ機能を実装する際、「コンテナ同士を並び替えたい」「コンテナにアイテムをドロップしたい」という要求に出会うことがあります。
+
+![sortable and droppable](image.gif)
+
+dnd-kitを使えば簡単に実装できそうに思えますが、実際にやってみると意外と複雑です。コンテナを並び替えようとすると中のアイテムが反応したり、逆にアイテムを移動しようとするとコンテナが動いてしまったり。
+
+今回は、そんな問題を解決する実装方法をご紹介します。
+
+## 問題の核心：SortableとDroppableの競合
+
+問題の根本原因は、dnd-kitの`useSortable`と`useDroppable`を同じ要素で使おうとすることです。
+
+コンテナをドラッグしようとした時、dnd-kitは「これはソート操作」と判断します。しかし同時に「これはドロップ操作かもしれない」とも考えてしまい、結果的にイベントが競合して期待通りに動作しません。
+
+一つの要素に複数の役割を持たせようとすることで、このような混乱が生じてしまいます。
+
+## 解決策：状況に応じた条件分岐
+
+解決方法は意外とシンプルです。
+
+**「今何がドラッグされているかを判定して、状況に合わせて機能を切り替える」**
+
+具体的には：
+- アイテムがドラッグされている時：コンテナのSortable機能を無効化
+- コンテナがドラッグされている時：通常通りSortable機能を有効化
+
+この条件分岐により、適切なタイミングで適切な機能だけを動作させることができます。
+
+## 実装の肝：状況判断ロジック
+
+実際のコードを見てみましょう。まず、「今何がドラッグされているか」を知る必要があります。
+
+```typescript
+const { active } = useDndContext();
+
+// 「item-」で始まるIDならアイテム、そうでなければコンテナ
+const isDraggingItem = active && active.id.toString().startsWith('item-');
+```
+
+次に、この情報を使ってrefを賢く切り替えます：
+
+```typescript
+// アイテムドラッグ中は「何もしない関数」を渡してSortableを無効化
+const conditionalSortableRef = isDraggingItem ? () => {} : setSortableRef;
+
+return (
+  <div
+    ref={conditionalSortableRef}
+    // アイテムドラッグ中はイベントリスナーも無効化
+    {...(isDraggingItem ? {} : attributes)}
+    {...(isDraggingItem ? {} : listeners)}
+  >
+    {/* Droppableは常に有効 */}
+    <div ref={setDroppableRef}>
+      {/* コンテンツ */}
+    </div>
+  </div>
+);
+```
+
+この仕組みにより、アイテムをドラッグしている時はコンテナがドロップ専用として振る舞い、コンテナをドラッグしている時は並び替え可能な要素として動作します。
+
+## コンテナコンポーネントの実装
+
+メインとなるコンテナコンポーネントはこんな感じです：
+
+```typescript
+const SortableDroppableContainer = ({ container }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setSortableRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: container.id });
+
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `container-${container.id}`,
+  });
+
+  const { active } = useDndContext();
+  const isDraggingItem = active && active.id.toString().startsWith('item-');
+
+  // ここが肝！状況に応じてrefを切り替え
+  const conditionalSortableRef = isDraggingItem ? () => {} : setSortableRef;
+
+  return (
+    <div
+      ref={conditionalSortableRef}
+      {...(isDraggingItem ? {} : attributes)}
+      {...(isDraggingItem ? {} : listeners)}
+    >
+      <div ref={setDroppableRef}>
+        {/* カードのUI */}
+      </div>
+    </div>
+  );
+};
+```
+
+ポイントは`conditionalSortableRef`の部分。アイテムがドラッグされている時は、何もしない空の関数を渡すことで、Sortable機能を無効化しています。
+
+## 実装時の注意点
+
+### 重複実行の防止
+
+ドラッグイベントでは、同じ処理が複数回実行されることがあります。特にモバイル環境でテストする際に顕著に現れます。処理中フラグを使って重複実行を防ぎましょう：
+
+```typescript
+const isDragProcessingRef = useRef(false);
+
+const handleDragEnd = (event) => {
+  if (isDragProcessingRef.current) return; // 既に処理中なら何もしない
+  
+  isDragProcessingRef.current = true;
+  // 実際の処理...
+  isDragProcessingRef.current = false;
+};
+```
+
+### 状態の深いコピー
+
+Reactの状態更新では、オブジェクトの参照が変わらないと再レンダリングされません。配列やオブジェクトを更新する際は、必ず新しい参照を作成しましょう：
+
+```typescript
+// ❌ これだと再レンダリングされない
+containers[0].items.push(newItem);
+
+// ✅ これが正解
+setContainers(prev => prev.map(c => 
+  c.id === targetId 
+    ? { ...c, items: [...c.items, newItem] }
+    : c
+));
+```
+
+### IDの命名規則
+
+アイテムとコンテナを区別するため、IDに接頭辞を付けることをお勧めします：
+
+- コンテナ：`container-1`, `container-2`...
+- アイテム：`item-1`, `item-2`...
+
+この命名規則により、後で判定処理を書く際に迷うことがなくなります。
+
+## まとめ
+
+dnd-kitでSortableとDroppableを両立させる秘訣は、**状況に応じた条件分岐**です。「今何をドラッグしているか」を判定して、適切な機能だけを有効にすることで、直感的で使いやすいドラッグ＆ドロップインターフェースを実現できます。
+
+この実装パターンを覚えておけば、カンバンボードやファイル管理システム、プレイリスト編集機能など、様々な場面で応用できるでしょう。
+
+複雑なドラッグ＆ドロップ機能も、この条件分岐のテクニックを使えば自信を持って実装できるはずです。
