@@ -33,7 +33,7 @@ export function TagBadge({
   const iconSize = size === 'sm' ? 14 : 16;
 
   const renderIcon = () => {
-    if (!showIcon) return null;
+    if (!showIcon || !tag.icon || tag.icon.trim() === '') return null;
 
     // Check if icon is an SVG file path
     if (tag.icon.endsWith('.svg')) {

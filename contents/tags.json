@@ -26,6 +26,7 @@
   },
   "dnd-kit": {
     "label": "dnd kit",
+    "icon": "",
     "description": "dnd kit"
   }
 }

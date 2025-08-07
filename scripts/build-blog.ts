@@ -37,8 +37,8 @@ function validateTagConfig(tagId: string, config: unknown): void {
     throw new Error(`Invalid or missing label for tag "${tagId}". Expected non-empty string.`);
   }
 
-  if (typeof tagConfig.icon !== 'string' || tagConfig.icon.trim().length === 0) {
-    throw new Error(`Invalid or missing icon for tag "${tagId}". Expected non-empty string.`);
+  if (typeof tagConfig.icon !== 'string') {
+    throw new Error(`Invalid icon for tag "${tagId}". Expected string (can be empty).`);
   }
 
   // Validate optional fields
