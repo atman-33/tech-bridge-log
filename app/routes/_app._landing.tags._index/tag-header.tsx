@@ -99,22 +99,24 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
         </Link>
 
         {/* Individual tag buttons */}
-        {allTags.map((tag) => {
-          const tagIcon = renderTagIcon(tag);
-          return (
-            <Link
-              key={tag.id}
-              to={`/tags?tag=${encodeURIComponent(tag.id)}`}
-              className={`inline-flex items-center ${tagIcon ? 'gap-2' : ''} px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${currentTag === tag.id
-                ? 'bg-primary text-primary-foreground shadow-md'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-            >
-              {tagIcon}
-              {tag.label}
-            </Link>
-          );
-        })}
+        {allTags
+          .sort((a, b) => a.label.localeCompare(b.label))
+          .map((tag) => {
+            const tagIcon = renderTagIcon(tag);
+            return (
+              <Link
+                key={tag.id}
+                to={`/tags?tag=${encodeURIComponent(tag.id)}`}
+                className={`inline-flex items-center ${tagIcon ? 'gap-2' : ''} px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${currentTag === tag.id
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+              >
+                {tagIcon}
+                {tag.label}
+              </Link>
+            );
+          })}
       </div>
     </header>
   );
