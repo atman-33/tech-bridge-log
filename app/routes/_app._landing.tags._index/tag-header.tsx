@@ -89,7 +89,7 @@ export function TagHeader({ selectedTag, allTags, articleCount }: TagHeaderProps
         {/* All articles button */}
         <Link
           to="/tags"
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${!currentTag
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 h-9 ${!currentTag
             ? 'bg-primary text-primary-foreground shadow-md'
             : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
