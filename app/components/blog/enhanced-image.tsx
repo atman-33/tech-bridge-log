@@ -68,7 +68,7 @@ export function EnhancedImage({
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
-          'w-full h-auto transition-opacity duration-300',
+          'w-full h-auto sm:max-h-96 object-contain transition-opacity duration-300',
           isLoading ? 'opacity-0' : 'opacity-100'
         )}
       />
