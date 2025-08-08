@@ -28,5 +28,25 @@
     "label": "dnd kit",
     "icon": "",
     "description": "dnd kit"
+  },
+  "ollama": {
+    "label": "ollama",
+    "icon": "/icons/tags/ollama.svg",
+    "description": "ollama"
+  },
+  "cline": {
+    "label": "cline",
+    "icon": "/icons/tags/cline.svg",
+    "description": "cline"
+  },
+  "llm": {
+    "label": "llm",
+    "icon": "",
+    "description": "llm"
+  },
+  "vscode": {
+    "label": "vscode",
+    "icon": "/icons/tags/vscode.svg",
+    "description": "vscode"
   }
 }
