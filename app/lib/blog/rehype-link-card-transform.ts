@@ -22,7 +22,7 @@ export const rehypeLinkCardTransform: Plugin<[], Root> = () => {
         node.properties.dataLinkcardUrl
       ) {
         const url = String(node.properties.dataLinkcardUrl);
-        console.log("url", url);
+        // console.log("url", url);
 
         // Transform the node into an mdxJsxFlowElement
         const newNode: Element = {
@@ -34,7 +34,7 @@ export const rehypeLinkCardTransform: Plugin<[], Root> = () => {
 
         // Replace the original paragraph node with the new mdxJsxFlowElement
         parent.children.splice(index, 1, newNode);
-        console.log("newNode", newNode);
+        // console.log("newNode", newNode);
       }
     });
   };
