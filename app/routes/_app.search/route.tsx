@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router';
 import type { Route } from './+types/route';
-import { SearchResults } from './search-results';
+import { SearchResults } from './components/search-results';
 import { SearchErrorBoundary } from '~/components/error-boundaries/search-error-boundary';
 import { NoScriptSearchFallback } from '~/components/blog/noscript-fallback';
 import type { SearchIndex } from '~/lib/blog/search-index';

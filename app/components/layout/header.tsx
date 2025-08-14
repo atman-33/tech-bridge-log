@@ -1,6 +1,6 @@
 import { ThemeToggle } from "~/components/theme-toggle";
 import { Logo } from "~/components/logo";
-import { SearchBox } from "~/routes/_app/search-box";
+import { SearchBox } from "~/components/search-box";
 
 export function Header() {
 

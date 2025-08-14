@@ -1,5 +1,5 @@
 import type { Route } from './+types/route';
-import { AppCard } from './app-card';
+import { AppCard } from './components/app-card';
 import appsData from '~/contents/apps.json';
 
 export function meta(): Route.MetaDescriptors {
