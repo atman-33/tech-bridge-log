@@ -4,9 +4,9 @@ import { loadArticleContent } from '~/lib/blog/mdx-processor';
 import { getTagsByIds } from '~/lib/blog/tags';
 import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
 import { findRelatedArticles } from '~/lib/blog/related-articles';
-import { ArticleContent } from './article-content';
+import { ArticleContent } from './components/article-content';
 import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
-import { ArticleHeader } from './article-header';
+import { ArticleHeader } from './components/article-header';
 import { ScrollToTopButton } from '~/components/ui/scroll-to-top-button';
 
 export const meta: Route.MetaFunction = ({ data }) => {

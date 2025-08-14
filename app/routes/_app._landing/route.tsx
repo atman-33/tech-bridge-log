@@ -1,5 +1,5 @@
 import { Separator } from '~/components/ui/separator';
-import { AppNavLink } from './app-nav-link';
+import { AppNavLink } from './components/app-nav-link';
 import { Outlet } from 'react-router';
 
 const AppTopLayout = () => {
