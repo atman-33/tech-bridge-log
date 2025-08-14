@@ -69,12 +69,12 @@ export function createMarkdownComponents(slug: string): CustomComponents {
 
     // Lists with proper styling
     ul: ({ children, ...props }) => (
-      <ul className="mb-4 ml-6 list-disc space-y-2" {...props}>
+      <ul className="mb-4 ml-8 list-disc space-y-1" {...props}>
         {children}
       </ul>
     ),
     ol: ({ children, ...props }) => (
-      <ol className="mb-4 ml-6 list-decimal space-y-2" {...props}>
+      <ol className="mb-4 ml-8 list-decimal space-y-1" {...props}>
         {children}
       </ol>
     ),
