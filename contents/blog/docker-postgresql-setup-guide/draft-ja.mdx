@@ -1,0 +1,296 @@
+---
+title: "Docker + PostgreSQL開発環境構築の完全ガイド"
+slug: "docker-postgresql-setup-guide"
+publishedAt: "2025-01-16T00:00:00Z"
+updatedAt: "2025-01-16T00:00:00Z"
+tags: ["docker", "postgresql", "database", "development"]
+description: "DockerとDocker Composeを使ってPostgreSQLの開発環境を構築する手順を詳しく解説します。初期設定からスキーマ作成まで、実際の開発で使える構成を紹介。"
+emoji: "🐳"
+---
+
+開発環境でデータベースを使う際、「ローカルにPostgreSQLをインストールするのは面倒だし、バージョン管理も大変...」と感じたことはありませんか？
+
+そんな悩みを解決してくれるのがDockerです。この記事では、DockerとDocker Composeを使って、**簡単に構築・管理できるPostgreSQL開発環境**の作り方を詳しく解説します。
+
+## なぜDockerでPostgreSQLなのか？
+
+### 従来の問題点
+
+- ローカル環境にPostgreSQLを直接インストールすると、他のプロジェクトとバージョンが競合する
+- チーム開発で環境の差異が発生しやすい
+- 環境をクリーンにリセットするのが困難
+
+### Dockerを使うメリット
+
+- **環境の分離**: プロジェクトごとに独立したデータベース環境
+- **バージョン管理**: 必要なPostgreSQLバージョンを簡単に指定
+- **チーム共有**: 同じ設定ファイルで全員が同じ環境を構築
+- **簡単リセット**: コンテナを削除するだけで環境をクリーンに
+
+## 前提条件
+
+この記事では、Ubuntu環境でのセットアップを想定していますが、他のLinuxディストリビューションでも基本的な流れは同じです。
+
+## Step 1: Docker CEのインストール
+
+まずは、Docker CE（Community Edition）をインストールします。
+
+### 既存Dockerの削除
+
+既にDockerがインストールされている場合は、クリーンインストールのために削除します：
+
+```bash
+sudo apt remove docker docker-engine docker.io containerd runc
+```
+
+### 必要パッケージのインストール
+
+Dockerのインストールに必要なパッケージを準備します：
+
+```bash
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+```
+
+### Docker GPGキーの追加
+
+公式のDocker GPGキーを追加して、パッケージの信頼性を確保します：
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+### Dockerリポジトリの追加
+
+Docker公式リポジトリをAPTソースに追加します：
+
+```bash
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+### Docker CEのインストール
+
+パッケージリストを更新してDockerをインストールします：
+
+```bash
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+```
+
+### インストール確認
+
+正常にインストールされたか確認します：
+
+```bash
+docker --version
+```
+
+以下のような出力が表示されれば成功です：
+
+```
+Docker version 24.0.0, build 123abc
+```
+
+## Step 2: Docker Composeのインストール
+
+複数のコンテナを管理するためにDocker Composeをインストールします。
+
+### Docker Composeのインストール
+
+```bash
+sudo apt install -y docker-compose
+```
+
+### インストール確認
+
+```bash
+docker-compose --version
+```
+
+バージョン情報が表示されれば、インストール完了です。
+
+## Step 3: PostgreSQL環境の構築
+
+ここからが本題です。実際の開発で使いやすい構成でPostgreSQL環境を作っていきます。
+
+### ディレクトリ構造の準備
+
+まず、プロジェクト用のディレクトリ構造を作成します：
+
+```
+tools/database-local/
+├── compose.yaml
+├── image/postgres/
+│   └── Dockerfile
+└── init/
+    └── create_schema.sql
+```
+
+### compose.yamlの作成
+
+Docker Composeの設定ファイルを作成します。この設定では、実際の開発で使いやすいように命名規則を統一しています：
+
+```yaml
+services:
+  postgres:
+    container_name: atman_hub_db_dev # {app_name}_db_{env}
+    build: ./image/postgres # Build the image from the Dockerfile in the image/postgres directory
+    restart: no # Do not restart the container automatically
+    ports:
+      - 5432:5432
+    volumes:
+      - atman_hub_db_dev_data:/data/db # {app_name}_db_{env}_data
+      - ./init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: atman_hub_db_dev # {app_name}_db_{env}
+
+volumes:
+  atman_hub_db_dev_data:
+```
+
+### Dockerfileの作成
+
+PostgreSQLのカスタムイメージを定義します：
+
+```dockerfile
+FROM postgres:17
+```
+
+シンプルですが、必要に応じてカスタマイズを追加できる構造になっています。
+
+### 初期スキーマの作成
+
+データベース起動時に自動実行される初期化スクリプトを作成します：
+
+```sql
+CREATE SCHEMA IF NOT EXISTS atman_hub;
+COMMENT ON SCHEMA atman_hub IS 'Schema for the Atman Hub database';
+```
+
+## Step 4: データベースの起動と確認
+
+### データベースの起動
+
+Docker Composeを使ってデータベースを起動します：
+
+```bash
+docker-compose -f tools/database-local/compose.yaml up -d
+```
+
+`-d`オプションでバックグラウンド実行されます。
+
+### 起動確認
+
+コンテナが正常に起動しているか確認します：
+
+```bash
+docker ps
+```
+
+`atman_hub_db_dev`という名前のコンテナが表示されていれば成功です。
+
+### データベースへの接続
+
+PostgreSQLクライアントでデータベースに接続します：
+
+```bash
+docker exec -it atman_hub_db_dev psql -U user -d atman_hub_db_dev
+```
+
+### スキーマの確認
+
+接続後、作成されたスキーマを確認します：
+
+```sql
+\dn
+```
+
+`atman_hub`スキーマが表示されることを確認してください。
+
+### スキーマの切り替え
+
+作成したスキーマを使用するように設定します：
+
+```sql
+SHOW search_path;
+SET search_path TO atman_hub;
+SHOW search_path;
+```
+
+### 接続終了
+
+作業が完了したら、PostgreSQLクライアントを終了します：
+
+```sql
+\q
+```
+
+## 実際の開発での活用方法
+
+### 環境の使い分け
+
+この構成では、環境ごとに異なる設定を簡単に管理できます：
+
+- **開発環境**: `atman_hub_db_dev`
+- **テスト環境**: `atman_hub_db_test`
+- **ステージング環境**: `atman_hub_db_staging`
+
+### データの永続化
+
+Docker volumeを使用しているため、コンテナを停止・再起動してもデータは保持されます。
+
+### 環境のリセット
+
+開発中にデータベースをクリーンな状態に戻したい場合：
+
+```bash
+# コンテナとボリュームを削除
+docker-compose -f tools/database-local/compose.yaml down -v
+
+# 再度起動
+docker-compose -f tools/database-local/compose.yaml up -d
+```
+
+## トラブルシューティング
+
+### ポート競合エラー
+
+既に5432ポートが使用されている場合は、compose.yamlのポート設定を変更します：
+
+```yaml
+ports:
+  - 5433:5432  # ローカルポートを5433に変更
+```
+
+### 権限エラー
+
+Dockerコマンドで権限エラーが発生する場合は、ユーザーをdockerグループに追加します：
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+その後、ログアウト・ログインして設定を反映させてください。
+
+## まとめ
+
+DockerとDocker Composeを使ったPostgreSQL環境構築は、一度設定してしまえば非常に便利です。
+
+**この構成の利点**：
+
+- **再現性**: チーム全員が同じ環境を構築可能
+- **分離性**: プロジェクトごとに独立したデータベース
+- **柔軟性**: 必要に応じて設定をカスタマイズ可能
+- **保守性**: 環境のリセットや更新が簡単
+
+特に複数のプロジェクトを並行して開発している場合や、チーム開発では、この方法が威力を発揮します。
+
+データベース環境の構築で悩んでいる方は、ぜひ試してみてください。
+
+## 参考リンク
+
+- [Docker公式ドキュメント](https://docs.docker.com/)
+- [PostgreSQL公式Dockerイメージ](https://hub.docker.com/_/postgres)
+- [Docker Compose公式ドキュメント](https://docs.docker.com/compose/)

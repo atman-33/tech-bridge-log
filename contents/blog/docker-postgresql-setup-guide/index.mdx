@@ -1,0 +1,296 @@
+---
+title: "Complete Guide to Setting Up Docker + PostgreSQL Development Environment"
+slug: "docker-postgresql-setup-guide"
+publishedAt: "2025-08-14T00:00:00Z"
+updatedAt: "2025-08-14T00:00:00Z"
+tags: ["docker", "postgresql", "database", "development"]
+description: "Learn how to set up a PostgreSQL development environment using Docker and Docker Compose. From initial setup to schema creation, discover a practical configuration for real-world development."
+emoji: "🐳"
+---
+
+Have you ever felt frustrated when setting up databases for development, thinking "Installing PostgreSQL locally is such a hassle, and managing versions is complicated..."?
+
+Docker is here to solve those problems. In this article, I'll walk you through creating an **easily manageable PostgreSQL development environment** using Docker and Docker Compose.
+
+## Why Docker for PostgreSQL?
+
+### Traditional Problems
+
+- Installing PostgreSQL directly on your local machine can cause version conflicts with other projects
+- Environment inconsistencies are common in team development
+- Resetting the environment to a clean state is difficult
+
+### Benefits of Using Docker
+
+- **Environment Isolation**: Independent database environments for each project
+- **Version Management**: Easily specify the required PostgreSQL version
+- **Team Sharing**: Everyone builds the same environment using the same configuration files
+- **Easy Reset**: Clean environment by simply removing containers
+
+## Prerequisites
+
+This article assumes an Ubuntu environment setup, but the basic process is the same for other Linux distributions.
+
+## Step 1: Installing Docker CE
+
+First, let's install Docker CE (Community Edition).
+
+### Remove Existing Docker
+
+If Docker is already installed, remove it for a clean installation:
+
+```bash
+sudo apt remove docker docker-engine docker.io containerd runc
+```
+
+### Install Required Packages
+
+Prepare the packages needed for Docker installation:
+
+```bash
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+```
+
+### Add Docker GPG Key
+
+Add the official Docker GPG key to ensure package authenticity:
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+### Add Docker Repository
+
+Add the Docker official repository to APT sources:
+
+```bash
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+### Install Docker CE
+
+Update the package list and install Docker:
+
+```bash
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+```
+
+### Verify Installation
+
+Check if Docker was installed correctly:
+
+```bash
+docker --version
+```
+
+If you see output like this, the installation was successful:
+
+```
+Docker version 24.0.0, build 123abc
+```
+
+## Step 2: Installing Docker Compose
+
+Install Docker Compose to manage multiple containers.
+
+### Install Docker Compose
+
+```bash
+sudo apt install -y docker-compose
+```
+
+### Verify Installation
+
+```bash
+docker-compose --version
+```
+
+If version information is displayed, the installation is complete.
+
+## Step 3: Building the PostgreSQL Environment
+
+Now for the main part. Let's create a PostgreSQL environment with a configuration that's practical for real development.
+
+### Prepare Directory Structure
+
+First, create the directory structure for the project:
+
+```
+tools/database-local/
+├── compose.yaml
+├── image/postgres/
+│   └── Dockerfile
+└── init/
+    └── create_schema.sql
+```
+
+### Create compose.yaml
+
+Create the Docker Compose configuration file. This configuration uses a unified naming convention for ease of use in actual development:
+
+```yaml
+services:
+  postgres:
+    container_name: atman_hub_db_dev # {app_name}_db_{env}
+    build: ./image/postgres # Build the image from the Dockerfile in the image/postgres directory
+    restart: no # Do not restart the container automatically
+    ports:
+      - 5432:5432
+    volumes:
+      - atman_hub_db_dev_data:/data/db # {app_name}_db_{env}_data
+      - ./init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: atman_hub_db_dev # {app_name}_db_{env}
+
+volumes:
+  atman_hub_db_dev_data:
+```
+
+### Create Dockerfile
+
+Define a custom PostgreSQL image:
+
+```dockerfile
+FROM postgres:17
+```
+
+It's simple, but structured to allow customizations as needed.
+
+### Create Initial Schema
+
+Create an initialization script that runs automatically when the database starts:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS atman_hub;
+COMMENT ON SCHEMA atman_hub IS 'Schema for the Atman Hub database';
+```
+
+## Step 4: Starting and Verifying the Database
+
+### Start the Database
+
+Use Docker Compose to start the database:
+
+```bash
+docker-compose -f tools/database-local/compose.yaml up -d
+```
+
+The `-d` option runs it in the background.
+
+### Verify Startup
+
+Check if the container started successfully:
+
+```bash
+docker ps
+```
+
+If you see a container named `atman_hub_db_dev`, it's successful.
+
+### Connect to the Database
+
+Connect to the database using the PostgreSQL client:
+
+```bash
+docker exec -it atman_hub_db_dev psql -U user -d atman_hub_db_dev
+```
+
+### Verify Schema
+
+After connecting, verify the created schema:
+
+```sql
+\dn
+```
+
+Confirm that the `atman_hub` schema is displayed.
+
+### Switch Schema
+
+Configure to use the created schema:
+
+```sql
+SHOW search_path;
+SET search_path TO atman_hub;
+SHOW search_path;
+```
+
+### End Connection
+
+When finished, exit the PostgreSQL client:
+
+```sql
+\q
+```
+
+## Practical Usage in Development
+
+### Environment Separation
+
+This configuration allows easy management of different settings for each environment:
+
+- **Development**: `atman_hub_db_dev`
+- **Test**: `atman_hub_db_test`
+- **Staging**: `atman_hub_db_staging`
+
+### Data Persistence
+
+Since Docker volumes are used, data is retained even when containers are stopped and restarted.
+
+### Environment Reset
+
+To return the database to a clean state during development:
+
+```bash
+# Remove containers and volumes
+docker-compose -f tools/database-local/compose.yaml down -v
+
+# Start again
+docker-compose -f tools/database-local/compose.yaml up -d
+```
+
+## Troubleshooting
+
+### Port Conflict Error
+
+If port 5432 is already in use, change the port setting in compose.yaml:
+
+```yaml
+ports:
+  - 5433:5432  # Change local port to 5433
+```
+
+### Permission Error
+
+If you encounter permission errors with Docker commands, add the user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+Then log out and log back in to apply the settings.
+
+## Conclusion
+
+Setting up a PostgreSQL environment using Docker and Docker Compose is extremely convenient once configured.
+
+**Benefits of this configuration**:
+
+- **Reproducibility**: All team members can build the same environment
+- **Isolation**: Independent databases for each project
+- **Flexibility**: Settings can be customized as needed
+- **Maintainability**: Easy environment reset and updates
+
+This approach is particularly powerful when developing multiple projects in parallel or in team development scenarios.
+
+If you're struggling with database environment setup, definitely give this a try. If you have questions or suggestions for improvements, please let me know in the comments!
+
+## References
+
+- [Docker Official Documentation](https://docs.docker.com/)
+- [PostgreSQL Official Docker Image](https://hub.docker.com/_/postgres)
+- [Docker Compose Official Documentation](https://docs.docker.com/compose/)

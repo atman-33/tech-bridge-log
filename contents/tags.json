@@ -48,5 +48,25 @@
     "label": "vscode",
     "icon": "/icons/tags/vscode.svg",
     "description": "vscode"
+  },
+  "docker": {
+    "label": "Docker",
+    "icon": "/icons/tags/docker.svg",
+    "description": "Docker containerization platform"
+  },
+  "postgresql": {
+    "label": "PostgreSQL",
+    "icon": "/icons/tags/postgresql.svg",
+    "description": "PostgreSQL database"
+  },
+  "database": {
+    "label": "Database",
+    "icon": "",
+    "description": "Database technologies and concepts"
+  },
+  "development": {
+    "label": "Development",
+    "icon": "",
+    "description": "Software development practices and tools"
   }
 }
