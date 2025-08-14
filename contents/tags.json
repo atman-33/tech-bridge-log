@@ -68,5 +68,15 @@
     "label": "Development",
     "icon": "",
     "description": "Software development practices and tools"
+  },
+  "github": {
+    "label": "GitHub",
+    "icon": "/icons/tags/github.svg",
+    "description": "GitHub platform and features"
+  },
+  "git": {
+    "label": "Git",
+    "icon": "",
+    "description": "Git version control system"
   }
 }

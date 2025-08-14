@@ -1,0 +1,166 @@
+---
+title: "GitHub Branch Protection Setup: Securing Your Main Branch with the New UI"
+slug: "github-branch-protection-setup"
+publishedAt: "2025-08-14T00:00:00Z"
+updatedAt: "2025-08-14T00:00:00Z"
+tags: ["github", "git", "development"]
+description: "Learn how to protect your main branch using GitHub's new UI interface. This guide covers step-by-step instructions for preventing direct pushes and enforcing pull request workflows."
+emoji: "🛡️"
+---
+
+Branch protection is essential for team development. By preventing direct pushes to the main branch and enforcing pull request workflows, you can maintain code quality and keep a clear history of all changes.
+
+GitHub has updated its interface, and the setup process has evolved. This guide walks you through the latest steps using the new UI, with clear instructions and practical examples.
+
+## Why Branch Protection Matters
+
+Before diving into the setup, let's understand why branch protection is crucial:
+
+- **Enforced Code Reviews**: All changes go through review, catching bugs early and promoting knowledge sharing
+- **Clear Change History**: Pull requests provide detailed records of what changed and why
+- **Accident Prevention**: Prevents accidental direct pushes that could impact production
+- **Standardized Workflow**: Ensures everyone follows the same development process
+
+## Setup Instructions (New UI)
+
+### 1. Access Repository Settings
+
+Start by navigating to your target repository:
+
+1. Open the repository you want to protect
+2. Click **Settings** in the top menu
+3. Select **Branches** from the left sidebar
+
+### 2. Create a Branch Ruleset
+
+The new UI uses "Rulesets" instead of the previous "Branch protection rules":
+
+1. Click the **Add branch ruleset** button
+
+### 3. Configure Basic Information
+
+In the ruleset creation screen, set up the following:
+
+#### ① Basic Information
+- **Ruleset name**: Enter a descriptive name (e.g., `Protect main branch`)
+- **Target branches**: Enter `main`
+
+This configuration applies the rules specifically to the main branch.
+
+### 4. Configure Restriction Rules
+
+#### ② Restriction Rules
+
+Enable the following options:
+
+**Require a pull request before merging** → ✅ ON
+- Option: Set **Required approvals** to `0` (if reviews aren't mandatory)
+
+**Block force pushes** → ✅ ON
+
+### 5. Save Configuration
+
+Once all settings are configured, click **Create** to save the ruleset.
+
+## Verifying the Setup
+
+Let's test the configuration to ensure it's working correctly:
+
+### Direct Push Attempt (Will be rejected)
+
+```bash
+# Attempt to push directly to main
+git checkout main
+git add .
+git commit -m "Direct commit to main"
+git push origin main
+```
+
+**Result**: The push will be rejected with an error message like:
+
+```
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote: error: Changes must be made through a pull request.
+```
+
+### Feature Branch Push (Will succeed)
+
+```bash
+# Create and push a feature branch
+git checkout -b feature/new-functionality
+git add .
+git commit -m "Add new functionality"
+git push origin feature/new-functionality
+```
+
+**Result**: The push succeeds normally.
+
+### Pull Request Merge (Will succeed)
+
+1. Create a pull request on GitHub
+2. Review (optional if Required approvals is set to 0)
+3. Click the merge button
+
+**Result**: The main branch updates successfully.
+
+## Common Questions and Solutions
+
+### Q: Can administrators still push directly?
+
+A: By default, administrators are also restricted. If you want to allow admin exceptions, you can add administrators to the "Bypass list" in the ruleset settings.
+
+### Q: What about emergency situations?
+
+A: For emergencies, you have several options:
+- Temporarily disable the ruleset
+- Use admin privileges to bypass rules
+- Create an emergency hotfix branch and use a pull request
+
+### Q: How do the new Rulesets differ from old branch protection rules?
+
+A: The new Rulesets offer several advantages:
+- More flexible condition settings
+- Bulk application to multiple branches
+- More granular permission management
+
+## Best Practices
+
+### Team Communication
+
+When implementing branch protection:
+
+1. **Notify your team** about the new workflow before enabling protection
+2. **Document the process** in your project's README or contributing guidelines
+3. **Provide training** on creating and managing pull requests
+
+### Gradual Implementation
+
+For existing projects:
+
+1. Start with basic protection (require PR, block force push)
+2. Add review requirements gradually as the team adapts
+3. Monitor the workflow and adjust settings based on team feedback
+
+### Emergency Procedures
+
+Establish clear procedures for:
+
+- **Hotfix deployments**: How to handle urgent production fixes
+- **Ruleset management**: Who can modify or temporarily disable rules
+- **Escalation paths**: When and how to bypass protection in emergencies
+
+## Conclusion
+
+GitHub's new UI makes branch protection setup more intuitive and user-friendly. The clearer organization, especially around the "Required approvals" setting, helps prevent configuration mistakes.
+
+This setup provides several key benefits:
+
+- **Enhanced Security**: Prevents direct changes and enforces review processes
+- **Quality Assurance**: All changes are documented through pull requests
+- **Team Collaboration**: Encourages discussion and knowledge sharing
+
+When starting team development, implementing branch protection should be one of your first steps. While it might feel like extra overhead initially, it will significantly improve development efficiency and code quality in the long run.
+
+> **Pro tip**: After setup, make sure to share the new workflow with your team members and explain how to create pull requests effectively.
+
+The investment in proper branch protection pays dividends in code quality, team collaboration, and project maintainability. Start with these basic protections and evolve your workflow as your team grows and matures.
