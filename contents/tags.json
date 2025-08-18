@@ -78,5 +78,10 @@
     "label": "Git",
     "icon": "",
     "description": "Git version control system"
+  },
+  "windows": {
+    "label": "Windows",
+    "icon": "/icons/tags/windows.svg",
+    "description": "Windows operating system and related tools"
   }
 }
