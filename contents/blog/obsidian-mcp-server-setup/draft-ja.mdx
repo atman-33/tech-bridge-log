@@ -1,0 +1,208 @@
+---
+title: "Obsidian MCPサーバーでAIツールと連携する方法 - Gemini CLI & Kiro編"
+slug: "obsidian-mcp-server-setup"
+description: "Obsidian MCPサーバーを使って、Gemini CLIやKiroからObsidianのノートを操作する方法を詳しく解説します。WindowsとWSL環境での設定手順も紹介。"
+publishedAt: "2025-08-19T00:00:00Z"
+updatedAt: "2025-08-19T00:00:00Z"
+tags: ["obsidian", "mcp", "gemini", "kiro", "wsl", "windows", "development"]
+emoji: "🔗"
+---
+
+# Obsidian MCPサーバーでAIツールと連携する方法 - Gemini CLI & Kiro編
+
+最近、AIツールとObsidianを連携させる需要が高まっていますね。今回は、MCP（Model Context Protocol）サーバーを使って、Gemini CLIやKiroからObsidianのノートを直接操作する方法をご紹介します。
+
+実際に試してみると、自然言語でObsidianのノート検索や作成ができるようになって、かなり便利でした。特にWSL環境からWindowsのObsidianにアクセスする方法も含めて、詳しく解説していきます。
+
+## MCPサーバーって何？
+
+MCP（Model Context Protocol）サーバーは、AIツールと外部アプリケーションをつなぐ橋渡しの役割を果たします。簡単に言うと、Gemini CLIやKiroなどのAIツールから、自然言語でObsidianを操作できるようにしてくれる仕組みです。
+
+「今日のメモを検索して」「新しいノートを作成して」といった指示を、AIツールがObsidianの操作に変換してくれるイメージですね。
+
+## Obsidian側の準備
+
+### コミュニティプラグインの有効化
+
+まず、Obsidianでコミュニティプラグインを使えるようにします。
+
+1. Obsidianの設定を開く
+2. 「コミュニティプラグイン」を選択
+3. 「制限モードをオフにする」をクリック
+
+### Local REST APIプラグインの導入
+
+次に、外部からObsidianにアクセスするためのAPIを有効にします。
+
+1. コミュニティプラグインの検索で「Local REST API」を検索
+2. インストール・有効化
+3. 設定画面で表示される**API Key**をメモしておく
+
+このAPI Keyは後でCLI連携に使うので、必ず控えておいてください。
+
+![api key](<Pasted image 20250819090059.png>)
+
+### MCP Toolsプラグインの導入
+
+続いて、MCPサーバー本体をインストールします。
+
+1. 「MCP Tools」プラグインを検索・インストール
+2. 有効化後、「Install server」を実行
+3. MCPサーバーの実行ファイル`mcp-server`がVault内に配置される
+
+![install server](<Pasted image 20250819090215.png>)
+
+## パスの確認と設定
+
+### 実行パスを取得
+
+プラグイン設定画面の「Server install folder」から`bin`フォルダを開き、パスを確認します。
+
+重要なのは、フォルダパスの末尾に手動で`/mcp-server`を追加することです。
+
+例（Windows環境）：
+```
+C:/Users/username/OneDrive/tools/obsidian/.obsidian/plugins/mcp-tools/bin/mcp-server
+```
+
+### パスにスペースが含まれる場合の注意
+
+`Obsidian Vault`のようにスペースを含むパスの場合は、必ずダブルクォートで囲んでください。
+
+## Gemini CLIでの設定
+
+### MCPサーバーの登録
+
+ターミナルで以下のコマンドを実行します：
+
+```bash
+gemini mcp add obsidian-mcp-tools -s user -- "パス/to/mcp-server" --env OBSIDIAN_API_KEY="あなたのAPI_KEY"
+```
+
+実際の例：
+```bash
+gemini mcp add obsidian-mcp-tools -s user -- "C:/Users/username/OneDrive/tools/obsidian/.obsidian/plugins/mcp-tools/bin/mcp-server" --env OBSIDIAN_API_KEY="あなたのAPI_KEY"
+```
+
+`-s user`オプションを使うことで、どのプロジェクトからでも利用できるようになります。
+
+### 設定ファイルでの直接編集
+
+コマンドラインが苦手な方は、`~/.gemini/settings.json`に直接記述することもできます：
+
+```json
+{
+  "mcpServers": {
+    "obsidian-mcp-tools": {
+      "command": "C:/Users/username/OneDrive/tools/obsidian/.obsidian/plugins/mcp-tools/bin/mcp-server",
+      "args": [],
+      "env": {
+        "OBSIDIAN_API_KEY": "あなたのAPI_KEY"
+      }
+    }
+  }
+}
+```
+
+### 接続確認
+
+設定が完了したら、接続を確認してみましょう：
+
+```bash
+gemini mcp list
+```
+
+以下のように表示されれば成功です：
+
+```
+obsidian-mcp-tools: ... - ✓ Connected
+```
+
+## 実際に使ってみる
+
+### ノート一覧の取得
+
+Geminiを起動して、実際にObsidianを操作してみます：
+
+```bash
+gemini
+```
+
+チャット画面で以下のように入力：
+
+```
+Get the list of notes in Obsidian
+```
+
+![get notes](<Pasted image 20250819092754.png>)
+
+うまく設定できていれば、Obsidianのノート一覧が表示されるはずです。
+
+![result](<Pasted image 20250819093024.png>)
+
+### その他の操作例
+
+- 「新しいノートを作成して」
+- 「特定のキーワードでノートを検索して」
+- 「ノートの内容を読み取って」
+
+など、自然言語でObsidianを操作できるようになります。
+
+## WSL環境からWindowsのObsidianに接続する方法
+
+WSLを使っている方向けに、Linux環境からWindowsのObsidianにアクセスする方法もご紹介します。
+
+### Kiroでの設定
+
+1. Kiroを開く
+2. MCPサーバーの設定ファイルに以下を追加：
+
+```json
+{
+  "mcpServers": {
+    "mcp-obsidian": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "mcp-obsidian",
+        "--config",
+        "{\"vaultPath\":\"/mnt/c/Users/username/OneDrive/tools/obsidian\"}"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "search_notes",
+        "read_notes"
+      ]
+    }
+  }
+}
+```
+
+![kiro mcp](<Pasted image 20250819223043.png>)
+
+ポイントは、WindowsのパスをWSLのマウントパス（`/mnt/c/...`）に変換することです。
+また、`smithery-ai`は設定が簡易ですが、obsidianの読み取りしかできず、書き込みはできません。
+
+## トラブルシューティング
+
+### よくある問題と解決方法
+
+**接続できない場合**
+- API Keyが正しく設定されているか確認
+- Obsidianが起動しているか確認
+- パスにスペースが含まれている場合はクォートで囲む
+
+**WSLで接続できない場合**
+- WindowsのObsidianが起動しているか確認
+- パスが正しくマウントされているか確認（`/mnt/c/...`）
+
+## まとめ
+
+Obsidian MCPサーバーを使うことで、AIツールから直接Obsidianを操作できるようになります。特に大量のノートを管理している方にとっては、自然言語での検索や操作ができるのは大きなメリットですね。
+
+WSL環境からでもWindowsのObsidianにアクセスできるので、開発環境を問わず活用できるのも魅力的です。
+
+ぜひ試してみて、より効率的なノート管理を実現してください。何か問題があれば、設定を見直してみることをおすすめします。
