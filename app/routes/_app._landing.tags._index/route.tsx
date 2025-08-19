@@ -4,6 +4,8 @@ import { loadTagsConfig, getUsedTags } from '~/lib/blog/tags';
 import { ArticleCard } from '~/components/blog/article-card';
 import { TagHeader } from './components/tag-header';
 import { TagErrorBoundary } from '~/components/error-boundaries/tag-error-boundary';
+import { Pagination } from '~/components/ui/pagination';
+import { paginateArray, getPageFromSearchParams, createPageUrl } from '~/lib/pagination';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -15,6 +17,7 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   const selectedTag = url.searchParams.get('tag');
+  const currentPage = getPageFromSearchParams(url.searchParams);
 
   try {
     // Load all articles and tags
@@ -41,16 +44,25 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       ? publishedArticles.filter(article => article.tags.includes(selectedTag))
       : publishedArticles;
 
+    // Apply pagination
+    const paginatedResult = paginateArray(filteredArticles, currentPage);
+
     // Find the selected tag info
     const selectedTagInfo = selectedTag
       ? usedTags.find(tag => tag.id === selectedTag) || null
       : null;
 
     return {
-      articles: filteredArticles,
+      articles: paginatedResult.items,
+      pagination: paginatedResult.pagination,
       allTags: usedTags,
       selectedTag: selectedTagInfo,
       requestedTagId: selectedTag,
+      totalArticles: filteredArticles.length,
+      currentUrl: {
+        pathname: url.pathname,
+        searchParams: url.searchParams.toString()
+      }
     };
   } catch (error) {
     if (error instanceof Response) {
@@ -62,7 +74,12 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 };
 
 export default function TagsPage({ loaderData }: Route.ComponentProps) {
-  const { articles, allTags, selectedTag, requestedTagId } = loaderData;
+  const { articles, pagination, allTags, selectedTag, requestedTagId, totalArticles, currentUrl } = loaderData;
+
+  const createPageUrlForTag = (page: number) => {
+    const searchParams = new URLSearchParams(currentUrl.searchParams);
+    return createPageUrl(currentUrl.pathname, page, searchParams);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800/50">
@@ -71,7 +88,7 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
           <TagHeader
             selectedTag={selectedTag}
             allTags={allTags}
-            articleCount={articles.length}
+            articleCount={totalArticles}
           />
 
           {articles.length === 0 ? (
@@ -90,15 +107,22 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-              {articles.map((article, index) => (
-                <ArticleCard
-                  key={article.slug}
-                  article={article}
-                  index={index}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                {articles.map((article, index) => (
+                  <ArticleCard
+                    key={article.slug}
+                    article={article}
+                    index={index}
+                  />
+                ))}
+              </div>
+
+              <Pagination
+                pagination={pagination}
+                createPageUrl={createPageUrlForTag}
+              />
+            </>
           )}
         </div>
       </div>
@@ -107,10 +131,5 @@ export default function TagsPage({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: { error?: Error; }) {
-  // Try to extract tag ID from URL if available
-  const tagId = typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('tag')
-    : null;
-
-  return <TagErrorBoundary tagId={tagId || undefined} error={error} />;
+  return <TagErrorBoundary error={error} />;
 }
