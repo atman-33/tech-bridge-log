@@ -3,7 +3,8 @@ import { loadArticleMetadata } from '~/lib/blog/article-loader';
 import { getUsedTags } from '~/lib/blog/tags';
 import { generateBlogListingMetaTags } from '~/lib/seo';
 import { ArticleCard } from '../../components/blog/article-card';
-import { ArticleLoadingErrorBoundary } from '~/components/error-boundaries/article-error-boundary';
+import { Pagination } from '~/components/ui/pagination';
+import { paginateArray, getPageFromSearchParams, createPageUrl } from '~/lib/pagination';
 
 export const meta: Route.MetaFunction = () => {
   return generateBlogListingMetaTags();
@@ -11,6 +12,9 @@ export const meta: Route.MetaFunction = () => {
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
+    const url = new URL(request.url);
+    const currentPage = getPageFromSearchParams(url.searchParams);
+
     const articles = await loadArticleMetadata(context, request);
 
     // Sort articles by publication date (newest first) and filter published articles
@@ -18,12 +22,21 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       .filter(article => article.publishedAt <= new Date())
       .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
+    // Apply pagination
+    const paginatedResult = paginateArray(publishedArticles, currentPage);
+
     // Get tags that are actually used in articles
     const usedTags = await getUsedTags(publishedArticles, context, request);
 
     return {
-      articles: publishedArticles,
-      tags: usedTags
+      articles: paginatedResult.items,
+      pagination: paginatedResult.pagination,
+      tags: usedTags,
+      totalArticles: publishedArticles.length,
+      currentUrl: {
+        pathname: url.pathname,
+        searchParams: url.searchParams.toString()
+      }
     };
   } catch (error) {
     console.error('Failed to load blog articles:', error);
@@ -32,7 +45,12 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 };
 
 export default function BlogPage({ loaderData }: Route.ComponentProps) {
-  const { articles, tags } = loaderData;
+  const { articles, pagination, tags, totalArticles, currentUrl } = loaderData;
+
+  const createPageUrlForBlog = (page: number) => {
+    const searchParams = new URLSearchParams(currentUrl.searchParams);
+    return createPageUrl(currentUrl.pathname, page, searchParams);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800/50">
@@ -56,16 +74,23 @@ export default function BlogPage({ loaderData }: Route.ComponentProps) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-              {articles.map((article, index) => (
-                <ArticleCard
-                  key={article.slug}
-                  article={article}
-                  index={index}
-                  tags={tags}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                {articles.map((article, index) => (
+                  <ArticleCard
+                    key={article.slug}
+                    article={article}
+                    index={index}
+                    tags={tags}
+                  />
+                ))}
+              </div>
+
+              <Pagination
+                pagination={pagination}
+                createPageUrl={createPageUrlForBlog}
+              />
+            </>
           )}
         </div>
       </div>
