@@ -83,5 +83,30 @@
     "label": "Windows",
     "icon": "/icons/tags/windows.svg",
     "description": "Windows operating system and related tools"
+  },
+  "obsidian": {
+    "label": "Obsidian",
+    "icon": "/icons/tags/obsidian.svg",
+    "description": "Obsidian note-taking application"
+  },
+  "mcp": {
+    "label": "MCP",
+    "icon": "",
+    "description": "Model Context Protocol"
+  },
+  "gemini": {
+    "label": "Gemini",
+    "icon": "/icons/tags/gemini.svg",
+    "description": "Google Gemini AI"
+  },
+  "kiro": {
+    "label": "Kiro",
+    "icon": "/icons/tags/kiro.svg",
+    "description": "Kiro AI assistant and IDE"
+  },
+  "wsl": {
+    "label": "WSL",
+    "icon": "",
+    "description": "Windows Subsystem for Linux"
   }
 }
