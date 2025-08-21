@@ -126,7 +126,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
 
       if (isInline) {
         return (
-          <code className="rounded bg-muted px-1.5 py-0.5 text-sm font-mono" {...props}>
+          <code className="rounded bg-muted px-1.5 py-0.5 text-sm font-mono break-all" {...props}>
             {children}
           </code>
         );
