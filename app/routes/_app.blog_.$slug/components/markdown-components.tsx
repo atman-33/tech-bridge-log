@@ -30,7 +30,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
     h3: ({ children, ...props }) => {
       const id = generateHeadingId(String(children));
       return (
-        <h3 id={id} className="text-2xl font-semibold tracking-tight mb-3 mt-6 scroll-mt-20" {...props}>
+        <h3 id={id} className="text-2xl font-semibold tracking-tight mb-3 mt-8 scroll-mt-20" {...props}>
           {children}
         </h3>
       );
@@ -62,7 +62,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
 
     // Paragraphs with proper spacing
     p: ({ children, ...props }) => (
-      <p className="mb-4 leading-7" {...props}>
+      <p className="mb-2 leading-7" {...props}>
         {children}
       </p>
     ),
@@ -187,7 +187,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
             src={src}
             alt={alt || 'Article image'}
             slug={slug}
-            className="max-w-full"
+            className="max-w-[720px]"
             {...props}
           />
           {title && (
@@ -306,7 +306,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
     // The key must be lowercase to match the HTML tag rendered by rehypeRaw.
     linkcard: ({ url, ...props }: { url?: string; }) => {
       if (!url) return null;
-      return <LinkCardComponent url={url} {...props} />;
+      return <LinkCardComponent url={url} className='max-w-[720px]' {...props} />;
     },
   };
 }

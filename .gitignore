@@ -37,6 +37,9 @@ node_modules/
 # tasks.json
 # tasks/ 
 
+# Local files
+prompt.local.md
+
 # Auto generated data
 public/blog-metadata.json
 public/tags-metadata.json

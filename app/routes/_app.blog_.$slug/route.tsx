@@ -102,7 +102,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         dangerouslySetInnerHTML={{ __html: structuredData }}
       />
 
-      <div className="mx-auto px-2 md:px-8 py-8">
+      <div className="mx-auto max-w-[1280px] px-2 md:px-8 py-8">
         <div className="mx-auto">
           <ArticleHeader article={article} tags={tags} />
           <ArticleContent
