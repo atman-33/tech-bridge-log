@@ -187,7 +187,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
             src={src}
             alt={alt || 'Article image'}
             slug={slug}
-            className="max-w-full"
+            className="max-w-[720px]"
             {...props}
           />
           {title && (
@@ -306,7 +306,7 @@ export function createMarkdownComponents(slug: string): CustomComponents {
     // The key must be lowercase to match the HTML tag rendered by rehypeRaw.
     linkcard: ({ url, ...props }: { url?: string; }) => {
       if (!url) return null;
-      return <LinkCardComponent url={url} {...props} />;
+      return <LinkCardComponent url={url} className='max-w-[720px]' {...props} />;
     },
   };
 }
