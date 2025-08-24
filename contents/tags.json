@@ -108,5 +108,20 @@
     "label": "WSL",
     "icon": "",
     "description": "Windows Subsystem for Linux"
+  },
+  "biome": {
+    "label": "Biome",
+    "icon": "/icons/tags/biome.svg",
+    "description": "Biome"
+  },
+  "husky": {
+    "label": "Husky",
+    "icon": "",
+    "description": "Husky"
+  },
+  "npm": {
+    "label": "npm",
+    "icon": "/icons/tags/npm.svg",
+    "description": "npm"
   }
 }
