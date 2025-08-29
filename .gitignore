@@ -45,3 +45,7 @@ public/blog-metadata.json
 public/tags-metadata.json
 public/search-index.json
 public/blog-content/
+
+# Prompt draft
+
+prompt.draft.md
