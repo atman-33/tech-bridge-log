@@ -1,0 +1,181 @@
+---
+title: "Automating PBL to SBL Item Creation in monday.com: Streamlining Subitem Workflows"
+slug: "monday-pbl-to-sbl-automation"
+publishedAt: "2025-08-29T00:00:00Z"
+updatedAt: "2025-08-29T00:00:00Z"
+tags: ["monday", "automation"]
+description: "Learn how to automate item creation from PBL board subitems to SBL board using monday.com's standard Automations, eliminating manual copying and improving workflow efficiency."
+emoji: "🔄"
+---
+
+Managing project workflows in monday.com often involves transferring Product Backlog Items (PBIs) from PBL (Product Backlog) boards to SBL (Sprint Backlog) boards. Manual copying of subitems is time-consuming and error-prone.
+
+This guide demonstrates how to automate the creation of SBL items from PBL subitems using monday.com's standard Automations, streamlining your agile workflow.
+
+## Motivation & Problem
+
+When registering PBIs from PBL board subitems to the SBL board, the lack of standard buttons creates manual copying overhead. While subitems could benefit from direct automation buttons, monday.com doesn't provide this functionality out of the box.
+
+The manual process involves:
+- Copying subitem names
+- Transferring story points
+- Moving acceptance criteria
+- Maintaining data consistency
+
+This repetitive work reduces team productivity and introduces potential for human error.
+
+## Approach
+
+Our solution leverages monday.com's standard Automations to create a seamless workflow that automatically transfers subitem data to the SBL board when triggered by a status change.
+
+The automation workflow consists of:
+1. PBL board preparation with required columns
+2. SBL board setup for receiving data
+3. Automation configuration with triggers and actions
+4. Testing and validation
+
+## PBL Board Setup
+
+First, prepare your PBL board with subitems containing the necessary information and add required columns for automation.
+
+### Required Columns
+
+Add these columns to your PBL board subitems:
+
+- **SP**: Story Points column for effort estimation
+- **Acceptance Criteria**: Detailed acceptance criteria (monday doc type)
+- **AC link**: Link to Acceptance Criteria page
+- **SBL Action**: Status column to trigger automation
+
+### Important Consideration
+
+Since monday doc type "Acceptance Criteria" cannot be directly copied during automation to other boards, we create an "AC link" column to store the link to the Acceptance Criteria page. This link will be transferred to the SBL board for reference.
+
+![[Pasted image 20250826092755.png]]
+
+## SBL Board Preparation
+
+Configure your SBL board to receive data from the PBL board by adding corresponding columns.
+
+### Required Columns
+
+Add these columns to match the PBL board structure:
+
+- **SP**: Story Points column to receive effort estimates
+- **AC link**: Column to receive Acceptance Criteria links
+
+![[Pasted image 20250826092811.png]]
+
+## Automation Configuration
+
+Set up the automation in your PBL board to automatically create SBL items when subitems are ready for sprint planning.
+
+### Trigger Setup
+
+Configure the automation to execute when the subitem's "SBL Action" status changes to "Add to SBL":
+
+![[Pasted image 20250826092845.png]]
+
+### Action Configuration
+
+When triggered, the automation creates a new item in the SBL board with the following data mapping:
+
+- **Item Name**: Subitem Name from PBL
+- **SP**: Story Points value
+- **AC link**: Acceptance Criteria link
+
+![[Pasted image 20250826092939.png]]
+
+## Testing the Automation
+
+Verify that your automation works correctly by testing the complete workflow.
+
+### Test Procedure
+
+1. Navigate to your PBL board and locate a subitem ready for sprint planning
+
+2. Change the "SBL Action" status to "Add to SBL"
+
+![[Pasted image 20250826093543.png]]
+
+3. Check the SBL board to confirm that a new item has been created with the correct data from the PBL subitem
+
+![[Pasted image 20250826093600.png]]
+
+## Benefits and Impact
+
+This automation delivers significant improvements to your agile workflow:
+
+### Efficiency Gains
+- **Time Savings**: Eliminates manual copying time
+- **Error Reduction**: Prevents human errors in data transfer
+- **Consistency**: Ensures uniform data formatting across boards
+
+### Data Integrity
+- **Complete Transfer**: All required information is reliably transferred
+- **Format Standardization**: Maintains consistent data structure
+- **Link Preservation**: Keeps reference links intact
+
+### Team Productivity
+- **Sprint Planning Efficiency**: Faster sprint setup and planning
+- **Focus on Development**: More time for actual development work
+- **Process Standardization**: Consistent workflow across team members
+
+## Best Practices and Considerations
+
+### Data Structure Alignment
+Ensure both PBL and SBL boards use identical column names and types to maintain data consistency and prevent mapping errors.
+
+### Link Management Strategy
+When direct copying isn't possible (like with monday docs), use link columns to maintain information connectivity between boards.
+
+### Testing Protocol
+Always test automations in a development environment before deploying to production boards to ensure expected behavior.
+
+### Monitoring and Maintenance
+- Regularly review automation logs for errors
+- Update column mappings when board structures change
+- Train team members on the new workflow
+
+## Advanced Customization
+
+### Conditional Logic
+You can enhance the automation with additional conditions:
+- Only transfer items with specific labels
+- Add priority-based routing
+- Include team member assignments
+
+### Multiple Board Integration
+Extend this pattern to other board combinations:
+- Epic to Feature breakdown
+- Feature to User Story mapping
+- Bug tracking to Sprint integration
+
+## Troubleshooting Common Issues
+
+### Automation Not Triggering
+- Verify status column configuration
+- Check automation permissions
+- Ensure trigger conditions are met
+
+### Data Not Transferring
+- Confirm column name matching
+- Validate data types compatibility
+- Review automation action configuration
+
+### Performance Considerations
+- Monitor automation execution time
+- Consider batch processing for large datasets
+- Optimize board structure for automation efficiency
+
+## Conclusion
+
+By leveraging monday.com's standard Automations, we've successfully automated the transfer of PBL subitems to SBL items, eliminating manual work and improving data consistency.
+
+This automation pattern can be adapted to various workflow scenarios in monday.com, making it a valuable technique for any team looking to optimize their project management processes.
+
+The key to successful automation lies in proper planning, thorough testing, and continuous refinement based on team feedback and changing requirements.
+
+> **Pro Tip**: Consider implementing similar automations for other repetitive tasks in your monday.com workspace. The time invested in setup pays dividends in long-term productivity gains.
+
+Start with this basic automation and gradually expand to more complex workflows as your team becomes comfortable with the process. The goal is to let automation handle the routine tasks so your team can focus on delivering value.
