@@ -126,7 +126,7 @@
   },
   "monday": {
     "label": "monday.com",
-    "icon": "/monday/tags/npm.svg",
+    "icon": "/icons/tags/monday.svg",
     "description": "monday.com project management platform"
   },
   "automation": {
