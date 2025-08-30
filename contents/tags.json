@@ -123,5 +123,15 @@
     "label": "npm",
     "icon": "/icons/tags/npm.svg",
     "description": "npm"
+  },
+  "monday": {
+    "label": "monday.com",
+    "icon": "/icons/tags/monday.svg",
+    "description": "monday.com project management platform"
+  },
+  "automation": {
+    "label": "Automation",
+    "icon": "",
+    "description": "Automation tools and workflows"
   }
 }
