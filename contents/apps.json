@@ -22,5 +22,17 @@
       "Music",
       "Video Player"
     ]
+  },
+  {
+    "title": "Double-Click Image Opener",
+    "icon": "https://tech-bridge-log.com/icons/tags/obsidian.svg",
+    "description": "Obsidian plugin to open images in your default system viewer by double-clicking them.",
+    "imageUrl": "https://raw.githubusercontent.com/atman-33/double-click-image-opener/refs/heads/main/images/double-click-image-to-open.png",
+    "appUrl": "https://github.com/atman-33/double-click-image-opener?tab=readme-ov-file#readme",
+    "tags": [
+      "Obsidian",
+      "Plugin",
+      "Image Viewer"
+    ]
   }
 ]
