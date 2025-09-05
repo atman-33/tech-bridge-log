@@ -2,7 +2,7 @@
 title: "Automating PBL to SBL Item Creation in monday.com"
 slug: "monday-pbl-to-sbl-automation"
 publishedAt: "2025-08-29T00:00:00Z"
-updatedAt: "2025-08-29T00:00:00Z"
+updatedAt: "2025-09-05T00:00:00Z"
 tags: ["monday", "automation"]
 description: "Eliminate manual copying between PBL and SBL boards during sprint planning. This guide shows how to automate the process using monday.com's standard automation features."
 emoji: "🔄"
@@ -36,6 +36,8 @@ The implementation involves four key steps:
 Monday.com's automation cannot directly copy monday doc column types. To work around this limitation, use a Link column to store references to the acceptance criteria documents. This approach maintains traceability while enabling automation compatibility.
 
 The AC link column serves as a bridge, allowing teams to access detailed acceptance criteria from the SBL board.
+
+> ⭐Additional option (new finding): If your goal is to show the source values on the SBL item without duplicating them, you can add a Connect boards column on the SBL board that links to the corresponding PBL item, and then add Mirror columns that reference that connection. With this setup, both the Acceptance Criteria (monday doc) and SP can be displayed on the SBL item, while keeping the PBL item as the single source of truth. Importantly, mirrored fields can be edited from the SBL side and those changes will sync back to the source fields on the PBL item. This does not remove the platform limitation—automation still cannot copy a monday doc—but mirroring avoids duplication and maintains live synchronization across boards.
 
 ![prepare-pbl](image.png)
 
