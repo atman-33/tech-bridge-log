@@ -1,0 +1,104 @@
+---
+title: "Kiro for Codex: Seamless Spec‑Driven Development in VS Code"
+slug: "kiro-for-codex"
+publishedAt: "2025-09-08T00:00:00Z"
+updatedAt: "2025-09-08T00:00:00Z"
+tags: ["vscode", "codex", "kiro", "development"]
+description: "A VS Code extension that brings Kiro‑style spec‑driven workflows to Codex CLI—manage Specs, Steering Docs, and Prompts visually and run tasks inline."
+emoji: "👻"
+---
+
+Kiro for Codex is a VS Code extension that brings the best of Kiro's Spec‑Driven Development into a Codex‑centric workflow. It centralizes Specs, Steering Docs, and Prompts so you can generate, review, and execute from one place—without leaving your editor.
+
+Available on the VS Code Marketplace:
+
+[![kiro-for-codex-marketplace](image-3.png)](https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex)
+
+## TL;DR
+
+- Integrates with Codex CLI to generate and manage requirements, design, and tasks directly in VS Code
+- Visualizes Specs in a sidebar; run each task from `tasks.md` via CodeLens and auto‑check it off
+- Treat Steering Docs and Prompts as shared workspace assets to reduce decision friction
+- Inspired by [notdp/kiro-for-cc](https://github.com/notdp/kiro-for-cc), redesigned around Codex CLI
+
+## Motivation & Approach
+
+Kiro excels at a spec‑first workflow with a thoughtful UI and model usage that meaningfully improves developer experience. I use Codex daily, so I wanted to recreate—and extend—that experience around Codex. Using [notdp/kiro-for-cc](https://github.com/notdp/kiro-for-cc) as a reference, this extension reworks the interactions, structure, and artifacts to fit Codex tightly.
+
+## Core Features
+
+### SPEC Management
+- Create Specs: scaffold Requirements / Design / Tasks via Codex CLI
+- Visual Explorer: browse and manage Specs from the sidebar
+- Spec Workflow: review each stage (Requirements → Design → Tasks)
+- CodeLens for Tasks: run individual tasks from `tasks.md` and auto‑mark as done
+
+### STEERING Management
+- Steering Documents: browse and edit global/project‑specific guidelines
+- Generated Docs: product, tech, and structure steering documents
+
+### PROMPTS
+- Create Prompts: scaffold `.codex/prompts/<name>.md` from the Prompts view
+- Click to Open: open the prompt Markdown for quick review
+- Inline Run Button: use ▶ to execute with Codex CLI in place
+- Organize & Refresh: maintain a workspace prompt library with quick refresh
+- Markdown Simplicity: plain Markdown—no front matter required
+
+![Kiro for Codex – CodeLens & Views](image.png)
+
+## Who It's For
+- Individuals or small teams who want a smooth path from specs to implementation
+- Developers who rely on Codex CLI and prefer to stay in VS Code
+- Teams who value Specs, decision guidelines (Steering), and Prompts as shared assets
+
+## Setup
+
+### Prerequisites
+- VS Code (latest)
+- Codex CLI installed (`codex --version`)
+- Permission to run commands at the project root
+
+### Installation
+- Marketplace: install from the listing above
+- From VSIX (alternative):
+  - VS Code: Extensions → … → Install from VSIX
+  - CLI: `code --install-extension ./kiro-for-codex-x.y.z.vsix`
+
+## Quick Start
+1. Open your workspace
+2. Open the “Kiro for Codex” sidebar
+3. Run “Create Specs” to scaffold Requirements → Design → Tasks
+4. Use CodeLens ▶ in `tasks.md` to run tasks individually
+5. Curate Steering/Prompts so repeated decisions and steps become reusable assets
+
+## Architecture
+- Sidebar views and CodeLens built with the VS Code Extension API
+- Safely invokes Codex CLI and writes generated artifacts (Specs/Docs/Prompts) into the workspace
+- Unifies creation and review in one UI to cut context‑switching
+
+## Differences vs. Kiro / Claude Code
+- Preserves the spirit of Kiro while optimizing IO layout and execution units for Codex CLI
+- Learns UI/interaction patterns from [notdp/kiro-for-cc](https://github.com/notdp/kiro-for-cc) and adapts them to Codex‑specific workflows
+
+## Use Cases
+- Rapidly settle requirements → design → task breakdown for new projects
+- Drive work in small increments and visualize progress via tasks
+- Capture product/tech decision criteria (Steering) and reuse them across projects
+
+## Troubleshooting
+- Codex not found: verify PATH with `codex --version`
+- Execution fails: check permissions at the workspace root and line endings
+- Windows issues: confirm shell configuration (PowerShell/WSL)
+
+## Roadmap
+- Richer settings UI
+
+## Repository / Credits
+- GitHub: [atman-33/kiro-for-codex](https://github.com/atman-33/kiro-for-codex)
+- Inspiration: [notdp/kiro-for-cc](https://github.com/notdp/kiro-for-cc)
+
+## Closing
+
+The goal is to bring Kiro’s delightful flow into a Codex‑first daily development loop in VS Code. Feedback and contributions are welcome—issues and PRs appreciated.
+
+https://github.com/atman-33/kiro-for-codex

@@ -43,6 +43,7 @@ public/tags-metadata.json
 public/search-index.json
 public/blog-content/
 
-# Prompt draft
+# Tempolary files
 
+.tmp
 prompt.draft.md

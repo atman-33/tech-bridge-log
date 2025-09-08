@@ -133,5 +133,10 @@
     "label": "Automation",
     "icon": "",
     "description": "Automation tools and workflows"
+  },
+  "codex": {
+    "label": "Codex",
+    "icon": "/icons/tags/codex.svg",
+    "description": "Codex CLI and ecosystem"
   }
 }
