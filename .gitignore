@@ -44,6 +44,7 @@ public/search-index.json
 public/blog-content/
 
 # Tempolary files
-
 .tmp
+.reopmix
 prompt.draft.md
+repomix-output*
