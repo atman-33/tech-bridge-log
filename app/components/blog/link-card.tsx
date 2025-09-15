@@ -15,6 +15,40 @@ interface LinkCardProps {
   className?: string;
 }
 
+// Decode common HTML entities in a safe, universal way (SSR/CSR)
+function decodeHtmlEntities(input: string): string {
+  if (!input) return input;
+
+  // Quick replace for the most common entities (works during SSR too)
+  const map: Record<string, string> = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&#x27;': "'",
+    '&#x2F;': '/',
+    '&#x60;': '`',
+    '&#x3D;': '=',
+  };
+
+  const hasBasicEntities = /&(amp|lt|gt|quot|#39|#x27|#x2F|#x60|#x3D);/.test(input);
+  let output = hasBasicEntities ? input.replace(/&(amp|lt|gt|quot|#39|#x27|#x2F|#x60|#x3D);/g, (m) => map[m] || m) : input;
+
+  // If running in the browser, use DOMParser for broader coverage
+  if (typeof window !== 'undefined' && typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(output, 'text/html');
+      const text = doc.documentElement.textContent;
+      if (text) output = text;
+    } catch {
+      // noop – fall back to basic replacements
+    }
+  }
+
+  return output;
+}
+
 function isLinkMetadata(data: unknown): data is LinkMetadata {
   return (
     typeof data === 'object' &&
@@ -32,6 +66,7 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
   const [metadata, setMetadata] = useState<LinkMetadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const decodedUrl = decodeHtmlEntities(url.trim());
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -39,7 +74,7 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
         setLoading(true);
         setError(false);
 
-        const response = await fetch(`/api/link-metadata?url=${encodeURIComponent(url)}`);
+        const response = await fetch(`/api/link-metadata?url=${encodeURIComponent(decodedUrl)}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch metadata');
@@ -51,7 +86,16 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
           throw new Error('Invalid metadata response');
         }
 
-        setMetadata(data);
+        // Normalize/Decode any HTML entities in textual fields from metadata
+        const normalized: LinkMetadata = {
+          ...data,
+          title: decodeHtmlEntities(data.title),
+          description: decodeHtmlEntities(data.description || ''),
+          siteName: data.siteName ? decodeHtmlEntities(data.siteName) : undefined,
+          url: decodeHtmlEntities(data.url),
+        };
+
+        setMetadata(normalized);
       } catch (err) {
         console.error('Error fetching link metadata:', err);
         setError(true);
@@ -61,7 +105,7 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
     };
 
     fetchMetadata();
-  }, [url]);
+  }, [decodedUrl]);
 
   if (loading) {
     return (
@@ -82,13 +126,13 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
     return (
       <div className={`mb-4 border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors ${className}`}>
         <a
-          href={url}
+          href={decodedUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center space-x-2 text-primary hover:text-primary/80"
         >
           <ExternalLink className="w-4 h-4 flex-shrink-0" />
-          <span className="break-all">{url}</span>
+          <span className="break-all">{decodedUrl}</span>
         </a>
       </div>
     );
@@ -97,7 +141,7 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
   return (
     <div className={`mb-4 border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow ${className}`}>
       <a
-        href={url}
+        href={decodedUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="block p-4 hover:bg-muted/50 transition-colors"
@@ -128,7 +172,7 @@ export function LinkCard({ url, className = '' }: LinkCardProps) {
               </p>
             )}
             <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-              <span>{metadata.siteName || new URL(url).hostname}</span>
+              <span>{metadata.siteName || new URL(decodedUrl).hostname}</span>
               <ExternalLink className="w-3 h-3" />
             </div>
           </div>
