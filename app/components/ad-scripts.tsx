@@ -1,9 +1,9 @@
 const AdScripts = () => {
   return (
     <>
-      {/* Googler Adsense */}
-      {/* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=your_id"
-        crossOrigin="anonymous"></script> */}
+      {/* Google Adsense */}
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3632222360837456"
+        crossOrigin="anonymous"></script>
 
       {/* Google tag (gtag.js) */}
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-SVP41D6M1G"></script>
