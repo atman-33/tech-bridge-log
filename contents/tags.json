@@ -138,5 +138,25 @@
     "label": "Codex",
     "icon": "/icons/tags/codex.svg",
     "description": "Codex CLI and ecosystem"
+  },
+  "cli": {
+    "label": "CLI",
+    "icon": "",
+    "description": "Command Line Interface tools"
+  },
+  "gpt5": {
+    "label": "GPT-5",
+    "icon": "",
+    "description": "GPT-5 AI Model"
+  },
+  "settings": {
+    "label": "Settings",
+    "icon": "",
+    "description": "Configuration and settings"
+  },
+  "tips": {
+    "label": "Tips",
+    "icon": "",
+    "description": "Tips and tricks"
   }
 }

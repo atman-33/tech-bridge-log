@@ -1,0 +1,212 @@
+---
+title: "Codex CLIの最新設定と便利機能まとめ【GPT-5対応】"
+slug: "codex-cli-latest-gpt5"
+publishedAt: "2025-09-23T00:00:00Z"
+updatedAt: "2025-09-23T00:00:00Z"
+tags: ["codex", "cli", "gpt5", "settings", "tips"]
+description: "GPT-5対応で注目度が急上昇中のCodex CLI。基本設定から便利なTips、Windows環境での注意点まで、最新の利用方法を整理しました。"
+emoji: "⚙️"
+---
+
+今回は、2025年に入ってから急速に注目を集めている **Codex CLI** について、基本設定から便利なTips、そしてWindowsユーザーがつまずきやすいポイントまでを一気に整理しました。
+
+この記事を読めば、Codex CLIをすぐに業務や開発環境で活用できるようになるはずです。
+
+---
+
+## 1. なぜ今、Codex CLIが注目されているのか？
+
+### GPT-5対応とChatGPTサブスクでの利用開始
+
+Codex CLIは2025年4月に登場した比較的新しいツールです。
+当初はAPIキー前提でしたが、**GPT-5公開（2025年8月）以降、ChatGPT Plus/Pro/Teamユーザーなら追加料金なしで利用可能**になりました。
+
+これにより導入のハードルが一気に下がり、多くの開発者が触り始めています。
+
+---
+
+## 2. Codex CLIの基本設定
+
+### インストール方法
+
+公式が案内しているインストール手順は以下のとおりです。
+
+```shell
+# npmで
+npm install -g @openai/codex
+
+# Homebrewで
+brew install codex
+```
+
+LinuxでもWindowsでも同様に導入できます。
+ただしWindowsでは後述する「フルパス指定」の落とし穴があるので要注意です。
+
+### AGENTS.mdで共通プロンプトを設定
+
+Codex CLIは `~/.codex/AGENTS.md` に記述した内容を全セッションで自動読み込みします。
+
+たとえばserenaを優先して使って欲しい場合は以下のように書いておくと便利です。
+
+```text
+- Always utilize the Serena MCP server as the primary tool for semantic code search, project analysis, and automated refactoring.
+- Upon project initialization, activate the current directory as a Serena project before performing any operations.
+- Prefer Serena tools over built-in commands whenever semantic understanding of the codebase is required.
+```
+
+Claude CodeやCopilotなど複数のAIツールでも共通化できるのがポイントです。
+
+#### Windowsでの配置場所
+
+Windowsの場合、AGENTS.md は以下に置きます。
+
+```
+C:\Users\{ユーザー名}\.codex\AGENTS.md
+```
+
+### config.tomlの基本
+
+設定ファイルは `~/.codex/config.toml`。
+TOML形式が採用されており、以下のように書きます。
+
+```toml
+model = "gpt-5-codex"
+network_access = true
+
+[tools]
+web_search = true
+```
+
+---
+
+## 3. 便利な機能・設定Tips
+
+### MCP設定
+
+Codex CLIはMCP（Model Context Protocol）に対応しています。
+設定は同じ`config.toml`に直接記述します。
+
+```toml
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+```
+
+> 補足：SSE型のMCPは直接利用できず、`mcp-proxy`や`mcp-remote`を経由する必要があります。
+
+### Web検索機能
+
+最新情報を取り込むなら以下を追加：
+
+```toml
+[tools]
+web_search = true
+```
+
+### Custom Prompts
+
+よく使うプロンプトを登録可能。
+配置場所は `~/.codex/prompts/` です。
+
+Claudeのスラッシュコマンドのように `/` を入力すると候補が出ます。
+
+### ファイルメンション機能
+
+プロンプト内で `@path/to/file` と書けば、特定ファイルを直接参照できます。
+
+---
+
+## 4. Windowsユーザーが注意すべきMCP設定
+
+LinuxやmacOSの記事のまま設定すると、Windowsでは次のようなエラーが出がちです。
+
+* `program not found`
+* `request timed out`
+
+原因は単純で、**PATHの解決に失敗するためCodexが実行ファイルを見つけられない**こと。
+
+### 解決策：フルパス指定
+
+PowerShellで `where.exe` を使い、実行ファイルの場所を確認します。
+
+```powershell
+where.exe npx
+where.exe uvx
+```
+
+出力例：
+
+```
+C:\Program Files\nodejs\npx.cmd
+C:\Users\xxxx\AppData\Local\Microsoft\WinGet\Links\uvx.exe
+```
+
+このパスをそのまま `config.toml` に書き込みましょう。
+
+さらに、Windowsでは `SYSTEMROOT` を環境変数として設定するのが安定動作のポイントです。
+
+---
+
+### serena MCPの設定例
+
+#### Windowsの場合（ユーザー名 = xxxx）
+
+```toml
+[mcp_servers.serena]
+command = "C:\\Users\\xxxx\\AppData\\Local\\Microsoft\\WinGet\\Links\\uvx.exe"
+args = [
+  "--from", "git+https://github.com/oraios/serena",
+  "serena-mcp-server",
+  "--context", "ide-assistant"
+]
+
+[mcp_servers.serena.env]
+PYTHONIOENCODING = "utf-8"
+SYSTEMROOT = 'C:\Windows'
+```
+
+#### Linuxの場合
+
+```toml
+[mcp_servers.serena]
+command = "uvx"
+args = [
+  "--from", "git+https://github.com/oraios/serena",
+  "serena", "start-mcp-server",
+  "--context", "codex"
+]
+```
+
+---
+
+## 5. Codex CLIのVS Code拡張
+
+2025年8月末に公式拡張が公開されました。
+CLIと比較したメリットは次の通りです。
+
+* VS Codeで開いているファイルを自動参照できる
+* Codex Cloudとの連携が可能
+
+CLIとシームレスに連携できるため、普段の開発に自然に組み込めます。
+
+---
+
+## 6. 主要コマンド
+
+| コマンド       | 説明               |
+| ---------- | ---------------- |
+| `/new`     | セッションをリセットして新規開始 |
+| `/mcp`     | 利用可能なMCP一覧を表示    |
+| `/compact` | 対話履歴を要約してトークンを節約 |
+
+---
+
+## 7. まとめ
+
+* Codex CLIはGPT-5対応で一気に実用性が増した
+* MCPやWeb検索などの拡張性も豊富
+* Windowsユーザーは「フルパス指定」と「SYSTEMROOT設定」が肝心
+* serena MCPなど高度な拡張も活用可能
+* VS Code拡張で開発体験がさらに向上
+
+今後も短いスパンで改善が続くことが予想されるため、早めに導入して慣れておくのがおすすめです。
