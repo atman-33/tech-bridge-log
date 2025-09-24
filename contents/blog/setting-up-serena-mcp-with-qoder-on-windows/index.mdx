@@ -1,0 +1,67 @@
+---
+title: 'How to Set Up Serena MCP with Qoder on Windows'
+slug: "setting-up-serena-mcp-with-qoder-on-windows"
+description: 'This guide explains how to resolve connection issues between Qoder and Serena MCP in a native Windows environment by using the HTTP server mode.'
+publishedAt: '2025-09-24T00:00:00.000Z'
+updatedAt: '2025-09-24T00:00:00.000Z'
+tags: ['windows', 'qoder', 'serena', 'mcp']
+emoji: "💡"
+---
+
+How to Set Up Serena MCP with Qoder on Windows
+
+## 1. Prerequisites
+
+*   Windows 10/11
+*   [Qoder](https://qoder.com) is installed
+*   [uv](https://github.com/astral-sh/uv) is installed via WinGet or another method (`uvx.exe` is available)
+*   Git for Windows is installed, and `git --version` can be run in PowerShell
+
+https://qoder.com
+
+## 2. Problem Overview
+
+While Serena MCP runs correctly in a WSL environment, the following issues occur on native Windows:
+
+*   When launched with a `stdio` connection, Qoder does not communicate with Serena after startup.
+*   With a `streamable-http` connection, Qoder accesses the root (`/`) and receives a 404 error.
+
+This results in a state where "Qoder cannot connect to Serena."
+
+## 3. Verified Solution
+
+### 3.1 Manually Start Serena as an HTTP Server
+
+First, run the following command in PowerShell to start Serena MCP in `streamable-http` mode.
+
+```powershell
+uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant --transport streamable-http
+```
+
+*   By default, the server starts at `http://127.0.0.1:8000`.
+*   A "StreamableHTTP session manager started" message in the log indicates a successful launch.
+
+### 3.2 Configure mcp.json in Qoder
+
+Configure Qoder to use Serena MCP via an HTTP connection.
+The key is to set the **URL to `/mcp`**, as the root (`/`) will result in a 404 error.
+
+```json
+"serena": {
+  "type": "streamableHttp",
+  "url": "http://127.0.0.1:8000/mcp"
+}
+```
+
+After this, enabling "MCP" in Qoder will establish the connection from Qoder to Serena.
+
+## 4. Important Notes
+
+*   This requires the manual step of starting Serena.
+*   If you want Serena to run persistently, you can use the **Windows Task Scheduler** to launch it automatically on logon.
+
+## 5. Summary
+
+1.  Start Serena MCP with `--transport streamable-http` in PowerShell.
+2.  Set the `url` in Qoder's `mcp.json` to `http://127.0.0.1:8000/mcp`.
+3.  Optionally, use Task Scheduler to automate the launch.
