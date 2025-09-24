@@ -1,0 +1,64 @@
+---
+title: 'Windowsで Qoder から Serena MCP を利用する設定方法'
+publishedAt: '2025-09-25T00:00:00.000Z'
+updatedAt: '2025-09-25T00:00:00.000Z'
+tags: ['windows', 'qoder', 'serena', 'mcp']
+description: 'Windows ネイティブ環境で Qoder から Serena MCP へ接続する際の問題と、HTTPサーバーモードを利用した解決策について解説します。'
+isPublished: false
+---
+
+# Windowsで Qoder から Serena MCP を利用する設定方法
+
+## 1. 前提環境
+
+* Windows 10/11
+* [Qoder](https://qoder.com) が導入済み
+* [uv](https://github.com/astral-sh/uv) が WinGet 等で導入済み (`uvx.exe` が使える状態)
+* Git for Windows がインストールされており、`git --version` が PowerShell で実行可能
+
+## 2. 問題の概要
+
+WSL 環境では正常に Serena MCP が起動できる一方、Windows ネイティブ環境では以下の問題が発生しました。
+
+* `stdio` 接続で起動すると、Qoder が Serena 起動後、やり取りを行わない
+* `streamable-http` 接続では Qoder がルート(`/`)にアクセスし、404 エラーになる
+
+結果として「Qoder から Serena に接続できない」状態になりました。
+
+## 3. 解決策（動作確認済み）
+
+### 3.1 Serena を手動で HTTP サーバーとして起動
+
+まず PowerShell で以下を実行し、Serena MCP を `streamable-http` モードで起動します。
+
+```powershell
+uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant --transport streamable-http
+```
+
+* デフォルトで `http://127.0.0.1:8000` にサーバーが立ち上がります。
+* ログに `StreamableHTTP session manager started` と出れば正常起動です。
+
+### 3.2 Qoder 側の `mcp.json` 設定
+
+Qoder に対しては、Serena MCP を HTTP 接続で利用するように設定します。
+ポイントは **URL を `/mcp` にすること**です（ルート`/`では404になる）。
+
+```json
+"serena": {
+  "type": "streamableHttp",
+  "url": "http://127.0.0.1:8000/mcp"
+}
+```
+
+これで Qoder の「MCP」を ON にすると、Qoder → Serena の接続が確立します。
+
+## 4. 注意点
+
+- Serena を手動で起動させる手間が発生します。
+* Serena 側を常駐させたい場合は、**Windows タスクスケジューラ**などを使ってログオン時に自動起動させる運用もあります。
+
+## 5. まとめ
+
+1. PowerShell で Serena MCP を `--transport streamable-http` で起動する
+2. Qoder の `mcp.json` で `url` を `http://127.0.0.1:8000/mcp` に設定する
+3. 必要ならタスクスケジューラで自動起動化する
