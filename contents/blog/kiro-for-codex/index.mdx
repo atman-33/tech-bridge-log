@@ -2,7 +2,7 @@
 title: "Kiro for Codex: Seamless Spec‑Driven Development in VS Code"
 slug: "kiro-for-codex"
 publishedAt: "2025-09-08T00:00:00Z"
-updatedAt: "2025-09-08T00:00:00Z"
+updatedAt: "2025-09-26T00:00:00Z"
 tags: ["vscode", "codex", "kiro", "development"]
 description: "A VS Code extension that brings Kiro‑style spec‑driven workflows to Codex CLI—manage Specs, Steering Docs, and Prompts visually and run tasks inline."
 emoji: "👻"
@@ -12,7 +12,9 @@ Kiro for Codex is a VS Code extension that brings the best of Kiro's Spec‑Driv
 
 Available on the VS Code Marketplace:
 
-https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex
+https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex-ide
+
+> In the original **[kiro-for-codex](https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex)**, interacting with Codex required sending prompts through the terminal, which unfortunately reduced usability. To address this, I’ve been developing [**kiro-for-codex-ide**](https://github.com/atman-33/kiro-for-codex-ide), which passes the necessary prompts (such as those for spec creation) directly into the context of [Codex - OpenAI’s coding agent](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt).
 
 ## TL;DR
 
@@ -33,6 +35,8 @@ Kiro excels at a spec‑first workflow with a thoughtful UI and model usage that
 - Spec Workflow: review each stage (Requirements → Design → Tasks)
 - CodeLens for Tasks: run individual tasks from `tasks.md` and auto‑mark as done
 
+![Kiro for Codex IDE – CodeLens & Views](image.png)
+
 ### STEERING Management
 - Steering Documents: browse and edit global/project‑specific guidelines
 - Generated Docs: product, tech, and structure steering documents
@@ -43,8 +47,6 @@ Kiro excels at a spec‑first workflow with a thoughtful UI and model usage that
 - Inline Run Button: use ▶ to execute with Codex CLI in place
 - Organize & Refresh: maintain a workspace prompt library with quick refresh
 - Markdown Simplicity: plain Markdown—no front matter required
-
-![Kiro for Codex – CodeLens & Views](image.png)
 
 ## Who It's For
 - Individuals or small teams who want a smooth path from specs to implementation
@@ -62,7 +64,7 @@ Kiro excels at a spec‑first workflow with a thoughtful UI and model usage that
 - Marketplace: install from the listing above
 - From VSIX (alternative):
   - VS Code: Extensions → … → Install from VSIX
-  - CLI: `code --install-extension ./kiro-for-codex-x.y.z.vsix`
+  - CLI: `code --install-extension ./kiro-for-codex-ide-x.y.z.vsix`
 
 ## Quick Start
 1. Open your workspace
@@ -94,11 +96,11 @@ Kiro excels at a spec‑first workflow with a thoughtful UI and model usage that
 - Richer settings UI
 
 ## Repository / Credits
-- GitHub: [atman-33/kiro-for-codex](https://github.com/atman-33/kiro-for-codex)
+- GitHub: [atman-33/kiro-for-codex-ide](https://github.com/atman-33/kiro-for-codex)
 - Inspiration: [notdp/kiro-for-cc](https://github.com/notdp/kiro-for-cc)
 
 ## Closing
 
 The goal is to bring Kiro’s delightful flow into a Codex‑first daily development loop in VS Code. Feedback and contributions are welcome—issues and PRs appreciated.
 
-https://github.com/atman-33/kiro-for-codex
+https://github.com/atman-33/kiro-for-codex-ide
