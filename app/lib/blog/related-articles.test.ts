@@ -64,7 +64,7 @@ describe("findRelatedArticles", () => {
     // Should find react-typescript-combo (shares 'react', 'frontend') and vue-basics (shares 'frontend')
     expect(related.length).toBeGreaterThan(0);
     expect(
-      related.some((article) => article.slug === "react-typescript-combo"),
+      related.some((article) => article.slug === "react-typescript-combo")
     ).toBe(true);
     expect(related.some((article) => article.slug === "vue-basics")).toBe(true);
   });
@@ -74,7 +74,7 @@ describe("findRelatedArticles", () => {
     const related = findRelatedArticles(currentArticle, mockArticles, 3);
 
     expect(
-      related.every((article) => article.slug !== currentArticle.slug),
+      related.every((article) => article.slug !== currentArticle.slug)
     ).toBe(true);
   });
 
@@ -84,12 +84,12 @@ describe("findRelatedArticles", () => {
 
     // All returned articles should be published
     expect(related.every((article) => article.publishedAt <= new Date())).toBe(
-      true,
+      true
     );
 
     // The future article should not be included even though it shares the 'react' tag
     expect(related.some((article) => article.slug === "future-article")).toBe(
-      false,
+      false
     );
   });
 
@@ -124,10 +124,10 @@ describe("findRelatedArticles", () => {
     // vue-basics shares 1 tag ('frontend')
     // So react-typescript-combo should come first
     const reactTypescriptIndex = related.findIndex(
-      (article) => article.slug === "react-typescript-combo",
+      (article) => article.slug === "react-typescript-combo"
     );
     const vueBasicsIndex = related.findIndex(
-      (article) => article.slug === "vue-basics",
+      (article) => article.slug === "vue-basics"
     );
 
     if (reactTypescriptIndex !== -1 && vueBasicsIndex !== -1) {

@@ -1,20 +1,29 @@
-import type { Route } from './+types/route';
-import { loadArticleBySlug, loadArticleMetadata } from '~/lib/blog/article-loader';
-import { loadArticleContent } from '~/lib/blog/mdx-processor';
-import { getTagsByIds } from '~/lib/blog/tags';
-import { generateArticleMetaTags, generateArticleStructuredData } from '~/lib/seo';
-import { findRelatedArticles } from '~/lib/blog/related-articles';
-import { ArticleContent } from './components/article-content';
-import { ArticleNotFoundBoundary } from '~/components/error-boundaries/article-error-boundary';
-import { ArticleHeader } from './components/article-header';
-import { ScrollToTopButton } from '~/components/ui/scroll-to-top-button';
+import { ArticleNotFoundBoundary } from "~/components/error-boundaries/article-error-boundary";
+import { ScrollToTopButton } from "~/components/ui/scroll-to-top-button";
+import {
+  loadArticleBySlug,
+  loadArticleMetadata,
+} from "~/lib/blog/article-loader";
+import { loadArticleContent } from "~/lib/blog/mdx-processor";
+import { findRelatedArticles } from "~/lib/blog/related-articles";
+import { getTagsByIds } from "~/lib/blog/tags";
+import {
+  generateArticleMetaTags,
+  generateArticleStructuredData,
+} from "~/lib/seo";
+import type { Route } from "./+types/route";
+import { ArticleContent } from "./components/article-content";
+import { ArticleHeader } from "./components/article-header";
 
 export const meta: Route.MetaFunction = ({ data }) => {
   if (!data?.article) {
     return [
-      { title: 'Article Not Found' },
-      { name: 'description', content: 'The requested article could not be found.' },
-      { name: 'robots', content: 'noindex, nofollow' },
+      { title: "Article Not Found" },
+      {
+        name: "description",
+        content: "The requested article could not be found.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
     ];
   }
 
@@ -22,13 +31,17 @@ export const meta: Route.MetaFunction = ({ data }) => {
   return generateArticleMetaTags(article);
 };
 
-export const loader = async ({ params, request, context }: Route.LoaderArgs) => {
+export const loader = async ({
+  params,
+  request,
+  context,
+}: Route.LoaderArgs) => {
   const { slug } = params;
 
   // console.log('Article loader called with slug:', slug);
 
   if (!slug) {
-    throw new Response('Article slug is required', { status: 400 });
+    throw new Response("Article slug is required", { status: 400 });
   }
 
   // Load article metadata
@@ -37,7 +50,7 @@ export const loader = async ({ params, request, context }: Route.LoaderArgs) => 
 
   if (!article) {
     // console.log('Article not found for slug:', slug);
-    throw new Response('Article not found', { status: 404 });
+    throw new Response("Article not found", { status: 404 });
   }
 
   // Check if article is published
@@ -46,8 +59,8 @@ export const loader = async ({ params, request, context }: Route.LoaderArgs) => 
   // console.log('Is published:', article.publishedAt <= new Date());
 
   if (article.publishedAt > new Date()) {
-    console.log('Article not published yet, throwing 404');
-    throw new Response('Article not found', { status: 404 });
+    console.log("Article not published yet, throwing 404");
+    throw new Response("Article not found", { status: 404 });
   }
 
   // Load MDX content
@@ -57,20 +70,24 @@ export const loader = async ({ params, request, context }: Route.LoaderArgs) => 
   // console.log('MDX content length:', mdxContent?.length);
 
   if (!mdxContent) {
-    console.log('MDX content is null, throwing 500');
-    throw new Response('Article content could not be loaded', { status: 500 });
+    console.log("MDX content is null, throwing 500");
+    throw new Response("Article content could not be loaded", { status: 500 });
   }
 
   // Load all articles for navigation
   const allArticles = await loadArticleMetadata(context, request);
   const publishedArticles = allArticles
-    .filter(a => a.publishedAt <= new Date())
+    .filter((a) => a.publishedAt <= new Date())
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 
   // Find previous and next articles
-  const currentIndex = publishedArticles.findIndex(a => a.slug === slug);
-  const previousArticle = currentIndex > 0 ? publishedArticles[currentIndex - 1] : null;
-  const nextArticle = currentIndex < publishedArticles.length - 1 ? publishedArticles[currentIndex + 1] : null;
+  const currentIndex = publishedArticles.findIndex((a) => a.slug === slug);
+  const previousArticle =
+    currentIndex > 0 ? publishedArticles[currentIndex - 1] : null;
+  const nextArticle =
+    currentIndex < publishedArticles.length - 1
+      ? publishedArticles[currentIndex + 1]
+      : null;
 
   // Load tags for the article
   const articleTags = await getTagsByIds(article.tags, context, request);
@@ -89,7 +106,14 @@ export const loader = async ({ params, request, context }: Route.LoaderArgs) => 
 };
 
 export default function ArticlePage({ loaderData }: Route.ComponentProps) {
-  const { article, mdxContent, previousArticle, nextArticle, tags, relatedArticles } = loaderData;
+  const {
+    article,
+    mdxContent,
+    previousArticle,
+    nextArticle,
+    tags,
+    relatedArticles,
+  } = loaderData;
 
   // Generate structured data for SEO
   const structuredData = generateArticleStructuredData(article);
@@ -98,19 +122,20 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     <>
       {/* JSON-LD Structured Data */}
       <script
-        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
         dangerouslySetInnerHTML={{ __html: structuredData }}
+        type="application/ld+json"
       />
 
-      <div className="mx-auto max-w-[1280px] px-2 md:px-8 py-8">
+      <div className="mx-auto max-w-[1280px] px-2 py-8 md:px-8">
         <div className="mx-auto">
           <ArticleHeader article={article} tags={tags} />
           <ArticleContent
             mdxContent={mdxContent}
-            slug={article.slug}
-            previousArticle={previousArticle}
             nextArticle={nextArticle}
+            previousArticle={previousArticle}
             relatedArticles={relatedArticles}
+            slug={article.slug}
           />
         </div>
       </div>

@@ -10,17 +10,17 @@ import type { ArticleMetadata } from "./mdx-processor";
 export function findRelatedArticles(
   currentArticle: ArticleMetadata,
   allArticles: ArticleMetadata[],
-  maxResults: number = 3,
+  maxResults = 3
 ): ArticleMetadata[] {
   // Filter out the current article and unpublished articles
   const candidateArticles = allArticles.filter(
     (article) =>
-      article.slug !== currentArticle.slug && article.publishedAt <= new Date(),
+      article.slug !== currentArticle.slug && article.publishedAt <= new Date()
   );
 
   // Find articles that share at least one tag with the current article
   const relatedArticles = candidateArticles.filter((article) =>
-    article.tags.some((tag) => currentArticle.tags.includes(tag)),
+    article.tags.some((tag) => currentArticle.tags.includes(tag))
   );
 
   // If no related articles found, return empty array
@@ -33,7 +33,7 @@ export function findRelatedArticles(
     .map((article) => ({
       article,
       sharedTagCount: article.tags.filter((tag) =>
-        currentArticle.tags.includes(tag),
+        currentArticle.tags.includes(tag)
       ).length,
     }))
     .sort((a, b) => {
@@ -51,9 +51,10 @@ export function findRelatedArticles(
   const tagGroups = new Map<number, ArticleMetadata[]>();
 
   // Group articles by shared tag count
+  // biome-ignore lint/complexity/noForEach: ignore
   sortedRelated.forEach((article) => {
     const sharedTagCount = article.tags.filter((tag) =>
-      currentArticle.tags.includes(tag),
+      currentArticle.tags.includes(tag)
     ).length;
     const group = tagGroups.get(sharedTagCount) || [];
     group.push(article);
@@ -65,7 +66,9 @@ export function findRelatedArticles(
 
   for (const tagCount of sortedTagCounts) {
     const group = tagGroups.get(tagCount);
-    if (!group) continue;
+    if (!group) {
+      continue;
+    }
     const shuffled = shuffleArray([...group]);
 
     for (const article of shuffled) {

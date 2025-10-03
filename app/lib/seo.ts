@@ -2,7 +2,7 @@ import type { MetaDescriptor } from "react-router";
 import { siteConfig } from "~/config/site-config";
 import type { ArticleMetadata } from "./blog/mdx-processor";
 
-export interface SEOConfig {
+export type SEOConfig = {
   title?: string;
   description?: string;
   image?: string;
@@ -13,14 +13,16 @@ export interface SEOConfig {
   tags?: string[];
   author?: string;
   siteName?: string;
-}
+};
 
 /**
  * Generates comprehensive meta tags for SEO and social media sharing
  */
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
 export function generateMetaTags(
   config: SEOConfig,
-  _request?: Request,
+  _request?: Request
 ): MetaDescriptor[] {
   const {
     title,
@@ -42,7 +44,8 @@ export function generateMetaTags(
   const baseUrl = siteConfig.appUrl;
   const absoluteUrl = url ? `${baseUrl}${url}` : baseUrl;
   const absoluteImage = image
-    ? image.startsWith("http")
+    ? // biome-ignore lint/style/noNestedTernary: ignore
+      image.startsWith("http")
       ? image
       : `${baseUrl}${image}`
     : `${baseUrl}${siteConfig.ogpImage}`;
@@ -92,6 +95,7 @@ export function generateMetaTags(
     }
     if (tags && tags.length > 0) {
       // Add each tag as a separate meta tag (OGP standard)
+      // biome-ignore lint/complexity/noForEach: ignore
       tags.forEach((tag) => {
         metaTags.push({ property: "article:tag", content: tag });
       });
@@ -109,7 +113,7 @@ export function generateMetaTags(
  */
 export function generateArticleMetaTags(
   article: ArticleMetadata,
-  request?: Request,
+  request?: Request
 ): MetaDescriptor[] {
   // For emoji thumbnails, use the default OGP image instead
   // since social media platforms don't handle emoji images well
@@ -126,7 +130,7 @@ export function generateArticleMetaTags(
       modifiedTime: article.updatedAt.toISOString(),
       tags: article.tags,
     },
-    request,
+    request
   );
 }
 
@@ -134,7 +138,7 @@ export function generateArticleMetaTags(
  * Generates meta tags for the blog listing page
  */
 export function generateBlogListingMetaTags(
-  request?: Request,
+  request?: Request
 ): MetaDescriptor[] {
   return generateMetaTags(
     {
@@ -144,7 +148,7 @@ export function generateBlogListingMetaTags(
       url: "/blog",
       type: "website",
     },
-    request,
+    request
   );
 }
 
@@ -154,7 +158,7 @@ export function generateBlogListingMetaTags(
 export function generateTagPageMetaTags(
   tag: string,
   articleCount: number,
-  request?: Request,
+  request?: Request
 ): MetaDescriptor[] {
   return generateMetaTags(
     {
@@ -163,7 +167,7 @@ export function generateTagPageMetaTags(
       url: `/blog/tag/${tag}`,
       type: "website",
     },
-    request,
+    request
   );
 }
 
@@ -172,7 +176,7 @@ export function generateTagPageMetaTags(
  */
 export function generateArticleStructuredData(
   article: ArticleMetadata,
-  _request?: Request,
+  _request?: Request
 ): string {
   const baseUrl = siteConfig.appUrl;
   const absoluteUrl = `${baseUrl}/blog/${article.slug}`;

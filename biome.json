@@ -1,5 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite"],
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -9,31 +10,38 @@
     "includes": [
       "app/**/*.ts",
       "database/**/*.ts",
+      "!node_modules/**/*",
       "!worker-configuration.d.ts",
-      "!.react-router/**/*"
+      "!.react-router/**/*",
+      "!app/components/ui/**/*",
+      "!.codex/**/*",
+      "!.wrangler/**/*",
+      "!contents/**/*",
+      "!drizzle.config.ts",
+      "!app/app.css",
+      "!contents/**/*",
+      "!public/**/*"
     ],
     "ignoreUnknown": false
   },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space"
-  },
   "linter": {
-    "enabled": true,
     "rules": {
-      "recommended": true
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    }
-  },
-  "assist": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on"
+      "style": {
+        "noMagicNumbers": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "noNoninteractiveElementInteractions": "off"
+      },
+      "performance": {
+        "noImgElement": "off",
+        "useTopLevelRegex": "off"
+      },
+      "nursery": {
+        "useImageSize": "off"
+      },
+      "suspicious": {
+        "noConsole": "off"
       }
     }
   }

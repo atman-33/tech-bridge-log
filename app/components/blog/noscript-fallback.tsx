@@ -1,40 +1,41 @@
-import { Link } from 'react-router';
+import { Link } from "react-router";
 
 export function NoScriptSearchFallback() {
   return (
     <noscript>
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+      <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
         <div className="flex items-start gap-3">
           <svg
-            className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0"
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
+            viewBox="0 0 24 24"
           >
             <path
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
             />
           </svg>
           <div>
-            <h3 className="font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+            <h3 className="mb-1 font-medium text-yellow-800 dark:text-yellow-200">
               JavaScript Required for Search
             </h3>
-            <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
-              Search functionality requires JavaScript to be enabled. You can still browse articles using the links below.
+            <p className="mb-3 text-sm text-yellow-700 dark:text-yellow-300">
+              Search functionality requires JavaScript to be enabled. You can
+              still browse articles using the links below.
             </p>
             <div className="flex flex-wrap gap-2">
               <Link
+                className="inline-flex items-center rounded-md bg-yellow-100 px-3 py-1.5 font-medium text-sm text-yellow-800 transition-colors hover:bg-yellow-200 dark:bg-yellow-800/30 dark:text-yellow-200 dark:hover:bg-yellow-800/50"
                 to="/"
-                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-yellow-800 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-800/30 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition-colors"
               >
                 Browse All Articles
               </Link>
               <Link
+                className="inline-flex items-center rounded-md bg-yellow-100 px-3 py-1.5 font-medium text-sm text-yellow-800 transition-colors hover:bg-yellow-200 dark:bg-yellow-800/30 dark:text-yellow-200 dark:hover:bg-yellow-800/50"
                 to="/tags"
-                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-yellow-800 dark:text-yellow-200 bg-yellow-100 dark:bg-yellow-800/30 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition-colors"
               >
                 Browse by Tags
               </Link>

@@ -23,7 +23,7 @@
     "appUrl": "https://github.com/atman-33/double-click-image-opener?tab=readme-ov-file#readme",
     "tags": ["Obsidian", "Plugin", "Image Viewer"]
   },
-    {
+  {
     "title": "Article Paste",
     "icon": "https://tech-bridge-log.com/icons/tags/obsidian.svg",
     "description": "Obsidian plugin to copy content with images preserved for easy pasting into article drafts.",
@@ -37,7 +37,7 @@
     "description": "VS Code extension for spec-driven development with Codex CLI, leveraging OpenAI’s Codex VS Code extension.",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/kiro-for-codex-ide/refs/heads/main/screenshots/image.png",
     "appUrl": "https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex-ide",
-    "tags": ["VSCode", "Extension", "AI" ]
+    "tags": ["VSCode", "Extension", "AI"]
   },
   {
     "title": "Sketch Illustrations",

@@ -1,38 +1,49 @@
-import { useSearchParams } from 'react-router';
-import type { Route } from './+types/route';
-import { SearchResults } from './components/search-results';
-import { SearchErrorBoundary } from '~/components/error-boundaries/search-error-boundary';
-import { NoScriptSearchFallback } from '~/components/blog/noscript-fallback';
-import type { SearchIndex } from '~/lib/blog/search-index';
+import { useSearchParams } from "react-router";
+import { NoScriptSearchFallback } from "~/components/blog/noscript-fallback";
+import { SearchErrorBoundary } from "~/components/error-boundaries/search-error-boundary";
+import type { SearchIndex } from "~/lib/blog/search-index";
+import type { Route } from "./+types/route";
+import { SearchResults } from "./components/search-results";
 
 export const meta: Route.MetaFunction = ({ location }) => {
-  const url = new URL(location.pathname + location.search, 'https://example.com');
-  const query = url.searchParams.get('q') || '';
+  const url = new URL(
+    location.pathname + location.search,
+    "https://example.com"
+  );
+  const query = url.searchParams.get("q") || "";
 
   return [
-    { title: query ? `Search results for "${query}"` : 'Search' },
-    { name: 'description', content: query ? `Search results for "${query}" in our tech blog` : 'Search through our technical articles and tutorials' },
+    { title: query ? `Search results for "${query}"` : "Search" },
+    {
+      name: "description",
+      content: query
+        ? `Search results for "${query}" in our tech blog`
+        : "Search through our technical articles and tutorials",
+    },
   ];
 };
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const url = new URL(request.url);
-  const query = url.searchParams.get('q') || '';
+  const query = url.searchParams.get("q") || "";
 
   // Load search index from public directory using static assets utility
   let searchIndex: SearchIndex | null = null;
   let searchIndexError: string | null = null;
 
   try {
-    const { fetchStaticJSON } = await import('~/lib/utils/static-assets');
+    const { fetchStaticJSON } = await import("~/lib/utils/static-assets");
     searchIndex = await fetchStaticJSON<SearchIndex>(
-      '/search-index.json',
+      "/search-index.json",
       context,
       request
     );
   } catch (error) {
-    console.error('Failed to load search index:', error);
-    searchIndexError = error instanceof Error ? error.message : 'Unknown error loading search index';
+    console.error("Failed to load search index:", error);
+    searchIndexError =
+      error instanceof Error
+        ? error.message
+        : "Unknown error loading search index";
   }
 
   return {
@@ -45,13 +56,13 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const { query, searchIndex, searchIndexError } = loaderData;
   const [searchParams] = useSearchParams();
-  const currentQuery = searchParams.get('q') || query;
+  const currentQuery = searchParams.get("q") || query;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Search</h1>
+          <h1 className="mb-2 font-bold text-3xl">Search</h1>
           {currentQuery && (
             <p className="text-muted-foreground">
               Results for "{currentQuery}"

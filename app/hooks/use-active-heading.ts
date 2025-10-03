@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import type { HeadingItem } from "~/types/heading";
 
-interface ReadingProgress {
+type ReadingProgress = {
   headings: HeadingItem[];
   activeId: string;
   readHeadings: Set<string>;
-}
+};
 
 export function useActiveHeading(): ReadingProgress {
   const [state, setState] = useState<ReadingProgress>({
@@ -15,10 +15,11 @@ export function useActiveHeading(): ReadingProgress {
   });
 
   useEffect(() => {
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
     const calculateActiveHeading = () => {
       // Extract headings from actual DOM (similar to reading-progress.tsx approach)
       const headingElements = document.querySelectorAll(
-        "article h1, article h2, article h3, article h4, article h5, article h6",
+        "article h1, article h2, article h3, article h4, article h5, article h6"
       );
 
       // Early return if no headings found (not an error, just empty state)
@@ -33,9 +34,10 @@ export function useActiveHeading(): ReadingProgress {
 
       // Build headings array from DOM elements
       const headings: HeadingItem[] = [];
+      // biome-ignore lint/complexity/noForEach: ignore
       headingElements.forEach((element) => {
         const tagName = element.tagName.toLowerCase();
-        const level = parseInt(tagName.charAt(1), 10);
+        const level = Number.parseInt(tagName.charAt(1), 10);
         const text = element.textContent?.trim() || "";
         const id = element.id;
 
@@ -55,7 +57,9 @@ export function useActiveHeading(): ReadingProgress {
 
       for (let i = 0; i < headings.length; i++) {
         const element = document.getElementById(headings[i].id);
-        if (!element) continue;
+        if (!element) {
+          continue;
+        }
 
         const elementTop = element.offsetTop;
 

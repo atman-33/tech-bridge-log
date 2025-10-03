@@ -1,4 +1,4 @@
-export interface PaginationInfo {
+export type PaginationInfo = {
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -7,19 +7,19 @@ export interface PaginationInfo {
   hasPreviousPage: boolean;
   startIndex: number;
   endIndex: number;
-}
+};
 
-export interface PaginatedResult<T> {
+export type PaginatedResult<T> = {
   items: T[];
   pagination: PaginationInfo;
-}
+};
 
 export const DEFAULT_PAGE_SIZE = 20;
 
 export function calculatePagination(
   totalItems: number,
-  currentPage: number = 1,
-  itemsPerPage: number = DEFAULT_PAGE_SIZE,
+  currentPage = 1,
+  itemsPerPage: number = DEFAULT_PAGE_SIZE
 ): PaginationInfo {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages));
@@ -41,17 +41,17 @@ export function calculatePagination(
 
 export function paginateArray<T>(
   items: T[],
-  currentPage: number = 1,
-  itemsPerPage: number = DEFAULT_PAGE_SIZE,
+  currentPage = 1,
+  itemsPerPage: number = DEFAULT_PAGE_SIZE
 ): PaginatedResult<T> {
   const pagination = calculatePagination(
     items.length,
     currentPage,
-    itemsPerPage,
+    itemsPerPage
   );
   const paginatedItems = items.slice(
     pagination.startIndex,
-    pagination.endIndex,
+    pagination.endIndex
   );
 
   return {
@@ -62,14 +62,14 @@ export function paginateArray<T>(
 
 export function getPageFromSearchParams(searchParams: URLSearchParams): number {
   const pageParam = searchParams.get("page");
-  const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const page = pageParam ? Number.parseInt(pageParam, 10) : 1;
   return Number.isNaN(page) || page < 1 ? 1 : page;
 }
 
 export function createPageUrl(
   pathname: string,
   page: number,
-  existingParams?: URLSearchParams,
+  existingParams?: URLSearchParams
 ): string {
   const params = new URLSearchParams();
 

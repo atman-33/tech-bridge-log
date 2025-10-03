@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+// biome-ignore lint/style/noExportedImports: ignore
 import { account, session, user, verification } from "./auth-schema";
 
 const guestBook = sqliteTable("guestBook", {

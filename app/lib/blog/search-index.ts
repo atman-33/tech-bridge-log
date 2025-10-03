@@ -1,6 +1,6 @@
 import { Document, Index } from "flexsearch";
 
-export interface SearchableArticle {
+export type SearchableArticle = {
   slug: string;
   title: string;
   description: string;
@@ -8,9 +8,9 @@ export interface SearchableArticle {
   tags: string[];
   // biome-ignore lint/suspicious/noExplicitAny: <>
   [key: string]: any; // Index signature for FlexSearch compatibility
-}
+};
 
-export interface SearchResult {
+export type SearchResult = {
   slug: string;
   title: string;
   description: string;
@@ -20,12 +20,12 @@ export interface SearchResult {
     description?: string;
     content?: string;
   };
-}
+};
 
-export interface SearchIndex {
+export type SearchIndex = {
   articles: SearchableArticle[];
   generatedAt: string;
-}
+};
 
 /**
  * Creates a FlexSearch index for client-side searching
@@ -85,18 +85,22 @@ export function stripMarkdown(content: string): string {
  */
 export function highlightSearchTerms(
   text: string,
-  searchTerms: string[],
+  searchTerms: string[]
 ): string {
-  if (!searchTerms.length) return text;
+  if (!searchTerms.length) {
+    return text;
+  }
 
   let highlightedText = text;
 
   for (const term of searchTerms) {
-    if (term.length < 2) continue; // Skip very short terms
+    if (term.length < 2) {
+      continue; // Skip very short terms
+    }
 
     const regex = new RegExp(
       `(${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-      "gi",
+      "gi"
     );
     highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
   }
@@ -108,7 +112,7 @@ export function highlightSearchTerms(
  * Deduplicates search results by slug to ensure unique articles
  */
 export function deduplicateSearchResults(
-  results: SearchResult[],
+  results: SearchResult[]
 ): SearchResult[] {
   const seen = new Set<string>();
   const deduplicated: SearchResult[] = [];
@@ -127,17 +131,17 @@ export function deduplicateSearchResults(
  * Validates and deduplicates searchable articles
  */
 export function deduplicateSearchableArticles(
-  articles: SearchableArticle[],
+  articles: SearchableArticle[]
 ): SearchableArticle[] {
   const seen = new Set<string>();
   const deduplicated: SearchableArticle[] = [];
 
   for (const article of articles) {
-    if (!seen.has(article.slug)) {
+    if (seen.has(article.slug)) {
+      console.warn(`Duplicate article found in search index: ${article.slug}`);
+    } else {
       seen.add(article.slug);
       deduplicated.push(article);
-    } else {
-      console.warn(`Duplicate article found in search index: ${article.slug}`);
     }
   }
 
@@ -150,7 +154,7 @@ export function deduplicateSearchableArticles(
 export function extractSnippets(
   content: string,
   searchTerms: string[],
-  maxLength = 200,
+  maxLength = 200
 ): string {
   if (!searchTerms.length) {
     return content.length > maxLength
@@ -163,7 +167,9 @@ export function extractSnippets(
 
   // Find positions of search terms
   for (const term of searchTerms) {
-    if (term.length < 2) continue;
+    if (term.length < 2) {
+      continue;
+    }
 
     const lowerTerm = term.toLowerCase();
     let index = lowerContent.indexOf(lowerTerm);
@@ -191,8 +197,12 @@ export function extractSnippets(
   let snippet = content.substring(start, end);
 
   // Add ellipsis if needed
-  if (start > 0) snippet = `...${snippet}`;
-  if (end < content.length) snippet = `${snippet}...`;
+  if (start > 0) {
+    snippet = `...${snippet}`;
+  }
+  if (end < content.length) {
+    snippet = `${snippet}...`;
+  }
 
   return snippet;
 }
@@ -200,20 +210,26 @@ export function extractSnippets(
 /**
  * Performs client-side search using FlexSearch
  */
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
 export function performSearch(
   // biome-ignore lint/suspicious/noExplicitAny: <>
   index: any, // FlexSearch Document instance
   articles: SearchableArticle[],
   query: string,
-  limit = 10,
+  limit = 10
 ): SearchResult[] {
-  if (!query.trim()) return [];
+  if (!query.trim()) {
+    return [];
+  }
 
   const searchTerms = query
     .toLowerCase()
     .split(/\s+/)
     .filter((term) => term.length >= 2);
-  if (searchTerms.length === 0) return [];
+  if (searchTerms.length === 0) {
+    return [];
+  }
 
   try {
     // Perform the search with a higher limit to account for duplicates
@@ -236,10 +252,14 @@ export function performSearch(
         for (const item of result.result) {
           if (typeof item === "object" && "id" in item && "doc" in item) {
             const article = articles.find((a) => a.slug === item.id);
-            if (!article) continue;
+            if (!article) {
+              continue;
+            }
 
             // Skip if we already have this article (deduplication)
-            if (uniqueResults.has(article.slug)) continue;
+            if (uniqueResults.has(article.slug)) {
+              continue;
+            }
 
             const searchResult: SearchResult = {
               slug: article.slug,
@@ -250,11 +270,11 @@ export function performSearch(
                 title: highlightSearchTerms(article.title, searchTerms),
                 description: highlightSearchTerms(
                   extractSnippets(article.description, searchTerms, 150),
-                  searchTerms,
+                  searchTerms
                 ),
                 content: highlightSearchTerms(
                   extractSnippets(article.content, searchTerms, 200),
-                  searchTerms,
+                  searchTerms
                 ),
               },
             };
@@ -262,13 +282,17 @@ export function performSearch(
             uniqueResults.set(article.slug, searchResult);
 
             // Stop when we have enough unique results
-            if (uniqueResults.size >= limit) break;
+            if (uniqueResults.size >= limit) {
+              break;
+            }
           }
         }
       }
 
       // Stop outer loop when we have enough unique results
-      if (uniqueResults.size >= limit) break;
+      if (uniqueResults.size >= limit) {
+        break;
+      }
     }
 
     // Convert Map values to array and return

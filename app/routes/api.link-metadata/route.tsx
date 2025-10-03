@@ -1,37 +1,40 @@
-import type { LoaderFunctionArgs } from 'react-router';
+import type { LoaderFunctionArgs } from "react-router";
 
-interface LinkMetadata {
+type LinkMetadata = {
   title: string;
   description: string;
   image?: string;
   favicon?: string;
   siteName?: string;
   url: string;
-}
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const targetUrl = url.searchParams.get('url');
+  const targetUrl = url.searchParams.get("url");
 
   if (!targetUrl) {
-    return Response.json({ error: 'URL parameter is required' }, { status: 400 });
+    return Response.json(
+      { error: "URL parameter is required" },
+      { status: 400 }
+    );
   }
 
   try {
     // Validate URL
     new URL(targetUrl);
   } catch {
-    return Response.json({ error: 'Invalid URL' }, { status: 400 });
+    return Response.json({ error: "Invalid URL" }, { status: 400 });
   }
 
   try {
     // Fetch the target page
     const response = await fetch(targetUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LinkPreview/1.0)',
+        "User-Agent": "Mozilla/5.0 (compatible; LinkPreview/1.0)",
       },
       // Add timeout
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!response.ok) {
@@ -43,18 +46,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     return Response.json(metadata, {
       headers: {
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        "Cache-Control": "public, max-age=3600", // Cache for 1 hour
       },
     });
   } catch (error) {
-    console.error('Error fetching link metadata:', error);
+    console.error("Error fetching link metadata:", error);
 
     // Return fallback metadata
     const domain = new URL(targetUrl).hostname;
     const fallbackMetadata: LinkMetadata = {
-      title: domain.replace('www.', ''),
+      title: domain.replace("www.", ""),
       description: `Visit ${domain} for more information`,
-      siteName: domain.replace('www.', ''),
+      siteName: domain.replace("www.", ""),
       url: targetUrl,
       favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=32`,
     };
@@ -69,42 +72,59 @@ function extractMetadata(html: string, url: string): LinkMetadata {
   // Simple regex-based extraction (in production, consider using a proper HTML parser)
   const getMetaContent = (property: string): string | undefined => {
     const patterns = [
-      new RegExp(`<meta\\s+property=["']${property}["']\\s+content=["']([^"']+)["']`, 'i'),
-      new RegExp(`<meta\\s+content=["']([^"']+)["']\\s+property=["']${property}["']`, 'i'),
-      new RegExp(`<meta\\s+name=["']${property}["']\\s+content=["']([^"']+)["']`, 'i'),
-      new RegExp(`<meta\\s+content=["']([^"']+)["']\\s+name=["']${property}["']`, 'i'),
+      new RegExp(
+        `<meta\\s+property=["']${property}["']\\s+content=["']([^"']+)["']`,
+        "i"
+      ),
+      new RegExp(
+        `<meta\\s+content=["']([^"']+)["']\\s+property=["']${property}["']`,
+        "i"
+      ),
+      new RegExp(
+        `<meta\\s+name=["']${property}["']\\s+content=["']([^"']+)["']`,
+        "i"
+      ),
+      new RegExp(
+        `<meta\\s+content=["']([^"']+)["']\\s+name=["']${property}["']`,
+        "i"
+      ),
     ];
 
     for (const pattern of patterns) {
       const match = html.match(pattern);
-      if (match) return match[1];
+      if (match) {
+        return match[1];
+      }
     }
-    return undefined;
+    return;
   };
 
   const getTitleContent = (): string => {
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    return titleMatch ? titleMatch[1].trim() : domain.replace('www.', '');
+    return titleMatch ? titleMatch[1].trim() : domain.replace("www.", "");
   };
 
-  const title = getMetaContent('og:title') ||
-    getMetaContent('twitter:title') ||
+  const title =
+    getMetaContent("og:title") ||
+    getMetaContent("twitter:title") ||
     getTitleContent();
 
-  const description = getMetaContent('og:description') ||
-    getMetaContent('twitter:description') ||
-    getMetaContent('description') ||
-    '';
+  const description =
+    getMetaContent("og:description") ||
+    getMetaContent("twitter:description") ||
+    getMetaContent("description") ||
+    "";
 
-  const image = getMetaContent('og:image') ||
-    getMetaContent('twitter:image') ||
-    getMetaContent('twitter:image:src');
+  const image =
+    getMetaContent("og:image") ||
+    getMetaContent("twitter:image") ||
+    getMetaContent("twitter:image:src");
 
-  const siteName = getMetaContent('og:site_name') ||
-    domain.replace('www.', '');
+  const siteName = getMetaContent("og:site_name") || domain.replace("www.", "");
 
-  const favicon = getMetaContent('icon') ||
-    getMetaContent('shortcut icon') ||
+  const favicon =
+    getMetaContent("icon") ||
+    getMetaContent("shortcut icon") ||
     `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
 
   return {

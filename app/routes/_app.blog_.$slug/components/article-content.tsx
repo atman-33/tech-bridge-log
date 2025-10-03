@@ -1,18 +1,18 @@
-import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
-import { ReadingProgress } from './reading-progress';
-import { TableOfContents } from './table-of-contents';
-import { NavigationMenu } from './navigation-menu';
-import { MarkdownRenderer } from './markdown-renderer';
-import { ArticleNavigation } from './article-navigation';
-import { RelatedArticles } from './related-articles';
+import type { ArticleMetadata } from "~/lib/blog/mdx-processor";
+import { ArticleNavigation } from "./article-navigation";
+import { MarkdownRenderer } from "./markdown-renderer";
+import { NavigationMenu } from "./navigation-menu";
+import { ReadingProgress } from "./reading-progress";
+import { RelatedArticles } from "./related-articles";
+import { TableOfContents } from "./table-of-contents";
 
-interface ArticleContentProps {
+type ArticleContentProps = {
   mdxContent: string;
   slug: string;
   previousArticle: ArticleMetadata | null;
   nextArticle: ArticleMetadata | null;
   relatedArticles: ArticleMetadata[];
-}
+};
 
 export function ArticleContent({
   mdxContent,
@@ -28,18 +28,24 @@ export function ArticleContent({
       {/* Mobile Navigation Menu - shows when TOC is hidden */}
       <NavigationMenu content={mdxContent} />
 
-      <div className="flex gap-8 max-w-full">
+      <div className="flex max-w-full gap-8">
         {/* Main Content */}
-        <article className="prose prose-lg max-w-none flex-1 min-w-0">
+        <article className="prose prose-lg min-w-0 max-w-none flex-1">
           <MarkdownRenderer content={mdxContent} slug={slug} />
           <RelatedArticles articles={relatedArticles} />
-          <ArticleNavigation previousArticle={previousArticle} nextArticle={nextArticle} />
+          <ArticleNavigation
+            nextArticle={nextArticle}
+            previousArticle={previousArticle}
+          />
         </article>
 
         {/* Table of Contents Sidebar - hidden on mobile */}
-        <aside className="hidden md:block w-64 flex-shrink-0">
+        <aside className="hidden w-64 flex-shrink-0 md:block">
           <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto overflow-x-hidden">
-            <TableOfContents content={mdxContent} className="p-4 border border-border rounded-lg bg-muted/50" />
+            <TableOfContents
+              className="rounded-lg border border-border bg-muted/50 p-4"
+              content={mdxContent}
+            />
           </div>
         </aside>
       </div>

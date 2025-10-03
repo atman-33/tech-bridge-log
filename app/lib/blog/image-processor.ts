@@ -2,20 +2,20 @@ import { existsSync } from "node:fs";
 import { copyFile, mkdir, readdir, stat } from "node:fs/promises";
 import { basename, dirname, extname, join } from "node:path";
 
-export interface ImageAsset {
+export type ImageAsset = {
   originalPath: string;
   publicPath: string;
   filename: string;
   extension: string;
   size: number;
   isOptimized: boolean;
-}
+};
 
-export interface ImageProcessingResult {
+export type ImageProcessingResult = {
   assets: ImageAsset[];
   thumbnailPath: string | null;
   errors: string[];
-}
+};
 
 const SUPPORTED_IMAGE_EXTENSIONS = [
   ".png",
@@ -57,7 +57,7 @@ export function resolveImagePath(imagePath: string, slug: string): string {
   }
 
   // Handle relative paths without ./
-  if (!imagePath.startsWith("/") && !imagePath.startsWith("http")) {
+  if (!(imagePath.startsWith("/") || imagePath.startsWith("http"))) {
     return generateAssetUrl(slug, imagePath);
   }
 
@@ -70,7 +70,7 @@ export function resolveImagePath(imagePath: string, slug: string): string {
  */
 export function resolveThumbnailPath(
   thumbnailPath: string,
-  slug: string,
+  slug: string
 ): string {
   return resolveImagePath(thumbnailPath, slug);
 }
@@ -98,7 +98,7 @@ async function getImageInfo(filePath: string): Promise<{
  * Discovers all image assets in an article directory
  */
 export async function discoverArticleImages(
-  articleDir: string,
+  articleDir: string
 ): Promise<string[]> {
   if (!existsSync(articleDir)) {
     return [];
@@ -108,10 +108,12 @@ export async function discoverArticleImages(
   const entries = await readdir(articleDir, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (entry.isFile() && entry.name !== "index.mdx") {
-      if (isSupportedImageFormat(entry.name)) {
-        images.push(join(articleDir, entry.name));
-      }
+    if (
+      entry.isFile() &&
+      entry.name !== "index.mdx" &&
+      isSupportedImageFormat(entry.name)
+    ) {
+      images.push(join(articleDir, entry.name));
     }
   }
 
@@ -123,7 +125,7 @@ export async function discoverArticleImages(
  */
 export async function processArticleImages(
   articleDir: string,
-  slug: string,
+  slug: string
 ): Promise<ImageProcessingResult> {
   const publicDir = join(PUBLIC_ASSETS_DIR, slug);
   const assets: ImageAsset[] = [];
@@ -174,7 +176,7 @@ export async function processArticleImages(
       }
 
       console.log(
-        `✓ Copied image asset: ${imageInfo.filename} (${formatFileSize(imageInfo.size)})`,
+        `✓ Copied image asset: ${imageInfo.filename} (${formatFileSize(imageInfo.size)})`
       );
     } catch (error) {
       const errorMsg = `Failed to process image ${imagePath}: ${error}`;
@@ -208,13 +210,13 @@ export function formatFileSize(bytes: number): string {
 export function validateThumbnailPath(
   thumbnailPath: string,
   assets: ImageAsset[],
-  slug: string,
+  slug: string
 ): { isValid: boolean; resolvedPath: string; error?: string } {
   const resolvedPath = resolveThumbnailPath(thumbnailPath, slug);
 
   // Check if the resolved path matches any of the processed assets
   const matchingAsset = assets.find(
-    (asset) => asset.publicPath === resolvedPath,
+    (asset) => asset.publicPath === resolvedPath
   );
 
   if (!matchingAsset) {
@@ -242,7 +244,7 @@ export async function optimizeImage(
     width?: number;
     height?: number;
     format?: "webp" | "avif" | "jpeg" | "png";
-  } = {},
+  } = {}
 ): Promise<{
   success: boolean;
   originalSize: number;
@@ -275,7 +277,7 @@ export async function optimizeImage(
 export async function generateResponsiveImages(
   imagePath: string,
   outputDir: string,
-  _sizes: number[] = [320, 640, 1024, 1920],
+  _sizes: number[] = [320, 640, 1024, 1920]
 ): Promise<{
   variants: Array<{ width: number; path: string; size: number }>;
   errors: string[];
@@ -308,7 +310,7 @@ export async function generateResponsiveImages(
  * Cleans up unused image assets from public directory
  */
 export async function cleanupUnusedAssets(
-  activeArticleSlugs: string[],
+  activeArticleSlugs: string[]
 ): Promise<{ cleaned: string[]; errors: string[] }> {
   const cleaned: string[] = [];
   const errors: string[] = [];

@@ -7,11 +7,11 @@
  * - Build time (Node.js): Falls back to file system access
  */
 
-interface CloudflareContext {
+type CloudflareContext = {
   cloudflare?: {
     env: Env;
   };
-}
+};
 
 /**
  * Determines if we have access to Cloudflare Workers ASSETS binding
@@ -23,10 +23,12 @@ function hasAssetsBinding(context?: CloudflareContext): boolean {
 /**
  * Fetches a static asset with automatic fallback between ASSETS and standard fetch
  */
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
 export async function fetchStaticAsset(
   path: string,
   context?: CloudflareContext,
-  request?: Request,
+  request?: Request
 ): Promise<Response> {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
@@ -48,7 +50,7 @@ export async function fetchStaticAsset(
         process.env.NODE_ENV === "development"
       ) {
         console.warn(
-          `[Static Assets] Failed for ${normalizedPath} (${response.status}), using fallback`,
+          `[Static Assets] Failed for ${normalizedPath} (${response.status}), using fallback`
         );
       }
     } catch (error) {
@@ -74,7 +76,7 @@ export async function fetchStaticAsset(
 
   if (!response.ok) {
     throw new Error(
-      `Static asset not found: ${normalizedPath} (${response.status})`,
+      `Static asset not found: ${normalizedPath} (${response.status})`
     );
   }
 
@@ -87,7 +89,7 @@ export async function fetchStaticAsset(
 export async function fetchStaticJSON<T>(
   path: string,
   context?: CloudflareContext,
-  request?: Request,
+  request?: Request
 ): Promise<T> {
   try {
     const response = await fetchStaticAsset(path, context, request);
@@ -111,7 +113,7 @@ export async function fetchStaticJSON<T>(
 export async function fetchStaticText(
   path: string,
   context?: CloudflareContext,
-  request?: Request,
+  request?: Request
 ): Promise<string> {
   try {
     const response = await fetchStaticAsset(path, context, request);
@@ -132,19 +134,21 @@ export async function fetchStaticText(
 /**
  * Type-safe wrapper for React Router context
  */
-export interface ReactRouterContext {
+export type ReactRouterContext = {
   cloudflare?: {
     env: Env;
   };
-}
+};
 
 /**
  * React Router specific helper for fetching static JSON
  */
+
+// biome-ignore lint/suspicious/useAwait: ignore
 export async function fetchStaticJSONFromRoute<T>(
   path: string,
   context: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<T> {
   return fetchStaticJSON<T>(path, context, request);
 }
@@ -152,10 +156,12 @@ export async function fetchStaticJSONFromRoute<T>(
 /**
  * React Router specific helper for fetching static text
  */
+
+// biome-ignore lint/suspicious/useAwait: ignore
 export async function fetchStaticTextFromRoute(
   path: string,
   context: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<string> {
   return fetchStaticText(path, context, request);
 }

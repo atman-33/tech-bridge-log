@@ -15,15 +15,10 @@
     "strict": true,
     "noEmit": true,
     "paths": {
-      "~/database/*": [
-        "./database/*"
-      ],
-      "~/contents/*": [
-        "./contents/*"
-      ],
-      "~/*": [
-        "./app/*"
-      ]
-    }
+      "~/database/*": ["./database/*"],
+      "~/contents/*": ["./contents/*"],
+      "~/*": ["./app/*"]
+    },
+    "strictNullChecks": true
   }
 }

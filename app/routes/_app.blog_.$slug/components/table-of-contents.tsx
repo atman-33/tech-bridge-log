@@ -1,13 +1,13 @@
-import { useActiveHeading } from '~/hooks/use-active-heading';
-import { scrollToHeading } from '~/utils/heading-utils';
-import { ProgressTableOfContents } from '~/components/ui/progress-table-of-contents';
+import { ProgressTableOfContents } from "~/components/ui/progress-table-of-contents";
+import { useActiveHeading } from "~/hooks/use-active-heading";
+import { scrollToHeading } from "~/utils/heading-utils";
 
-interface TableOfContentsProps {
+type TableOfContentsProps = {
   content: string;
   className?: string;
-}
+};
 
-export function TableOfContents({ content, className = '' }: TableOfContentsProps) {
+export function TableOfContents({ className = "" }: TableOfContentsProps) {
   const { headings, activeId, readHeadings } = useActiveHeading();
 
   if (headings.length === 0) {
@@ -16,15 +16,15 @@ export function TableOfContents({ content, className = '' }: TableOfContentsProp
 
   return (
     <nav className={`${className}`}>
-      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4">
+      <h3 className="mb-4 font-semibold text-muted-foreground text-sm uppercase tracking-wide">
         Table of Contents
       </h3>
 
       <ProgressTableOfContents
-        headings={headings}
         activeId={activeId}
-        readHeadings={readHeadings}
+        headings={headings}
         onHeadingClick={scrollToHeading}
+        readHeadings={readHeadings}
       />
     </nav>
   );

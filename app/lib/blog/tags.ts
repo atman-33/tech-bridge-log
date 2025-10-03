@@ -3,17 +3,17 @@ import {
   type ReactRouterContext,
 } from "~/lib/utils/static-assets";
 
-export interface Tag {
+export type Tag = {
   id: string;
   label: string;
   icon: string;
   description?: string;
-}
+};
 
-interface TagsMetadata {
+type TagsMetadata = {
   tags: Tag[];
   generatedAt: string;
-}
+};
 
 // Cache for tags data
 let tagsCache: Tag[] | null = null;
@@ -23,7 +23,7 @@ let tagsCache: Tag[] | null = null;
  */
 async function loadTagsMetadata(
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<Tag[]> {
   if (tagsCache) {
     return tagsCache;
@@ -33,10 +33,10 @@ async function loadTagsMetadata(
     const metadata = await fetchStaticJSON<TagsMetadata>(
       "/tags-metadata.json",
       context,
-      request,
+      request
     );
 
-    if (!metadata.tags || !Array.isArray(metadata.tags)) {
+    if (!(metadata.tags && Array.isArray(metadata.tags))) {
       throw new Error("Invalid tags metadata format");
     }
 
@@ -55,7 +55,7 @@ async function loadTagsMetadata(
  */
 export async function loadTagsConfig(
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<Tag[]> {
   return await loadTagsMetadata(context, request);
 }
@@ -66,7 +66,7 @@ export async function loadTagsConfig(
 export async function getTagById(
   tagId: string,
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<Tag | null> {
   const tags = await loadTagsConfig(context, request);
   return tags.find((tag) => tag.id === tagId) || null;
@@ -78,7 +78,7 @@ export async function getTagById(
 export async function getTagsByIds(
   tagIds: string[],
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<Tag[]> {
   const allTags = await loadTagsConfig(context, request);
   const tagMap = new Map(allTags.map((tag) => [tag.id, tag]));
@@ -96,7 +96,7 @@ export async function validateArticleTags(
   articleTags: string[],
   articleSlug: string,
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<void> {
   try {
     const allTags = await loadTagsConfig(context, request);
@@ -107,14 +107,14 @@ export async function validateArticleTags(
     if (invalidTags.length > 0) {
       console.warn(
         `Article "${articleSlug}" contains invalid tags: ${invalidTags.join(", ")}. ` +
-          `All tags must be defined in contents/tags.json.`,
+          "All tags must be defined in contents/tags.json."
       );
     }
   } catch (error) {
     // Don't throw in runtime, just log the warning
     console.warn(
       `Could not validate tags for article "${articleSlug}":`,
-      error,
+      error
     );
   }
 }
@@ -122,10 +122,12 @@ export async function validateArticleTags(
 /**
  * Gets all unique tags used across articles
  */
+
+// biome-ignore lint/suspicious/useAwait: ignore
 export async function getUsedTags(
   articles: { tags: string[] }[],
   context?: ReactRouterContext,
-  request?: Request,
+  request?: Request
 ): Promise<Tag[]> {
   const usedTagIds = new Set<string>();
 

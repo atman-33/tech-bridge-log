@@ -1,7 +1,7 @@
 import { siteConfig } from "~/config/site-config";
 
 // Route definition type
-interface RouteDefinition {
+type RouteDefinition = {
   path: string;
   isPublic: boolean;
   priority?: number;
@@ -14,7 +14,7 @@ interface RouteDefinition {
     | "yearly"
     | "never";
   lastmod?: Date;
-}
+};
 
 // Public routes definition (requires manual management)
 export const publicRoutes: RouteDefinition[] = [
@@ -49,7 +49,7 @@ export const publicRoutes: RouteDefinition[] = [
 export type DynamicRouteGenerator = () => Promise<RouteDefinition[]>;
 
 // Sitemap URL generation
-export interface SitemapUrl {
+export type SitemapUrl = {
   loc: string;
   lastmod?: string;
   changefreq?:
@@ -61,10 +61,10 @@ export interface SitemapUrl {
     | "yearly"
     | "never";
   priority?: number;
-}
+};
 
 export const generateSitemapUrls = async (
-  dynamicGenerators: DynamicRouteGenerator[] = [],
+  dynamicGenerators: DynamicRouteGenerator[] = []
 ): Promise<SitemapUrl[]> => {
   // Process static routes
   const staticUrls: SitemapUrl[] = publicRoutes
