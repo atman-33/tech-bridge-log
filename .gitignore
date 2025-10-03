@@ -46,5 +46,6 @@ public/blog-content/
 # Tempolary files
 .tmp
 .reopmix
-prompt.draft.md
 repomix-output*
+prompt.draft.md
+.serena

@@ -1,6 +1,7 @@
 import type { Route } from './+types/route';
 import { AppCard } from './components/app-card';
 import appsData from '~/contents/apps.json';
+import { AppsGrid } from './components/apps-grid';
 
 export function meta(): Route.MetaDescriptors {
   return [
@@ -24,12 +25,7 @@ export default function AppsPage({ loaderData }: Route.ComponentProps) {
           Explore a collection of web applications and projects showcasing modern development practices.
         </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {apps.map((app, index) => (
-          <AppCard key={index} app={app} />
-        ))}
-      </div>
+      <AppsGrid apps={apps} />
     </div>
   );
 }

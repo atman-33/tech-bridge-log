@@ -5,11 +5,7 @@
     "description": "Track & Organize Your Manga Reading Journey",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/manga-log/refs/heads/main/public/ogp-image.png",
     "appUrl": "https://mangalogs.com/",
-    "tags": [
-      "Manga",
-      "Tracker",
-      "Reading Log"
-    ]
+    "tags": ["Manga", "Tracker", "Reading Log"]
   },
   {
     "title": "TubeLoopPlayer",
@@ -17,11 +13,7 @@
     "description": "Loop & Playlist Your Favorite YouTube Videos",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/tube-loop-player/refs/heads/main/public/ogp-image.png",
     "appUrl": "https://tubeloopplayer.com/",
-    "tags": [
-      "YouTube",
-      "Music",
-      "Video Player"
-    ]
+    "tags": ["YouTube", "Music", "Video Player"]
   },
   {
     "title": "Double-Click Image Opener",
@@ -29,10 +21,30 @@
     "description": "Obsidian plugin to open images in your default system viewer by double-clicking them.",
     "imageUrl": "https://raw.githubusercontent.com/atman-33/double-click-image-opener/refs/heads/main/images/double-click-image-to-open.png",
     "appUrl": "https://github.com/atman-33/double-click-image-opener?tab=readme-ov-file#readme",
-    "tags": [
-      "Obsidian",
-      "Plugin",
-      "Image Viewer"
-    ]
+    "tags": ["Obsidian", "Plugin", "Image Viewer"]
+  },
+    {
+    "title": "Article Paste",
+    "icon": "https://tech-bridge-log.com/icons/tags/obsidian.svg",
+    "description": "Obsidian plugin to copy content with images preserved for easy pasting into article drafts.",
+    "imageUrl": "https://raw.githubusercontent.com/atman-33/obsidian-article-paste/refs/heads/main/images/paste-word-doc.png",
+    "appUrl": "https://github.com/atman-33/obsidian-article-paste?tab=readme-ov-file#readme",
+    "tags": ["Obsidian", "Plugin"]
+  },
+  {
+    "title": "Kiro for Codex IDE",
+    "icon": "https://raw.githubusercontent.com/atman-33/kiro-for-codex-ide/refs/heads/main/icon.png",
+    "description": "VS Code extension for spec-driven development with Codex CLI, leveraging OpenAI’s Codex VS Code extension.",
+    "imageUrl": "https://raw.githubusercontent.com/atman-33/kiro-for-codex-ide/refs/heads/main/screenshots/image.png",
+    "appUrl": "https://marketplace.visualstudio.com/items?itemName=atman-dev.kiro-for-codex-ide",
+    "tags": ["VSCode", "Extension", "AI" ]
+  },
+  {
+    "title": "Sketch Illustrations",
+    "icon": "https://raw.githubusercontent.com/atman-33/sketch-illustrations/refs/heads/main/public/favicons/favicon-32x32.png",
+    "description": "Application that showcases a curated catalog of hand-drawn, CC0-licensed SVG illustrations. ",
+    "imageUrl": "https://raw.githubusercontent.com/atman-33/sketch-illustrations/refs/heads/main/screenshots/image.png",
+    "appUrl": "https://sketch-illustrations.atman-33.workers.dev",
+    "tags": ["Illustrations", "SVG", "Catalog"]
   }
 ]

@@ -1,68 +1,102 @@
-import { ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-
-interface AppItem {
-  title: string;
-  icon: string;
-  description: string;
-  imageUrl: string;
-  appUrl: string;
-  tags: string[];
-}
+import { useState } from 'react';
+import { Skeleton } from '~/components/ui/skeleton';
+import type { AppItem } from '~/types/app-itme';
 
 interface AppCardProps {
-  app: AppItem;
+  app?: AppItem;
+  isLoading?: boolean;
 }
 
-export function AppCard({ app }: AppCardProps) {
+export function AppCard({ app, isLoading = false }: AppCardProps) {
+  const [imageError, setImageError] = useState(false);
+
+  if (isLoading || !app) {
+    return (
+      <div className="glass glow-on-hover rounded-2xl border border-border/60 bg-background/80 p-6 text-foreground backdrop-blur-md transition-colors dark:border-white/10 dark:bg-white/10">
+        <div className="aspect-video overflow-hidden rounded-xl bg-muted/30 dark:bg-white/10">
+          <Skeleton className="h-full w-full bg-muted/40 dark:bg-white/20" />
+        </div>
+        <div className="mt-6 space-y-3">
+          <Skeleton className="h-6 w-3/4 bg-muted/40 dark:bg-white/20" />
+          <Skeleton className="h-4 w-full bg-muted/40 dark:bg-white/20" />
+          <Skeleton className="h-4 w-5/6 bg-muted/40 dark:bg-white/20" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Card className="h-full flex flex-col">
-      <div className="relative">
-        <img
-          src={app.imageUrl}
-          alt={app.title}
-          className="w-full h-48 object-cover rounded-t-lg"
-          loading="lazy"
-        />
-        {app.icon && (
-          <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-lg p-1 shadow-md">
-            <img
-              src={app.icon}
-              alt={`${app.title} icon`}
-              className="w-full h-full object-contain"
-            />
+    <div className="group glass glow-on-hover rounded-2xl border border-border/60 bg-background/80 text-foreground backdrop-blur-md overflow-hidden transition-all duration-500 hover:scale-105 hover:rotate-1 dark:border-white/10 dark:bg-white/10 shadow-lg">
+      {/* Image with overlay gradient */}
+      <div className="relative aspect-video overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10"></div>
+        {imageError ? (
+          <div className="flex h-full w-full items-center justify-center bg-destructive/20 dark:bg-red-500/30">
+            <span className="text-destructive dark:text-red-100">Image failed to load</span>
           </div>
+        ) : (
+          <img
+            src={app.imageUrl}
+            alt={app.title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={() => setImageError(true)}
+            loading="lazy"
+          />
         )}
       </div>
 
-      <CardHeader className="flex-1">
-        <CardTitle className="text-xl">{app.title}</CardTitle>
-        <CardDescription>{app.description}</CardDescription>
-      </CardHeader>
-
-      <CardContent className="pt-0">
-        <div className="flex flex-wrap gap-2 mb-4">
-          {app.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
+      {/* Content */}
+      <div className="p-6">
+        <div className="flex items-center gap-3 mb-3">
+          {app.icon && (
+            <div className="relative">
+              <img
+                src={app.icon}
+                alt="App Icon"
+                className="h-6 w-6 rounded-lg shadow-lg"
+              />
+              <div className="absolute inset-0 rounded-lg bg-background/60 dark:bg-white/20"></div>
+            </div>
+          )}
+          <h3 className="text-xl font-semibold tracking-tight text-foreground dark:text-white">
+            {app.title}
+          </h3>
         </div>
 
-        <Button asChild className="w-full">
-          <a
-            href={app.appUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2"
-          >
-            Visit App
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </Button>
-      </CardContent>
-    </Card>
+        <p className="mb-4 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+          {app.description}
+        </p>
+
+        {/* Tags with glass effect */}
+        <div className="flex flex-wrap gap-2">
+          {app.tags.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="glass rounded-full border border-border/40 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm transition-colors dark:border-white/20 dark:text-white/90"
+            >
+              {tag}
+            </span>
+          ))}
+          {app.tags.length > 3 && (
+            <span className="glass rounded-full border border-border/40 px-3 py-1 text-xs text-muted-foreground backdrop-blur-sm transition-colors dark:border-white/20 dark:text-white/80">
+              +{app.tags.length - 3}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Hover overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      <a
+        href={app.appUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute inset-0 z-20"
+        aria-label={`View ${app.title} demo`}
+      >
+        <span className="sr-only">View {app.title} demo</span>
+      </a>
+    </div>
   );
 }
