@@ -1,31 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { Search, X } from 'lucide-react';
-import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
+import { Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import {
   createDocumentIndex,
   performSearch,
+  type SearchIndex,
   type SearchResult,
-  type SearchIndex
-} from '~/lib/blog/search-index';
+} from "~/lib/blog/search-index";
 
-interface SearchBoxProps {
+type SearchBoxProps = {
   className?: string;
   placeholder?: string;
   showSuggestions?: boolean;
-}
+};
 
 export function SearchBox({
-  className = '',
-  placeholder = 'Search articles...',
-  showSuggestions = true
+  className = "",
+  placeholder = "Search articles...",
+  showSuggestions = true,
 }: SearchBoxProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
   const [showSuggestionsList, setShowSuggestionsList] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,15 +40,15 @@ export function SearchBox({
   useEffect(() => {
     const loadSearchIndex = async () => {
       try {
-        const response = await fetch('/search-index.json');
+        const response = await fetch("/search-index.json");
         if (response.ok) {
-          const index = await response.json() as SearchIndex;
+          const index = (await response.json()) as SearchIndex;
           setSearchIndex(index);
         } else {
-          console.warn('Search index not available:', response.status);
+          console.warn("Search index not available:", response.status);
         }
       } catch (error) {
-        console.error('Failed to load search index:', error);
+        console.error("Failed to load search index:", error);
       }
     };
 
@@ -56,8 +56,9 @@ export function SearchBox({
   }, []);
 
   // Update query when URL search params change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: ignore
   useEffect(() => {
-    const urlQuery = searchParams.get('q') || '';
+    const urlQuery = searchParams.get("q") || "";
     if (urlQuery !== query) {
       setQuery(urlQuery);
     }
@@ -69,7 +70,7 @@ export function SearchBox({
       clearTimeout(timeoutRef.current);
     }
 
-    if (!query.trim() || !searchIndex || !showSuggestions) {
+    if (!(query.trim() && searchIndex && showSuggestions)) {
       setSuggestions([]);
       setShowSuggestionsList(false);
       return;
@@ -88,7 +89,7 @@ export function SearchBox({
             title: article.title,
             description: article.description,
             content: article.content,
-            tags: article.tags.join(' '),
+            tags: article.tags.join(" "),
           });
         }
 
@@ -98,7 +99,7 @@ export function SearchBox({
         setShowSuggestionsList(results.length > 0);
         setSelectedIndex(-1);
       } catch (error) {
-        console.error('Suggestion search error:', error);
+        console.error("Suggestion search error:", error);
         setSuggestions([]);
         setShowSuggestionsList(false);
       } finally {
@@ -116,24 +117,25 @@ export function SearchBox({
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestionsList || suggestions.length === 0) {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         handleSearch();
       }
       return;
     }
 
+    // biome-ignore lint/style/useDefaultSwitchClause: ignore
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(prev =>
+        setSelectedIndex((prev) =>
           prev < suggestions.length - 1 ? prev + 1 : prev
         );
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
           navigate(`/blog/${suggestions[selectedIndex].slug}`);
@@ -143,7 +145,7 @@ export function SearchBox({
           handleSearch();
         }
         break;
-      case 'Escape':
+      case "Escape":
         setShowSuggestionsList(false);
         setSelectedIndex(-1);
         inputRef.current?.blur();
@@ -166,7 +168,7 @@ export function SearchBox({
   };
 
   const handleClear = () => {
-    setQuery('');
+    setQuery("");
     setSuggestions([]);
     setShowSuggestionsList(false);
     setSelectedIndex(-1);
@@ -191,19 +193,19 @@ export function SearchBox({
     <div className={`relative ${className}`}>
       {/* Fallback form for users without JavaScript */}
       <noscript>
-        <form action="/search" method="get" className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <form action="/search" className="relative" method="get">
+          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 transform text-muted-foreground" />
           <Input
-            type="text"
+            className="pr-20 pl-10"
+            defaultValue={query}
             name="q"
             placeholder={placeholder}
-            defaultValue={query}
-            className="pl-10 pr-20"
+            type="text"
           />
           <Button
-            type="submit"
+            className="-translate-y-1/2 absolute top-1/2 right-1 h-8 transform px-3"
             size="sm"
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 px-3"
+            type="submit"
           >
             Search
           </Button>
@@ -212,24 +214,24 @@ export function SearchBox({
 
       {/* JavaScript-enhanced search */}
       <div className="js-only relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 transform text-muted-foreground" />
         <Input
+          className="pr-10 pl-10"
+          onBlur={handleInputBlur}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={handleInputFocus}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
-          className="pl-10 pr-10"
         />
         {query && (
           <Button
-            variant="ghost"
-            size="sm"
+            className="-translate-y-1/2 absolute top-1/2 right-1 h-8 w-8 transform p-0"
             onClick={handleClear}
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+            size="sm"
+            variant="ghost"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -239,45 +241,57 @@ export function SearchBox({
       {/* Suggestions dropdown - JavaScript only */}
       {showSuggestionsList && (
         <Card
+          className="absolute top-full right-0 left-0 z-50 mt-1 max-h-96 overflow-y-auto"
           ref={suggestionsRef}
-          className="absolute top-full left-0 right-0 mt-1 z-50 max-h-96 overflow-y-auto"
         >
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
+              <div className="p-4 text-center text-muted-foreground text-sm">
                 Searching...
               </div>
+              // biome-ignore lint/style/noNestedTernary: ignore
             ) : suggestions.length > 0 ? (
               <div className="py-2">
                 {suggestions.map((suggestion, index) => (
+                  // biome-ignore lint/a11y/useButtonType: ignore
                   <button
+                    className={`w-full px-4 py-3 text-left transition-colors hover:bg-muted ${
+                      index === selectedIndex ? "bg-muted" : ""
+                    }`}
                     key={suggestion.slug}
                     onClick={() => handleSuggestionClick(suggestion.slug)}
-                    className={`w-full text-left px-4 py-3 hover:bg-muted transition-colors ${index === selectedIndex ? 'bg-muted' : ''
-                      }`}
                   >
                     <div className="space-y-1">
                       <div
                         className="font-medium text-sm"
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
                         dangerouslySetInnerHTML={{
-                          __html: suggestion.highlights.title || suggestion.title
+                          __html:
+                            suggestion.highlights.title || suggestion.title,
                         }}
                       />
                       <div
-                        className="text-xs text-muted-foreground line-clamp-2"
+                        className="line-clamp-2 text-muted-foreground text-xs"
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
                         dangerouslySetInnerHTML={{
-                          __html: suggestion.highlights.description || suggestion.description
+                          __html:
+                            suggestion.highlights.description ||
+                            suggestion.description,
                         }}
                       />
                       {suggestion.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="mt-2 flex flex-wrap gap-1">
                           {suggestion.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
+                            <Badge
+                              className="text-xs"
+                              key={tag}
+                              variant="secondary"
+                            >
                               {tag}
                             </Badge>
                           ))}
                           {suggestion.tags.length > 3 && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge className="text-xs" variant="secondary">
                               +{suggestion.tags.length - 3}
                             </Badge>
                           )}
@@ -288,17 +302,18 @@ export function SearchBox({
                 ))}
 
                 {/* Show all results link */}
-                <div className="border-t mt-2 pt-2">
+                <div className="mt-2 border-t pt-2">
                   <button
+                    className="w-full px-4 py-2 text-left text-primary text-sm transition-colors hover:bg-muted"
                     onClick={handleSearch}
-                    className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-muted transition-colors"
+                    type="button"
                   >
                     See all results for "{query}"
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="p-4 text-center text-sm text-muted-foreground">
+              <div className="p-4 text-center text-muted-foreground text-sm">
                 No suggestions found
               </div>
             )}

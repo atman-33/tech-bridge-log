@@ -1,25 +1,30 @@
-import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
+import type { ArticleMetadata } from "~/lib/blog/mdx-processor";
 
-interface ArticleNavigationProps {
+type ArticleNavigationProps = {
   previousArticle: ArticleMetadata | null;
   nextArticle: ArticleMetadata | null;
-}
+};
 
-export function ArticleNavigation({ previousArticle, nextArticle }: ArticleNavigationProps) {
-  if (!previousArticle && !nextArticle) {
+export function ArticleNavigation({
+  previousArticle,
+  nextArticle,
+}: ArticleNavigationProps) {
+  if (!(previousArticle || nextArticle)) {
     return null;
   }
 
   return (
-    <nav className="mt-12 pt-8 border-t border-border">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <nav className="mt-12 border-border border-t pt-8">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {previousArticle && (
           <a
+            className="group rounded-lg border border-border p-4 transition-colors hover:border-primary"
             href={`/blog/${previousArticle.slug}`}
-            className="group p-4 rounded-lg border border-border hover:border-primary transition-colors"
           >
-            <div className="text-sm text-muted-foreground mb-1">Previous Article</div>
-            <div className="font-semibold group-hover:text-primary transition-colors">
+            <div className="mb-1 text-muted-foreground text-sm">
+              Previous Article
+            </div>
+            <div className="font-semibold transition-colors group-hover:text-primary">
               {previousArticle.title}
             </div>
           </a>
@@ -27,11 +32,13 @@ export function ArticleNavigation({ previousArticle, nextArticle }: ArticleNavig
 
         {nextArticle && (
           <a
+            className="group rounded-lg border border-border p-4 transition-colors hover:border-primary md:text-right"
             href={`/blog/${nextArticle.slug}`}
-            className="group p-4 rounded-lg border border-border hover:border-primary transition-colors md:text-right"
           >
-            <div className="text-sm text-muted-foreground mb-1">Next Article</div>
-            <div className="font-semibold group-hover:text-primary transition-colors">
+            <div className="mb-1 text-muted-foreground text-sm">
+              Next Article
+            </div>
+            <div className="font-semibold transition-colors group-hover:text-primary">
               {nextArticle.title}
             </div>
           </a>

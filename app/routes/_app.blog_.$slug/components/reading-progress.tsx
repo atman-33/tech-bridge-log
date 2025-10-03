@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-interface ReadingProgressProps {
+type ReadingProgressProps = {
   target?: string; // CSS selector for the content container
-}
+};
 
-export function ReadingProgress({ target = 'article' }: ReadingProgressProps) {
+export function ReadingProgress({ target = "article" }: ReadingProgressProps) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const updateProgress = () => {
       const targetElement = document.querySelector(target) as HTMLElement;
-      if (!targetElement) return;
+      if (!targetElement) {
+        return;
+      }
 
       const windowHeight = window.innerHeight;
 
@@ -30,26 +32,29 @@ export function ReadingProgress({ target = 'article' }: ReadingProgressProps) {
       } else {
         const progressRange = endProgress - startProgress;
         const currentProgress = scrollTop - startProgress;
-        const percentage = Math.min(100, Math.max(0, (currentProgress / progressRange) * 100));
+        const percentage = Math.min(
+          100,
+          Math.max(0, (currentProgress / progressRange) * 100)
+        );
         setProgress(percentage);
       }
     };
 
     // Update progress on scroll
-    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener("scroll", updateProgress, { passive: true });
     // Update progress on resize
-    window.addEventListener('resize', updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress, { passive: true });
     // Initial calculation
     updateProgress();
 
     return () => {
-      window.removeEventListener('scroll', updateProgress);
-      window.removeEventListener('resize', updateProgress);
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
     };
   }, [target]);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-muted">
+    <div className="fixed top-0 right-0 left-0 z-50 h-1 bg-muted">
       <div
         className="h-full bg-primary transition-all duration-150 ease-out"
         style={{ width: `${progress}%` }}

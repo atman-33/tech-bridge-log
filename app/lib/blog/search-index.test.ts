@@ -99,6 +99,7 @@ describe("Search Index Deduplication", () => {
         },
       ];
 
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: ignore
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       const deduplicated = deduplicateSearchableArticles(articles);
@@ -111,7 +112,7 @@ describe("Search Index Deduplication", () => {
 
       // Should log warning for duplicate
       expect(consoleSpy).toHaveBeenCalledWith(
-        "Duplicate article found in search index: article-1",
+        "Duplicate article found in search index: article-1"
       );
 
       consoleSpy.mockRestore();

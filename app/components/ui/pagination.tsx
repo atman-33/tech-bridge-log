@@ -1,7 +1,7 @@
-import { Link } from 'react-router';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '~/lib/utils';
-import type { PaginationInfo } from '~/lib/pagination';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router";
+import type { PaginationInfo } from "~/lib/pagination";
+import { cn } from "~/lib/utils";
 
 interface PaginationProps {
   pagination: PaginationInfo;
@@ -9,7 +9,11 @@ interface PaginationProps {
   className?: string;
 }
 
-export function Pagination({ pagination, createPageUrl, className }: PaginationProps) {
+export function Pagination({
+  pagination,
+  createPageUrl,
+  className,
+}: PaginationProps) {
   const { currentPage, totalPages, hasPreviousPage, hasNextPage } = pagination;
 
   if (totalPages <= 1) {
@@ -55,24 +59,24 @@ export function Pagination({ pagination, createPageUrl, className }: PaginationP
 
   return (
     <nav
+      aria-label="Pagination"
       className={cn(
-        'flex items-center justify-center space-x-1 mt-8',
+        "mt-8 flex items-center justify-center space-x-1",
         className
       )}
-      aria-label="Pagination"
     >
       {/* Previous button */}
       {hasPreviousPage ? (
         <Link
+          className="inline-flex items-center rounded-l-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-500 text-sm hover:bg-slate-50 hover:text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
           to={createPageUrl(currentPage - 1)}
-          className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-l-md hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
+          <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </Link>
       ) : (
-        <span className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-300 bg-white border border-slate-300 rounded-l-md cursor-not-allowed dark:bg-slate-800 dark:border-slate-600 dark:text-slate-600">
-          <ChevronLeft className="w-4 h-4 mr-1" />
+        <span className="inline-flex cursor-not-allowed items-center rounded-l-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-300 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-600">
+          <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </span>
       )}
@@ -83,8 +87,8 @@ export function Pagination({ pagination, createPageUrl, className }: PaginationP
           if (page === -1) {
             return (
               <span
+                className="inline-flex items-center border-slate-300 border-t border-b bg-white px-3 py-2 font-medium text-slate-500 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400"
                 key={`ellipsis-${index}`}
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 bg-white border-t border-b border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400"
               >
                 ...
               </span>
@@ -95,17 +99,17 @@ export function Pagination({ pagination, createPageUrl, className }: PaginationP
 
           return isCurrentPage ? (
             <span
-              key={page}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-primary border-t border-b border-primary dark:bg-primary dark:border-primary"
               aria-current="page"
+              className="inline-flex items-center border-primary border-t border-b bg-primary px-3 py-2 font-medium text-sm text-white dark:border-primary dark:bg-primary"
+              key={page}
             >
               {page}
             </span>
           ) : (
             <Link
+              className="inline-flex items-center border-slate-300 border-t border-b bg-white px-3 py-2 font-medium text-slate-500 text-sm hover:bg-slate-50 hover:text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
               key={page}
               to={createPageUrl(page)}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 bg-white border-t border-b border-slate-300 hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
             >
               {page}
             </Link>
@@ -116,16 +120,16 @@ export function Pagination({ pagination, createPageUrl, className }: PaginationP
       {/* Next button */}
       {hasNextPage ? (
         <Link
+          className="inline-flex items-center rounded-r-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-500 text-sm hover:bg-slate-50 hover:text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
           to={createPageUrl(currentPage + 1)}
-          className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-300 rounded-r-md hover:bg-slate-50 hover:text-slate-700 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
         >
           Next
-          <ChevronRight className="w-4 h-4 ml-1" />
+          <ChevronRight className="ml-1 h-4 w-4" />
         </Link>
       ) : (
-        <span className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-300 bg-white border border-slate-300 rounded-r-md cursor-not-allowed dark:bg-slate-800 dark:border-slate-600 dark:text-slate-600">
+        <span className="inline-flex cursor-not-allowed items-center rounded-r-md border border-slate-300 bg-white px-3 py-2 font-medium text-slate-300 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-600">
           Next
-          <ChevronRight className="w-4 h-4 ml-1" />
+          <ChevronRight className="ml-1 h-4 w-4" />
         </span>
       )}
     </nav>

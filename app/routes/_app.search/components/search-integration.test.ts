@@ -40,7 +40,7 @@ describe("Search Integration", () => {
     // Should remove the duplicate
     expect(deduplicatedArticles).toHaveLength(2);
     expect(
-      deduplicatedArticles.find((a) => a.slug === "react-guide")?.title,
+      deduplicatedArticles.find((a) => a.slug === "react-guide")?.title
     ).toBe("React Development Guide");
 
     // Create search index
@@ -86,7 +86,7 @@ describe("Search Integration", () => {
       index,
       deduplicatedArticles,
       "JavaScript",
-      10,
+      10
     );
 
     // Should find both articles
@@ -115,7 +115,7 @@ describe("Search Integration", () => {
       index,
       deduplicatedArticles,
       "nonexistent",
-      10,
+      10
     );
     expect(results).toHaveLength(0);
   });

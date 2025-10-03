@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { cn } from '~/lib/utils';
+import { useState } from "react";
+import { cn } from "~/lib/utils";
 
-interface EnhancedImageProps {
+type EnhancedImageProps = {
   src: string;
   alt: string;
   slug: string;
   className?: string;
-  loading?: 'lazy' | 'eager';
+  loading?: "lazy" | "eager";
   sizes?: string;
-}
+};
 
 export function EnhancedImage({
   src,
   alt,
   slug,
   className,
-  loading = 'lazy',
-  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw',
+  loading = "lazy",
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw",
 }: EnhancedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -35,42 +35,44 @@ export function EnhancedImage({
 
   if (hasError) {
     return (
-      <div className={cn(
-        'flex items-center justify-center bg-muted border border-border rounded-lg p-8 text-muted-foreground',
-        className
-      )}>
+      <div
+        className={cn(
+          "flex items-center justify-center rounded-lg border border-border bg-muted p-8 text-muted-foreground",
+          className
+        )}
+      >
         <div className="text-center">
-          <div className="text-2xl mb-2">🖼️</div>
+          <div className="mb-2 text-2xl">🖼️</div>
           <p className="text-sm">Failed to load image</p>
-          <p className="text-xs text-muted-foreground mt-1">{alt}</p>
+          <p className="mt-1 text-muted-foreground text-xs">{alt}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn('relative overflow-hidden rounded-lg', className)}>
+    <div className={cn("relative overflow-hidden rounded-lg", className)}>
       {/* Loading placeholder */}
       {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+        <div className="absolute inset-0 flex animate-pulse items-center justify-center bg-muted">
           <div className="text-muted-foreground">
-            <div className="w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
           </div>
         </div>
       )}
 
       {/* Main image */}
       <img
-        src={resolvedSrc}
         alt={alt}
-        loading={loading}
-        sizes={sizes}
-        onLoad={handleLoad}
-        onError={handleError}
         className={cn(
-          'w-full h-auto sm:max-h-96 object-contain transition-opacity duration-300',
-          isLoading ? 'opacity-0' : 'opacity-100'
+          "h-auto w-full object-contain transition-opacity duration-300 sm:max-h-96",
+          isLoading ? "opacity-0" : "opacity-100"
         )}
+        loading={loading}
+        onError={handleError}
+        onLoad={handleLoad}
+        sizes={sizes}
+        src={resolvedSrc}
       />
     </div>
   );
@@ -81,12 +83,12 @@ export function EnhancedImage({
  */
 function transformImagePath(imagePath: string, slug: string): string {
   // Handle relative paths starting with ./
-  if (imagePath.startsWith('./')) {
+  if (imagePath.startsWith("./")) {
     return `/blog-assets/${slug}/${imagePath.slice(2)}`;
   }
 
   // Handle relative paths without ./
-  if (!imagePath.startsWith('/') && !imagePath.startsWith('http')) {
+  if (!(imagePath.startsWith("/") || imagePath.startsWith("http"))) {
     return `/blog-assets/${slug}/${imagePath}`;
   }
 
@@ -99,10 +101,17 @@ function transformImagePath(imagePath: string, slug: string): string {
  */
 export function isSupportedImageFormat(filename: string): boolean {
   const supportedExtensions = [
-    '.png', '.jpg', '.jpeg', '.gif', '.svg',
-    '.webp', '.avif', '.bmp', '.tiff'
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".webp",
+    ".avif",
+    ".bmp",
+    ".tiff",
   ];
 
-  const ext = filename.toLowerCase().split('.').pop();
+  const ext = filename.toLowerCase().split(".").pop();
   return ext ? supportedExtensions.includes(`.${ext}`) : false;
 }

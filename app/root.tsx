@@ -1,72 +1,73 @@
 import {
-	isRouteErrorResponse,
-	Links,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { ReactCallRoots } from './components/react-call';
-import { AdScripts } from './components/ad-scripts';
-import { CustomToaster } from './components/custom-sonner';
-import { ThemeProvider } from './components/theme-provider';
+import { AdScripts } from "./components/ad-scripts";
+import { CustomToaster } from "./components/custom-sonner";
+import { ReactCallRoots } from "./components/react-call";
+import { ThemeProvider } from "./components/theme-provider";
 
-export const loader = async ({ }: Route.LoaderArgs) => {
-};
+// biome-ignore lint/correctness/noEmptyPattern: ignore
+// biome-ignore lint/suspicious/noEmptyBlockStatements: ignore
+export const loader = async ({}: Route.LoaderArgs) => {};
 
 export const links: Route.LinksFunction = () => [
-	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
-	{
-		rel: "preconnect",
-		href: "https://fonts.gstatic.com",
-		crossOrigin: "anonymous",
-	},
-	{
-		rel: "stylesheet",
-		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-	},
-	{
-		rel: "stylesheet",
-		href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
-	},
-	{
-		rel: 'apple-touch-icon',
-		sizes: '180x180',
-		href: '/favicons/apple-touch-icon.png',
-	},
-	{
-		rel: 'icon',
-		type: 'image/png',
-		sizes: '32x32',
-		href: '/favicons/favicon-32x32.png',
-	},
-	{
-		rel: 'icon',
-		type: 'image/png',
-		sizes: '16x16',
-		href: '/favicons/favicon-16x16.png',
-	},
-	{ rel: 'manifest', href: '/site.webmanifest' },
-	{ rel: 'icon', href: '/favicon.ico', type: 'image/x-icon' },
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
+  },
+  {
+    rel: "apple-touch-icon",
+    sizes: "180x180",
+    href: "/favicons/apple-touch-icon.png",
+  },
+  {
+    rel: "icon",
+    type: "image/png",
+    sizes: "32x32",
+    href: "/favicons/favicon-32x32.png",
+  },
+  {
+    rel: "icon",
+    type: "image/png",
+    sizes: "16x16",
+    href: "/favicons/favicon-16x16.png",
+  },
+  { rel: "manifest", href: "/site.webmanifest" },
+  { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
 ];
 
-export function Layout({ children }: { children: React.ReactNode; }) {
-	return (
-		<html lang="en">
-			<head>
-				<meta charSet="utf-8" />
-				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<AdScripts />
-				<Meta />
-				<Links />
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <AdScripts />
+        <Meta />
+        <Links />
 
-				{/* Noscript styles for graceful degradation */}
-				<noscript>
-					<style>
-						{`
+        {/* Noscript styles for graceful degradation */}
+        <noscript>
+          <style>
+            {`
 							/* Hide JavaScript-only elements */
 							.js-only {
 								display: none !important;
@@ -106,61 +107,61 @@ export function Layout({ children }: { children: React.ReactNode; }) {
 								display: none;
 							}
 						`}
-					</style>
-				</noscript>
-			</head>
-			<body>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-					storageKey="acme-theme"
-				>
-					{children}
-				</ThemeProvider>
-				<ScrollRestoration />
-				<Scripts />
-			</body>
-		</html>
-	);
+          </style>
+        </noscript>
+      </head>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableSystem
+          storageKey="acme-theme"
+        >
+          {children}
+        </ThemeProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
 }
 
 export default function App() {
-	return (
-		<>
-			<Outlet />
-			<ReactCallRoots />
-			<CustomToaster />
-		</>
-	);
+  return (
+    <>
+      <Outlet />
+      <ReactCallRoots />
+      <CustomToaster />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-	let message = "Oops!";
-	let details = "An unexpected error occurred.";
-	let stack: string | undefined;
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
 
-	if (isRouteErrorResponse(error)) {
-		message = error.status === 404 ? "404" : "Error";
-		details =
-			error.status === 404
-				? "The requested page could not be found."
-				: error.statusText || details;
-	} else if (import.meta.env.DEV && error && error instanceof Error) {
-		details = error.message;
-		stack = error.stack;
-	}
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
 
-	return (
-		<main className="pt-16 p-4 container mx-auto">
-			<h1>{message}</h1>
-			<p>{details}</p>
-			{stack && (
-				<pre className="w-full p-4 overflow-x-auto">
-					<code>{stack}</code>
-				</pre>
-			)}
-		</main>
-	);
+  return (
+    <main className="container mx-auto p-4 pt-16">
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre className="w-full overflow-x-auto p-4">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
+  );
 }

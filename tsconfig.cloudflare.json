@@ -12,35 +12,18 @@
   "compilerOptions": {
     "composite": true,
     "strict": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ],
-    "types": [
-      "node",
-      "vite/client",
-      "vitest/globals"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["node", "vite/client", "vitest/globals"],
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "rootDirs": [
-      ".",
-      "./.react-router/types"
-    ],
+    "rootDirs": [".", "./.react-router/types"],
     "paths": {
-      "~/database/*": [
-        "./database/*"
-      ],
-      "~/contents/*": [
-        "./contents/*"
-      ],
-      "~/*": [
-        "./app/*"
-      ]
+      "~/database/*": ["./database/*"],
+      "~/contents/*": ["./contents/*"],
+      "~/*": ["./app/*"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true

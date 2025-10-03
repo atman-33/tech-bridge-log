@@ -14,8 +14,8 @@
     "postinstall": "npm run cf-typegen",
     "preview": "npm run build && vite preview",
     "typecheck": "npm run cf-typegen && react-router typegen && tsc -b",
-    "check": "npm run typecheck && npm run biome:check",
-    "biome:check": "biome check --fix && biome format --write",
+    "check": "npm run typecheck && npx ultracite check",
+    "fix": "npx ultracite fix",
     "test": "vitest",
     "prepare": "husky",
     "auth:db:generate": "LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) npx env-cmd -f .dev.vars -- npx @better-auth/cli generate --output=\"database/auth-schema.ts\" --y && biome format database/auth-schema.ts --write"
@@ -60,7 +60,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.6",
+    "@biomejs/biome": "^2.2.4",
     "@cloudflare/vite-plugin": "^1.0.12",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
@@ -75,6 +75,7 @@
     "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5.8.3",
+    "ultracite": "^5.4.7",
     "vite": "^6.3.3",
     "vite-plugin-string": "^1.2.3",
     "vite-tsconfig-paths": "^5.1.4",

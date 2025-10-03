@@ -1,35 +1,35 @@
-import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { useActiveHeading } from '~/hooks/use-active-heading';
-import { scrollToHeading } from '~/utils/heading-utils';
-import { ProgressTableOfContents } from '~/components/ui/progress-table-of-contents';
+import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ProgressTableOfContents } from "~/components/ui/progress-table-of-contents";
+import { useActiveHeading } from "~/hooks/use-active-heading";
+import { scrollToHeading } from "~/utils/heading-utils";
 
-interface NavigationMenuProps {
+type NavigationMenuProps = {
   content: string;
   className?: string;
-}
+};
 
-export function NavigationMenu({ content, className = '' }: NavigationMenuProps) {
+export function NavigationMenu({ className = "" }: NavigationMenuProps) {
   const { headings, activeId, readHeadings } = useActiveHeading();
   const [isOpen, setIsOpen] = useState(false);
 
   // Handle ESC key to close menu
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
       // Prevent body scroll when menu is open
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
@@ -50,10 +50,11 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
   return (
     <div className={`md:hidden ${className}`}>
       {/* Menu Toggle Button */}
+      {/** biome-ignore lint/a11y/useButtonType: ignore */}
       <button
+        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+        className="fixed top-20 right-4 z-50 cursor-pointer rounded-full border border-border bg-background p-3 shadow-lg transition-colors hover:bg-muted"
         onClick={toggleMenu}
-        className="fixed top-20 right-4 z-50 p-3 bg-background border border-border rounded-full shadow-lg hover:bg-muted transition-colors cursor-pointer"
-        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -62,22 +63,25 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
       {isOpen && (
         <>
           {/* Backdrop */}
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: ignore */}
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: ignore */}
           <div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 z-40 bg-black/50"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Menu Content */}
-          <nav className="fixed top-20 right-4 left-4 z-50 bg-background border border-border rounded-lg shadow-xl max-h-[calc(100vh-6rem)] overflow-y-auto">
+          <nav className="fixed top-20 right-4 left-4 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg border border-border bg-background shadow-xl">
             {/* Header with close button */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            <div className="flex items-center justify-between border-border border-b p-4">
+              <h3 className="font-semibold text-muted-foreground text-sm uppercase tracking-wide">
                 Article Sections
               </h3>
+              {/** biome-ignore lint/a11y/useButtonType: ignore */}
               <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-muted rounded-md transition-colors cursor-pointer"
                 aria-label="Close navigation menu"
+                className="cursor-pointer rounded-md p-1 transition-colors hover:bg-muted"
+                onClick={() => setIsOpen(false)}
               >
                 <X size={16} />
               </button>
@@ -86,10 +90,10 @@ export function NavigationMenu({ content, className = '' }: NavigationMenuProps)
             {/* Menu content */}
             <div className="p-4">
               <ProgressTableOfContents
-                headings={headings}
                 activeId={activeId}
-                readHeadings={readHeadings}
+                headings={headings}
                 onHeadingClick={handleSectionClick}
+                readHeadings={readHeadings}
               />
             </div>
           </nav>

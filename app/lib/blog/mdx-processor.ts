@@ -1,7 +1,7 @@
 import matter from "gray-matter";
 import readingTime from "reading-time";
 
-export interface ArticleMetadata {
+export type ArticleMetadata = {
   slug: string;
   title: string;
   description: string;
@@ -10,13 +10,13 @@ export interface ArticleMetadata {
   tags: string[];
   emoji: string;
   readingTime: number;
-}
+};
 
 export interface Article extends ArticleMetadata {
   content?: string;
 }
 
-interface ArticleFrontmatter {
+type ArticleFrontmatter = {
   title: string;
   slug: string;
   publishedAt: string;
@@ -24,7 +24,7 @@ interface ArticleFrontmatter {
   tags: string[];
   description: string;
   emoji: string;
-}
+};
 
 /**
  * Validation schema for article frontmatter fields
@@ -96,7 +96,7 @@ function calculateReadingTime(content: string): {
  */
 export function validateArticleMetadata(
   metadata: unknown,
-  source: string,
+  source: string
 ): ArticleMetadata {
   if (typeof metadata !== "object" || metadata === null) {
     throw new Error(`Invalid article metadata in ${source}. Expected object.`);
@@ -117,7 +117,7 @@ export function validateArticleMetadata(
   for (const field of required) {
     if (!(field in meta)) {
       throw new Error(
-        `Missing required field "${field}" in article metadata from ${source}`,
+        `Missing required field "${field}" in article metadata from ${source}`
       );
     }
   }
@@ -137,13 +137,13 @@ export function validateArticleMetadata(
 
   if (!(meta.publishedAt instanceof Date)) {
     throw new Error(
-      `Invalid publishedAt type in ${source}. Expected Date object.`,
+      `Invalid publishedAt type in ${source}. Expected Date object.`
     );
   }
 
   if (!(meta.updatedAt instanceof Date)) {
     throw new Error(
-      `Invalid updatedAt type in ${source}. Expected Date object.`,
+      `Invalid updatedAt type in ${source}. Expected Date object.`
     );
   }
 
@@ -166,7 +166,7 @@ export function validateArticleMetadata(
  * Sanitizes and normalizes article metadata
  */
 export function sanitizeArticleMetadata(
-  metadata: ArticleMetadata,
+  metadata: ArticleMetadata
 ): ArticleMetadata {
   return {
     ...metadata,
@@ -191,7 +191,7 @@ export function isArticlePublished(metadata: ArticleMetadata): boolean {
  * Gets articles that are ready to be published
  */
 export function getPublishedArticles(
-  articles: ArticleMetadata[],
+  articles: ArticleMetadata[]
 ): ArticleMetadata[] {
   return articles.filter(isArticlePublished);
 }
@@ -199,10 +199,12 @@ export function getPublishedArticles(
 /**
  * Validates a single frontmatter field according to its validation rules
  */
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
 function validateField(
   fieldName: keyof typeof FRONTMATTER_VALIDATION,
   value: unknown,
-  filePath: string,
+  filePath: string
 ): void {
   const rules = FRONTMATTER_VALIDATION[fieldName];
 
@@ -212,7 +214,7 @@ function validateField(
     (value === undefined || value === null || value === "")
   ) {
     throw new Error(
-      `Missing required frontmatter field "${fieldName}" in ${filePath}`,
+      `Missing required frontmatter field "${fieldName}" in ${filePath}`
     );
   }
 
@@ -224,13 +226,13 @@ function validateField(
   // Type validation
   if (rules.type === "string" && typeof value !== "string") {
     throw new Error(
-      `Invalid ${fieldName} type in ${filePath}. Expected string, got ${typeof value}.`,
+      `Invalid ${fieldName} type in ${filePath}. Expected string, got ${typeof value}.`
     );
   }
 
   if (rules.type === "array" && !Array.isArray(value)) {
     throw new Error(
-      `Invalid ${fieldName} type in ${filePath}. Expected array, got ${typeof value}.`,
+      `Invalid ${fieldName} type in ${filePath}. Expected array, got ${typeof value}.`
     );
   }
 
@@ -238,13 +240,13 @@ function validateField(
   if (rules.type === "string" && typeof value === "string") {
     if ("minLength" in rules && value.length < rules.minLength) {
       throw new Error(
-        `${fieldName} in ${filePath} must be at least ${rules.minLength} characters long.`,
+        `${fieldName} in ${filePath} must be at least ${rules.minLength} characters long.`
       );
     }
 
     if ("maxLength" in rules && value.length > rules.maxLength) {
       throw new Error(
-        `${fieldName} in ${filePath} must be no more than ${rules.maxLength} characters long.`,
+        `${fieldName} in ${filePath} must be no more than ${rules.maxLength} characters long.`
       );
     }
 
@@ -257,13 +259,13 @@ function validateField(
   if (rules.type === "array" && Array.isArray(value)) {
     if ("minLength" in rules && value.length < rules.minLength) {
       throw new Error(
-        `${fieldName} in ${filePath} must have at least ${rules.minLength} items.`,
+        `${fieldName} in ${filePath} must have at least ${rules.minLength} items.`
       );
     }
 
     if ("maxLength" in rules && value.length > rules.maxLength) {
       throw new Error(
-        `${fieldName} in ${filePath} must have no more than ${rules.maxLength} items.`,
+        `${fieldName} in ${filePath} must have no more than ${rules.maxLength} items.`
       );
     }
 
@@ -272,12 +274,12 @@ function validateField(
       for (const tag of value) {
         if (typeof tag !== "string") {
           throw new Error(
-            `All tags in ${filePath} must be strings. Found ${typeof tag}.`,
+            `All tags in ${filePath} must be strings. Found ${typeof tag}.`
           );
         }
         if (tag.length === 0) {
           throw new Error(
-            `Empty tag found in ${filePath}. All tags must be non-empty strings.`,
+            `Empty tag found in ${filePath}. All tags must be non-empty strings.`
           );
         }
       }
@@ -290,7 +292,7 @@ function validateField(
  */
 function validateFrontmatter(
   frontmatter: unknown,
-  filePath: string,
+  filePath: string
 ): ArticleFrontmatter {
   // First assert frontmatter is an object
   if (typeof frontmatter !== "object" || frontmatter === null) {
@@ -312,19 +314,19 @@ function validateFrontmatter(
 
   if (Number.isNaN(publishedAt.getTime())) {
     throw new Error(
-      `Invalid publishedAt date format in ${filePath}. Expected ISO 8601 format.`,
+      `Invalid publishedAt date format in ${filePath}. Expected ISO 8601 format.`
     );
   }
 
   if (Number.isNaN(updatedAt.getTime())) {
     throw new Error(
-      `Invalid updatedAt date format in ${filePath}. Expected ISO 8601 format.`,
+      `Invalid updatedAt date format in ${filePath}. Expected ISO 8601 format.`
     );
   }
 
   if (updatedAt < publishedAt) {
     throw new Error(
-      `updatedAt cannot be earlier than publishedAt in ${filePath}.`,
+      `updatedAt cannot be earlier than publishedAt in ${filePath}.`
     );
   }
 
@@ -333,7 +335,7 @@ function validateFrontmatter(
   const uniqueTags = new Set(tags);
   if (uniqueTags.size !== tags.length) {
     throw new Error(
-      `Duplicate tags found in ${filePath}. All tags must be unique.`,
+      `Duplicate tags found in ${filePath}. All tags must be unique.`
     );
   }
 
@@ -364,7 +366,7 @@ export async function discoverArticles(): Promise<string[]> {
     if (!existsSync(BLOG_CONTENT_DIR)) {
       console.log(
         "discoverArticles - blog content directory does not exist:",
-        BLOG_CONTENT_DIR,
+        BLOG_CONTENT_DIR
       );
       return [];
     }
@@ -400,7 +402,7 @@ export async function discoverArticles(): Promise<string[]> {
  * Processes a single MDX file and extracts metadata
  */
 export async function processArticle(
-  filePath: string,
+  filePath: string
 ): Promise<ArticleMetadata> {
   let content: string;
 
@@ -474,7 +476,7 @@ export async function processArticle(
 export async function loadArticleContent(
   slug: string,
   context?: { cloudflare?: { env: Env } },
-  request?: Request,
+  request?: Request
 ): Promise<string | null> {
   // Check if we're in a build environment (Node.js without request object)
   if (typeof window === "undefined" && !request && !context) {
@@ -486,7 +488,7 @@ export async function loadArticleContent(
 
       const absolutePath = join(
         process.cwd(),
-        `contents/blog/${slug}/index.mdx`,
+        `contents/blog/${slug}/index.mdx`
       );
 
       if (!existsSync(absolutePath)) {
@@ -495,6 +497,7 @@ export async function loadArticleContent(
       }
 
       const rawContent = await readFile(absolutePath, "utf-8");
+      // biome-ignore lint/nursery/noShadow: ignore
       const matter = (await import("gray-matter")).default;
       const { content: mdxContent } = matter(rawContent);
       return mdxContent;
@@ -510,7 +513,7 @@ export async function loadArticleContent(
     const mdxContent = await fetchStaticText(
       `/blog-content/${slug}.mdx`,
       context,
-      request,
+      request
     );
     return mdxContent;
   } catch (_error) {
@@ -571,11 +574,13 @@ export async function generateArticleCache(): Promise<{
   };
 
   console.log(
-    `Article processing complete: ${stats.processed}/${stats.total} successful, ${stats.failed} failed`,
+    `Article processing complete: ${stats.processed}/${stats.total} successful, ${stats.failed} failed`
   );
 
   if (errors.length > 0) {
     console.warn(`${errors.length} errors encountered during processing:`);
+    // biome-ignore lint/complexity/noForEach: ignore
+    // biome-ignore lint/suspicious/useIterableCallbackReturn: ignore
     errors.forEach((error) => console.warn(`  - ${error}`));
   }
 

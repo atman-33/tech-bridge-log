@@ -16,6 +16,7 @@ export const remarkLinkCard: Plugin<[], Root> = () => {
   return (tree: Root) => {
     const replacements: Replacement[] = [];
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ignore
     visit(tree, "paragraph", (node: Paragraph, index, parent) => {
       if (!parent || typeof index !== "number") {
         return;

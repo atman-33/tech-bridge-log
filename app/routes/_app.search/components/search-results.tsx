@@ -1,29 +1,42 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { SearchIndexUnavailable, SearchErrorBoundary } from '~/components/error-boundaries/search-error-boundary';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import {
+  SearchErrorBoundary,
+  SearchIndexUnavailable,
+} from "~/components/error-boundaries/search-error-boundary";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import {
   createDocumentIndex,
-  performSearch,
   deduplicateSearchableArticles,
   deduplicateSearchResults,
+  performSearch,
+  type SearchIndex,
   type SearchResult,
-  type SearchIndex
-} from '~/lib/blog/search-index';
+} from "~/lib/blog/search-index";
 
-interface SearchResultsProps {
+type SearchResultsProps = {
   query: string;
   searchIndex: SearchIndex | null;
   searchIndexError?: string | null;
-}
+};
 
-export function SearchResults({ query, searchIndex, searchIndexError }: SearchResultsProps) {
+export function SearchResults({
+  query,
+  searchIndex,
+  searchIndexError,
+}: SearchResultsProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!query.trim() || !searchIndex) {
+    if (!(query.trim() && searchIndex)) {
       setResults([]);
       return;
     }
@@ -33,7 +46,9 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
 
     try {
       // Deduplicate articles before indexing to prevent duplicate entries
-      const deduplicatedArticles = deduplicateSearchableArticles(searchIndex.articles);
+      const deduplicatedArticles = deduplicateSearchableArticles(
+        searchIndex.articles
+      );
 
       // Create FlexSearch index
       const index = createDocumentIndex();
@@ -45,20 +60,25 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
           title: article.title,
           description: article.description,
           content: article.content,
-          tags: article.tags.join(' '),
+          tags: article.tags.join(" "),
         });
       }
 
       // Perform search with deduplicated articles
-      const searchResults = performSearch(index, deduplicatedArticles, query, 20);
+      const searchResults = performSearch(
+        index,
+        deduplicatedArticles,
+        query,
+        20
+      );
 
       // Apply final deduplication as a safety measure
       const uniqueResults = deduplicateSearchResults(searchResults);
 
       setResults(uniqueResults);
     } catch (error) {
-      console.error('Search error:', error);
-      setSearchError('An error occurred while searching. Please try again.');
+      console.error("Search error:", error);
+      setSearchError("An error occurred while searching. Please try again.");
       setResults([]);
     } finally {
       setIsLoading(false);
@@ -76,7 +96,7 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-muted-foreground">Searching...</p>
       </div>
     );
@@ -84,7 +104,7 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
 
   if (searchError) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-destructive">{searchError}</p>
       </div>
     );
@@ -92,7 +112,7 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
 
   if (!query.trim()) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-muted-foreground">
           Enter a search term to find articles.
         </p>
@@ -102,7 +122,7 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
 
   if (results.length === 0) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-muted-foreground">
           No articles found for "{query}". Try different keywords.
         </p>
@@ -113,8 +133,8 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Found {results.length} {results.length === 1 ? 'article' : 'articles'}
+        <p className="text-muted-foreground text-sm">
+          Found {results.length} {results.length === 1 ? "article" : "articles"}
         </p>
       </div>
 
@@ -127,32 +147,31 @@ export function SearchResults({ query, searchIndex, searchIndexError }: SearchRe
   );
 }
 
-interface SearchResultCardProps {
+type SearchResultCardProps = {
   result: SearchResult;
-}
+};
 
 function SearchResultCard({ result }: SearchResultCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="transition-shadow hover:shadow-md">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <CardTitle className="text-xl">
-              <Link
-                to={`/blog/${result.slug}`}
-                className="hover:underline"
-              >
+              <Link className="hover:underline" to={`/blog/${result.slug}`}>
                 <span
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
                   dangerouslySetInnerHTML={{
-                    __html: result.highlights.title || result.title
+                    __html: result.highlights.title || result.title,
                   }}
                 />
               </Link>
             </CardTitle>
             <CardDescription className="mt-2">
               <span
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
                 dangerouslySetInnerHTML={{
-                  __html: result.highlights.description || result.description
+                  __html: result.highlights.description || result.description,
                 }}
               />
             </CardDescription>
@@ -164,9 +183,10 @@ function SearchResultCard({ result }: SearchResultCardProps) {
         {result.highlights.content && (
           <div className="mb-4">
             <p
-              className="text-sm text-muted-foreground leading-relaxed"
+              className="text-muted-foreground text-sm leading-relaxed"
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: ignore
               dangerouslySetInnerHTML={{
-                __html: result.highlights.content
+                __html: result.highlights.content,
               }}
             />
           </div>
@@ -176,8 +196,8 @@ function SearchResultCard({ result }: SearchResultCardProps) {
           <div className="flex flex-wrap gap-2">
             {result.tags.map((tag) => (
               <span
+                className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 font-medium text-slate-700 text-xs dark:bg-slate-800 dark:text-slate-300"
                 key={tag}
-                className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md"
               >
                 {tag}
               </span>

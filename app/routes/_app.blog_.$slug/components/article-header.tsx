@@ -1,24 +1,22 @@
-import type { ArticleMetadata } from '~/lib/blog/mdx-processor';
-import type { Tag } from '~/lib/blog/tags';
-import { TagBadge } from '~/components/blog/tag-badge';
-import { formatDate } from '~/lib/utils';
+import { TagBadge } from "~/components/blog/tag-badge";
+import type { ArticleMetadata } from "~/lib/blog/mdx-processor";
+import type { Tag } from "~/lib/blog/tags";
+import { formatDate } from "~/lib/utils";
 
-interface ArticleHeaderProps {
+type ArticleHeaderProps = {
   article: ArticleMetadata;
   tags: Tag[];
-}
+};
 
 export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
   return (
     <header className="border-border pb-8">
-      <div className="flex flex-col items-center text-center gap-4 mb-4">
+      <div className="mb-4 flex flex-col items-center gap-4 text-center">
         <span className="text-6xl">{article.emoji}</span>
-        <h1 className="text-4xl font-bold tracking-tight">
-          {article.title}
-        </h1>
+        <h1 className="font-bold text-4xl tracking-tight">{article.title}</h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center text-sm text-muted-foreground mb-4 gap-4">
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-4 text-muted-foreground text-sm">
         <time dateTime={article.publishedAt.toISOString()}>
           Published {formatDate(article.publishedAt)}
         </time>
@@ -32,19 +30,19 @@ export function ArticleHeader({ article, tags }: ArticleHeaderProps) {
         <span>{article.readingTime} min read</span>
       </div>
 
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex flex-wrap justify-center gap-2">
         {tags.map((tag) => (
           <TagBadge
             key={tag.id}
+            showIcon={true}
+            size="md"
             tag={tag}
             variant="default"
-            size="md"
-            showIcon={true}
           />
         ))}
       </div>
 
-      <p className="text-md text-muted-foreground mt-4">
+      <p className="mt-4 text-md text-muted-foreground">
         {article.description}
       </p>
     </header>

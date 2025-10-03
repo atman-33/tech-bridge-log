@@ -26,8 +26,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
@@ -163,7 +164,7 @@ body {
     -webkit-line-clamp: 2;
     line-clamp: 2;
   }
-  
+
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;
@@ -178,28 +179,28 @@ body {
   .prose details {
     @apply mb-4 border border-border rounded-lg overflow-hidden;
   }
-  
+
   .prose details > summary {
     @apply bg-muted px-4 py-2 cursor-pointer hover:bg-muted/80 font-medium border-b border-border;
     @apply transition-colors duration-200;
   }
-  
+
   .prose details[open] > summary {
     @apply border-b border-border;
   }
-  
+
   .prose details > *:not(summary) {
     @apply px-4 py-3;
   }
-  
+
   .prose details > *:last-child {
     @apply pb-4;
   }
-  
+
   .prose kbd {
     @apply inline-flex items-center px-2 py-1 text-xs font-mono bg-muted border border-border rounded shadow-sm;
   }
-  
+
   .prose mark {
     @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
   }

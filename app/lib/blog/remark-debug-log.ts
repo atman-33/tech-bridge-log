@@ -20,10 +20,10 @@ export const remarkDebugLog: Plugin<[], Root> = (options?: {
         console.log(JSON.stringify(node, null, 2));
         if (parent) {
           console.log(
-            `${label}Parent Children Length: ${parent.children.length}`,
+            `${label}Parent Children Length: ${parent.children.length}`
           );
         }
-      },
+      }
     );
     console.log(`--- ${label}AST Debug Log End ---`);
   };
